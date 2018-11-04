@@ -8,8 +8,8 @@ import Cookies from 'js-cookie';
  * 本地初步验证cookie是否有效，后续还需要在服务器进一步验证，因为存在httponly的id等
  */
 export const checkCookieLocal = () => {
-  const id = Cookies.get('ims-id');
-  return !!id;
+  const hasCookie = !!Cookies.get('ims_authType');
+  return hasCookie;
 };
 
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));

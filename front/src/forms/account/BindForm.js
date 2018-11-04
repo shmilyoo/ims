@@ -4,13 +4,7 @@ import Button from '@material-ui/core/Button';
 import compose from 'recompose/compose';
 import { withStyles } from '@material-ui/core/styles';
 import grey from '@material-ui/core/colors/grey';
-import {
-  syncCheckRegForm,
-  asyncCheckUsername,
-  shouldAsyncValidate,
-  required,
-  checkUsername
-} from '../validate';
+import { required } from '../validate';
 import { trim } from '../normalize';
 import {
   RenderTextField,
@@ -28,8 +22,8 @@ const styles = () => ({
   }
 });
 
-const RegForm = props => {
-  console.log('reg form render');
+const BindForm = props => {
+  console.log('bind form render');
   const { handleSubmit, pristine, reset, classes, submitting, error } = props;
   return (
     <form onSubmit={handleSubmit}>
@@ -40,26 +34,17 @@ const RegForm = props => {
           autoFocus
           component={RenderTextFieldAsync}
           label="用户名"
-          validate={[required, checkUsername]}
+          validate={required}
           normalize={trim}
         />
       </div>
       <div>
         <Field
-          name="password1"
+          name="password"
           component={RenderTextField}
           type="password"
           validate={required}
           label="密码"
-        />
-      </div>
-      <div>
-        <Field
-          name="password2"
-          component={RenderTextField}
-          type="password"
-          validate={required}
-          label="确认密码"
         />
       </div>
       <div>
@@ -78,7 +63,7 @@ const RegForm = props => {
           color="primary"
           disabled={pristine || submitting}
         >
-          注册
+          绑定
         </Button>
         <Button
           variant="text"
@@ -95,12 +80,8 @@ const RegForm = props => {
 const enchance = compose(
   withStyles(styles),
   reduxForm({
-    form: 'regForm',
-    shouldAsyncValidate,
-    validate: syncCheckRegForm,
-    asyncValidate: asyncCheckUsername,
-    asyncBlurFields: ['username']
+    form: 'bindForm'
   })
 );
 
-export default enchance(RegForm);
+export default enchance(BindForm);

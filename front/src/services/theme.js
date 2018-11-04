@@ -78,29 +78,30 @@ const theme = createMuiTheme({
   sharedClass: {
     link: {
       cursor: 'pointer',
+      color: '#6657F8',
       '&:hover': { textDecoration: 'underline' },
       '&:visited': { color: secondaryTextColor }
     }
   }
 });
 
-function themeProvider(Component) {
-  return class extends React.Component {
-    static displayName = 'material-ui-withRoot';
-    // MuiThemeProvider makes the theme available down the React tree
-    // thanks to React context.
-    render() {
-      return (
-        <MuiThemeProvider theme={theme}>
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-          <CssBaseline />
-          <Component {...this.props} />
-        </MuiThemeProvider>
-      );
-    }
-  };
-}
-themeProvider.displayName =
-  "Hoc to add material-ui's MthemeProvider and CssBaseline";
+// function themeProvider(Component) {
+//   return class extends React.Component {
+//     static displayName = 'material-ui-withRoot';
+//     // MuiThemeProvider makes the theme available down the React tree
+//     // thanks to React context.
+//     render() {
+//       return (
+//         <MuiThemeProvider theme={theme}>
+//           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+//           <CssBaseline />
+//           <Component {...this.props} />
+//         </MuiThemeProvider>
+//       );
+//     }
+//   };
+// }
+// themeProvider.displayName =
+//   "Hoc to add material-ui's MthemeProvider and CssBaseline";
 
-export default themeProvider;
+export default theme;

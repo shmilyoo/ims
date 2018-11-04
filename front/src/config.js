@@ -2,9 +2,21 @@ import AccountBox from '@material-ui/icons/AccountBox';
 
 const config = {};
 
+export const sysName = '办公信息管理系统';
+export const system = 'ims';
+export const server_base_url_product = '';
+export const server_baseURL_dev = 'http://localhost:8001';
+export const ssoBaseUrl = 'http://localhost:3000';
+export const ssoRegUrl = 'http://localhost:3000/reg';
+export const ssoAuthLoginPage = 'http://localhost:3000/auth/login';
+export const ssoLoginPage = 'http://localhost:3000/login';
+export const ssoCheckPage = 'http://localhost:3000/auth/check';
+export const ssoAuthOk = 'http://localhost:4000/auth/ok'; // sso认证成功后，重定向到本地此页面进行cookie和缓存的操作
+
 export const pathTitle = {
-  '/brief/mine': '个人概况',
-  '/brief/department': '部门概况',
+  '/': '首页',
+  '/brief/mine': '我的概况',
+  '/brief/department': '我的部门',
   '/account/info': '资料',
   '/account/changePasswd': '修改密码',
   '/account/changePasswd2': '修改密码2',
@@ -18,14 +30,6 @@ export const pathTitle = {
   '/admin/super/admins': '管理列表',
   '/admin/about': '关于'
 };
-export const sysName = '办公信息管理系统';
-export const system = 'ims';
-export const server_base_url_product = '';
-export const server_baseURL_dev = 'http://localhost:8001';
-export const ssoBaseUrl = 'http://localhost:3000';
-export const ssoLoginPage = 'http://localhost:3000/auth/login';
-export const ssoCheckPage = 'http://localhost:3000/auth/check';
-export const ssoAuthOk = 'http://localhost:4000/auth/ok'; // sso认证成功后，重定向到本地此页面进行cookie和缓存的操作
 
 // 没有children就有path属性，反之则有state属性表明类别
 export const leftMenu = [
@@ -59,40 +63,6 @@ export const leftMenu = [
     ]
   },
   { title: '关于', path: '/about', icon: AccountBox }
-];
-
-export const adminLeftMenu = [
-  {
-    title: '组织机构',
-    state: 'organ',
-    children: [
-      { title: pathTitle['/admin/organ/dept'], path: '/admin/organ/dept' },
-      { title: pathTitle['/admin/organ/person'], path: '/admin/organ/person' }
-    ]
-  },
-  {
-    title: '接口管理',
-    state: 'interface',
-    children: [
-      {
-        title: pathTitle['/admin/interface/api'],
-        path: '/admin/interface/api'
-      },
-      { title: pathTitle['/admin/interface/sso'], path: '/admin/interface/sso' }
-    ]
-  },
-  {
-    title: '超级管理',
-    state: 'super',
-    children: [
-      {
-        title: pathTitle['/admin/super/addAdmin'],
-        path: '/admin/super/addAdmin'
-      },
-      { title: pathTitle['/admin/super/admins'], path: '/admin/super/admins' }
-    ]
-  },
-  { title: pathTitle['/admin/about'], state: 'about', path: '/admin/about' }
 ];
 
 export default config;

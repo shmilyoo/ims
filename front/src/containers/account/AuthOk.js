@@ -31,7 +31,7 @@ class AuthOk extends PureComponent {
   render() {
     return (
       <Grid
-        style={{ height: '100%' }}
+        style={{ height: '70%' }}
         container
         justify="center"
         alignItems="center"

@@ -1,8 +1,8 @@
 // request.js
 import axios from 'axios';
 import NProgress from 'nprogress';
-// import { actions as commonActions } from './reducers/common';
-// import { actions as accountActions } from './reducers/account';
+import { actions as commonActions } from './reducers/common';
+import { actions as accountActions } from './reducers/account';
 
 const configureAxios = (dispatch, history) => {
   // 设置全局参数，如响应超市时间，请求前缀等。
@@ -28,7 +28,7 @@ const configureAxios = (dispatch, history) => {
       // 如果请求结果为200，且success为false，在这里统一报错
       if (!response.data.success) {
         // todo 可以在res中多加一个字段 show，代表是否在用户界面显示，还是记在日志中
-        // dispatch(commonActions.showMessage(response.data.error, 'error'));
+        dispatch(commonActions.showMessage(response.data.error, 'error'));
       }
       // 请求结束，蓝色过渡滚动条消失
       NProgress.done();
@@ -46,8 +46,7 @@ const configureAxios = (dispatch, history) => {
       // 401 auth fail响应在这里处理
       if (error.response && error.response.status === 401) {
         // 自定义401 auth 失败处理
-        // dispatch(accountActions.clearAuth());
-        // dispatch(accountActions.sagaForceLogout());
+        dispatch(accountActions.clearAuth());
         NProgress.done();
         return { success: false, error: error.message };
         // 这里throw错误需要在saga中处理，要不然saga会死掉
@@ -64,6 +63,7 @@ const configureAxios = (dispatch, history) => {
       NProgress.done();
       // return Promise.reject(error);
       console.log(error.response.data, error.response.status);
+      return { success: false, error: error.message };
       // 如果是在saga调用，throw会导致saga死掉
       throw new axios.Cancel('cancel request and redirect');
     }
