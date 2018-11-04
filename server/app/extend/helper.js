@@ -59,4 +59,9 @@ module.exports = {
       Object.assign({ signed: false, httpOnly: false }, option)
     );
   },
+
+  clearCookie() {
+    this.setCookie('ims_id', '');
+    this.setCookie('ims_authType', '');
+  },
 };

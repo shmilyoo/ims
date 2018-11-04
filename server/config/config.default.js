@@ -34,7 +34,7 @@ exports.onerror = {
     ctx.status = 200;
   },
 };
-exports.salt = 'ddsfsdfadsfds#4%#$3@kfd'; // 用户密码加盐 md5(md5-password+salt)
+exports.salt = 'ddsfddsfds#4%#$3@kfd'; // 用户密码加盐 md5(md5-password+salt)
 exports.usernameBlackList = [ 'admin' ]; // 不允许注册的用户名
 exports.cluster = {
   listen: {
@@ -43,6 +43,8 @@ exports.cluster = {
 };
 exports.sysName = 'ims';
 exports.ssoKey = '111111'; // sso服务器生成的和本服务端之间的通信密钥
-exports.ssoLoginPage = 'http://localhost:3000/auth/login';
+exports.ssoAuthLoginPage = 'http://localhost:3000/auth/login';
 exports.ssoCheckPage = 'http://localhost:3000/auth/check';
+exports.ssoCheckBind = 'http://localhost:3000/auth/check/bind';
+exports.ssoUserBind = 'http://localhost:3000/auth/user/bind';
 exports.ssoAuthOk = 'http://localhost:4000/auth/ok';

@@ -3,11 +3,13 @@
 ## 针对每个登录用户的缓存
 
 用户如果点击记住我，则保存一个星期，否则一个小时  
-redis key 为 ims-user-${user.id}，value 为一个 Object json.stringfy 后的字符串  
+redis key 为 ims:user:${user.id}，value 为一个 Object json.stringfy 后的字符串  
 Object 格式为：
 
 ```javascript
 {
+  authType: sso || local,
+  active: 0 || 1 || 2,
 }
 ```
 
@@ -22,5 +24,5 @@ Object 格式为：
 
 # set cookies 格式
 
-> ims_id : 用户 id，和 sso 系统用户 id 保持一致
-> auth_type: sso || local 用户认证方式，统一授权或者本地登录
+> ims_id : 用户 id，和 sso 系统用户 id 保持一致; httpOnly
+> auth_type: sso || local 用户认证方式，统一授权或者本地登录; not httpOnly,前端需要判断是否有 cookie

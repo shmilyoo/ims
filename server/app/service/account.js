@@ -11,7 +11,7 @@ class AccountService extends Service {
    * @param {boolean} remember 是否记住用户
    */
   async setCache(id, authType, maxAge, remember) {
-    const userId = `ims-user-${id}`;
+    const userId = `ims:user:${id}`;
     const cacheStr = await this.ctx.app.redis.get(userId);
     const cache = JSON.parse(cacheStr) || {};
     cache.authType = authType;
@@ -23,7 +23,7 @@ class AccountService extends Service {
     );
   }
 
-  async setCookie(id, authType, active, maxAge, expires, remember) {
+  async setCookie(id, authType, maxAge, expires, remember) {
     const ctx = this.ctx;
     ctx.helper.setCookie(
       'ims_id',
@@ -33,8 +33,18 @@ class AccountService extends Service {
     ctx.helper.setCookie(
       'ims_authType',
       authType,
-      remember ? { maxAge, expires, httpOnly: true } : { httpOnly: true }
+      remember ? { maxAge, expires } : null
     );
+  }
+
+  async checkUserPasswd(username, password) {
+    username = username.toLowerCase();
+    password = this.service.common.getCryptoPasswdSync(password, username);
+    const user = await this.ctx.model.User.findOne({
+      attributes: [ 'id', 'username', 'password' ],
+      where: { username, password },
+    });
+    return user;
   }
 }
 
