@@ -4,7 +4,10 @@ export const types = {
   AUTH_OK_SUCCESS: 'ACCOUNT/AUTH_OK_SUCCESS',
   CLEAR_AUTH: 'ACCOUNT/CLEAR_AUTH',
   CHECK_AUTH_SUCCESS: 'ACCOUNT/CHECK_AUTH_SUCCESS',
+  AUTH_SUCCESS: 'ACCOUNT/AUTH_SUCCESS',
+  CHECK_AUTH_FAILURE: 'ACCOUNT/CHECK_AUTH_FAILURE',
   LOGIN_SUCCESS: 'ACCOUNT/LOGIN_SUCCESS',
+  SAGA_CHECK_AUTH: 'ACCOUNT/SAGA_CHECK_AUTH',
   SAGA_REG_REQUEST: 'ACCOUNT/SAGA_REG_REQUEST',
   SAGA_BIND_REQUEST: 'ACCOUNT/SAGA_BIND_REQUEST',
   SAGA_LOGIN_REQUEST: 'ACCOUNT/SAGA_LOGIN_REQUEST',
@@ -17,19 +20,14 @@ export const actions = {
     token,
     redirect
   }),
-  authOkSuccess: (authType, user) => ({
-    type: types.AUTH_OK_SUCCESS,
+  authSuccess: (authType, user) => ({
+    // 'id', 'username', 'active', 'name', 'sex', 'dept_id','authType'
+    type: types.AUTH_SUCCESS,
     authType,
     user
   }),
   clearAuth: () => ({
     type: types.CLEAR_AUTH
-  }),
-  checkAuthSuccess: (authType, user) => ({
-    // 'id', 'username', 'active', 'name', 'sex', 'dept_id','authType'
-    type: types.CHECK_AUTH_SUCCESS,
-    authType,
-    user
   }),
   loginSuccess: (id, authType, username, active) => ({
     type: types.LOGIN_SUCCESS,
@@ -41,6 +39,7 @@ export const actions = {
 };
 
 const initState = {
+  auth: undefined,
   authType: '', // sso || local
   id: '', // 和sso user id保持一致 。注册用户在注册时进行绑定，sso用户在授权登录时进行生成
   username: '',
@@ -54,37 +53,25 @@ export default function accountReducer(state = initState, action) {
   switch (action.type) {
     case types.AUTH_OK_SUCCESS:
     case types.CHECK_AUTH_SUCCESS:
+    case types.AUTH_SUCCESS:
       return {
         ...state,
+        auth: true,
         authType: action.authType,
         id: action.user.id,
         active: action.user.active,
         username: action.user.username,
+        isSuperAdmin: action.user.isSuperAdmin,
         info: { ...state.info, name: action.user.name, sex: action.user.sex },
         dept: { ...state.dept, id: action.user.dept_id }
       };
+    case types.CHECK_AUTH_FAILURE:
+      return {
+        ...initState,
+        auth: false
+      };
     case types.CLEAR_AUTH:
       return initState;
-    // case types.CHECK_AUTH_SUCCESS:
-    //   //'id', 'username', 'active', 'name', 'sex', 'dept_id','authType'
-    //   const {
-    //     id,
-    //     username,
-    //     active,
-    //     name,
-    //     sex,
-    //     dept_id,
-    //     authType
-    //   } = action.data;
-    //   return {
-    //     ...state,
-    //     id,
-    //     active,
-    //     username,
-    //     authType,
-    //     dept: { ...state.dept, id: dept_id },
-    //     info: { ...state.info, name, sex }
-    //   };
     case types.LOGIN_SUCCESS:
       return {
         ...state,

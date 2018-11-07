@@ -26,8 +26,7 @@ class AuthController extends Controller {
   async checkAuth() {
     // 已经过中间件验证cookie session
     // 根据authType进行验证
-    // 是否在此获取用户相关信息？
-    // 不成功的话清空cookie,
+    // 用户刷新网页或者第一次访问，cookie有效时 调用
     const ctx = this.ctx;
     const { id, authType } = ctx.user;
     const config = await ctx.service.auth.addSsoTokenToConfig();
@@ -38,6 +37,11 @@ class AuthController extends Controller {
       config
     );
     if (response.success) {
+      // response.data : {authType,user}
+      const localUser = await ctx.model.User.findOne({
+        where: { id },
+      });
+      response.data.user.isSuperAdmin = localUser.is_super_admin;
       // 系统发送给sso的验证信息，确认正确
       // response.data.user.keys=['id', 'username', 'active', 'name', 'sex', 'dept_id','authType' ]
       ctx.body = ctx.helper.getRespBody(true, response.data);
@@ -81,10 +85,11 @@ class AuthController extends Controller {
     );
     // 用户使用统一授权登录，系统并不知道数据库中是否有用户条目，即用户是否以注册方式进行了登录
     // 所以要尝试创建相应的用户
-    await ctx.model.User.findOrCreate({
+    const [ localUser ] = await ctx.model.User.findOrCreate({
       where: { id },
       defaults: { id },
     });
+    // todo todo 两种登录方式，通过的时候都要获取本地用户数据库的一些信息
     ctx.body = await ctx.helper.getRespBody(true, {
       authType,
       user: {
@@ -93,6 +98,7 @@ class AuthController extends Controller {
         sex,
         dept_id,
         name,
+        isSuperAdmin: localUser.is_super_admin,
       },
     });
   }

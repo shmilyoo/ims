@@ -31,11 +31,15 @@ const style = theme => ({
 
 class Login extends PureComponent {
   handleSubmit = values => {
+    const { redirect } = qs.parse(this.props.location.search, {
+      ignoreQueryPrefix: true
+    });
     return new Promise(resolve => {
       this.props.dispatch({
         type: accountTypes.SAGA_LOGIN_REQUEST,
         resolve,
-        values
+        values,
+        redirect
       });
     });
   };

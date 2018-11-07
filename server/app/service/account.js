@@ -41,7 +41,7 @@ class AccountService extends Service {
     username = username.toLowerCase();
     password = this.service.common.getCryptoPasswdSync(password, username);
     const user = await this.ctx.model.User.findOne({
-      attributes: [ 'id', 'username', 'password' ],
+      // attributes: [ 'id', 'username', 'password' ],
       where: { username, password },
     });
     return user;

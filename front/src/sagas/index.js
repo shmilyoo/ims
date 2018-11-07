@@ -5,3 +5,5 @@ import accountSaga from './account';
 export default function* rootSaga() {
   yield all([...accountSaga]);
 }
+
+export const getAuth = state => state.account.auth;

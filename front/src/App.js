@@ -6,52 +6,25 @@ import axios from 'axios';
 import { checkCookieLocal } from './services/utility';
 import history from './history';
 import { actions as accountActions } from './reducers/account';
+import { types as accountTypes } from './reducers/account';
 import Home from './containers/Home';
 import { Grid, Typography, CircularProgress } from '@material-ui/core';
 
 class App extends Component {
-  state = {
-    isCheckAuthOver: false
-  };
-
   componentDidMount() {
-    const { location, dispatch } = this.props;
+    const { location, dispatch, auth } = this.props;
     const path = location.pathname;
-    if (checkCookieLocal()) {
-      // 本地cookie存在，发送到服务器进行下一步验证
-      axios
-        .get('/auth/check-auth')
-        // 后台可以根据origin获取来源网页地址
-        // .get(`/account/check-auth?redirect=${this.props.location.pathname}`)
-        .then(res => {
-          this.setState({ isCheckAuthOver: true });
-          if (res.success) {
-            // user.keys='id', username', 'active', 'name', 'sex', 'dept_id','authType'
-            dispatch(
-              accountActions.checkAuthSuccess(res.data.authType, res.data.user)
-            );
-          } else {
-            // 后台验证失败，重定向到登录页，清除cookie(http响应中做)
-            console.log('后台验证失败，重定向到登录页');
-            history.push(
-              `/login?redirect=${encodeURIComponent(
-                path === '/login' ? '/' : path
-              )}`
-            );
-          }
-        });
-    } else {
-      this.setState({ isCheckAuthOver: true });
-      // 本地cookie不存在或不正确，
-      history.push(
-        `/login?redirect=${encodeURIComponent(path === '/login' ? '/' : path)}`
-      );
+    if (!auth) {
+      // auth 为初始值undefined或者false
+      dispatch({
+        type: accountTypes.SAGA_CHECK_AUTH,
+        redirect: encodeURIComponent(path)
+      });
     }
   }
 
   render() {
-    const { isCheckAuthOver } = this.state;
-    return isCheckAuthOver ? (
+    return this.props.auth ? (
       <Route path="/" component={Home} />
     ) : (
       <Grid
@@ -73,7 +46,13 @@ class App extends Component {
   }
 }
 
+function mapStateToProps(state) {
+  return {
+    auth: state.account.auth
+  };
+}
+
 export default compose(
   withRouter,
-  connect()
+  connect(mapStateToProps)
 )(App);

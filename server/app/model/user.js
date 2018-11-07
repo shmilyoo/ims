@@ -9,7 +9,7 @@ module.exports = app => {
     // 添加user的时候需要指定id，此id为sso系统的user id，存在绑定关系
     username: { type: STRING(16), unique: true, allowNull: true }, // 用户名
     password: { type: STRING, allowNull: true }, // 密码
-    isSuperAdmin: { type: BOOLEAN, defaultValue: false }, // 是否是超级管理员
+    is_super_admin: { type: BOOLEAN, defaultValue: false }, // 是否是超级管理员
   });
 
   // User.associate = function() {
