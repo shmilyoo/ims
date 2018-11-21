@@ -12,10 +12,15 @@ module.exports = app => {
       app.logger.info('开始同步数据库表');
       await app.model.sync({ force: true });
       app.model.User.create({
-        id: 'f3762080cb9911e884eec9a890da67bf',
+        id: 'f3762080cb9911e884eec9a890da22bf',
         username: 'admin',
         password: 'c584033b9997e3b8c8efe585e4973397',
-        is_super_admin: true,
+        isSuperAdmin: true,
+      });
+      app.model.User.create({
+        id: 'f3762080cb9911e884eec9a890da67aa',
+        username: 'cccc',
+        password: '17f05fab87dbaf900ab4e5c33b0c9b48',
       });
       app.logger.info('同步数据库表完毕');
     });

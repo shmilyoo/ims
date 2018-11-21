@@ -48,3 +48,4 @@ exports.ssoCheckPage = 'http://localhost:3000/auth/check';
 exports.ssoCheckBind = 'http://localhost:3000/auth/check/bind';
 exports.ssoUserBind = 'http://localhost:3000/auth/user/bind';
 exports.ssoAuthOk = 'http://localhost:4000/auth/ok';
+exports.ssoDepts = 'http://localhost:3000/sso-api/depts'; // sso获取deptArray地址

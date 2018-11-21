@@ -92,10 +92,10 @@ export const makeDeptTree = (deptArray, expanded) => {
     if (expanded === true || expanded[dept.id] === true) {
       tmp[dept.id].expanded = true;
     }
-    if (dept.parent_id !== '0') {
-      tmp[dept.parent_id].children
-        ? tmp[dept.parent_id].children.push(tmp[dept.id])
-        : (tmp[dept.parent_id].children = [tmp[dept.id]]);
+    if (dept.parentId !== '0') {
+      tmp[dept.parentId].children
+        ? tmp[dept.parentId].children.push(tmp[dept.id])
+        : (tmp[dept.parentId].children = [tmp[dept.id]]);
     } else {
       result.push(tmp[dept.id]);
     }

@@ -21,7 +21,7 @@ export const actions = {
     redirect
   }),
   authSuccess: (authType, user) => ({
-    // 'id', 'username', 'active', 'name', 'sex', 'dept_id','authType'
+    // 'id', 'username', 'active', 'name', 'sex', 'deptId','authType'
     type: types.AUTH_SUCCESS,
     authType,
     user
@@ -51,8 +51,6 @@ const initState = {
 
 export default function accountReducer(state = initState, action) {
   switch (action.type) {
-    case types.AUTH_OK_SUCCESS:
-    case types.CHECK_AUTH_SUCCESS:
     case types.AUTH_SUCCESS:
       return {
         ...state,
@@ -61,9 +59,9 @@ export default function accountReducer(state = initState, action) {
         id: action.user.id,
         active: action.user.active,
         username: action.user.username,
-        isSuperAdmin: action.user.isSuperAdmin,
+        isSuperAdmin: action.user.isSuperAdmin || false,
         info: { ...state.info, name: action.user.name, sex: action.user.sex },
-        dept: { ...state.dept, id: action.user.dept_id }
+        dept: { ...state.dept, id: action.user.deptId }
       };
     case types.CHECK_AUTH_FAILURE:
       return {

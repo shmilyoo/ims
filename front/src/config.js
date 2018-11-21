@@ -17,18 +17,15 @@ export const pathTitle = {
   '/': '首页',
   '/brief/mine': '我的概况',
   '/brief/department': '我的部门',
+  '/brief/schedule': '我的日程',
   '/account/info': '资料',
   '/account/changePasswd': '修改密码',
   '/account/changePasswd2': '修改密码2',
   '/account/changePasswd3': '修改密码3',
   '/about': '关于',
-  '/admin/organ/dept': '部门管理',
-  '/admin/organ/person': '人员管理',
-  '/admin/interface/api': '接口注册',
-  '/admin/interface/sso': 'sso管理',
-  '/admin/super/addAdmin': '添加管理',
-  '/admin/super/admins': '管理列表',
-  '/admin/about': '关于'
+  '/sa/system': '系统设置',
+  '/sa/admin': '权限管理',
+  '/sa/deptRelation': '部门关系'
 };
 
 // 没有children就有path属性，反之则有state属性表明类别
@@ -39,6 +36,7 @@ export const leftMenu = [
     icon: AccountBox,
     children: [
       { title: pathTitle['/brief/mine'], path: '/brief/mine' },
+      { title: pathTitle['/brief/schedule'], path: '/brief/schedule' },
       { title: pathTitle['/brief/department'], path: '/brief/department' }
     ]
   },
@@ -60,6 +58,17 @@ export const leftMenu = [
         title: pathTitle['/account/changePasswd3'],
         path: '/account/changePasswd3'
       }
+    ]
+  },
+  {
+    title: '超级管理',
+    state: 'sa',
+    icon: AccountBox,
+    superAdmin: true,
+    children: [
+      { title: pathTitle['/sa/system'], path: '/sa/system' },
+      { title: pathTitle['/sa/deptRelation'], path: '/sa/deptRelation' },
+      { title: pathTitle['/sa/admin'], path: '/sa/admin' }
     ]
   },
   { title: '关于', path: '/about', icon: AccountBox }

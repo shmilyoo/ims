@@ -43,7 +43,7 @@ class AuthService extends Service {
     const reqConfig = await ctx.service.auth.addSsoTokenToConfig();
     const res = await axios.post(
       config.ssoCheckBind,
-      { user_id: id, sso_username: username },
+      { userId: id, ssoUsername: username },
       reqConfig
     );
     return res;

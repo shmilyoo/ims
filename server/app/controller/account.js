@@ -26,7 +26,10 @@ class AccountController extends Controller {
         const id = res.data.id;
         const user = await ctx.model.User.findOne({ where: { id } });
         if (user) {
-          // 用户使用注册登录方式使用过系统，数据库存在指定id用户，更新用户名密码即可、
+          // 用户使用授权登录方式使用过系统，数据库存在指定id用户，更新用户名密码即可、
+          if (user.username || user.password) {
+            throw '用户注册服务端处理时，这里的用户名密码应该都为空';
+          }
           await ctx.model.User.update(
             {
               username,
@@ -38,6 +41,7 @@ class AccountController extends Controller {
           await ctx.model.User.create({
             username,
             password: passwordCrypto,
+            deptId: res.data.deptId,
             id, // 创建本地用户和绑定的cas用户id一致
           });
         }
@@ -100,6 +104,7 @@ class AccountController extends Controller {
     const user = await ctx.service.account.checkUserPasswd(username, password);
     if (user) {
       const res = await ctx.service.auth.checkBind(user.id, username);
+      // 验证绑定失败包括用户未激活被禁用或者没有对应用户，未同意绑定等
       if (!res.success) {
         ctx.body = res;
         return;
@@ -115,11 +120,15 @@ class AccountController extends Controller {
         expires,
         remember
       );
-
-      ctx.body = ctx.helper.getRespBody(true, {
-        id: user.id,
+      const _user = Object.assign(res.data.user, {
+        isSuperAdmin: user.isSuperAdmin,
         username: user.username,
-        active: user.active,
+        // 用户实际工作所在部门
+        deptId: user.deptId,
+      });
+      ctx.body = ctx.helper.getRespBody(true, {
+        authType,
+        user: _user,
       });
     } else {
       ctx.body = ctx.helper.getRespBody(false, '用户名或密码不正确');

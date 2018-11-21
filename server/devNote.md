@@ -1,9 +1,10 @@
 # redis 缓存格式
 
-## 针对每个登录用户的缓存
+## 针对每个登录用户的 session
 
 用户如果点击记住我，则保存一个星期，否则一个小时  
 redis key 为 ims:user:${user.id}，value 为一个 Object json.stringfy 后的字符串  
+因为 session 有过期设置，所以采用 json 格式转换为字符串后存储，同时设置过期时间  
 Object 格式为：
 
 ```javascript
@@ -13,14 +14,15 @@ Object 格式为：
 }
 ```
 
-## 全局缓存
+## ims:cache ———— 针对 ims 系统的全局缓存，hash 格式，无过期时间
 
-- 不设置过期时间，eggjs 后台定期更新
-
-> 部门结构缓存
->
-> > 树形结构缓存  
-> > array 结构缓存
+```javascript
+{
+  // deptArray 和 deptTree 在后台定时更新,deptTree可以由前台自己计算
+  deptArray:[{id:string,name:string,...},...], // 部门结构列表，按照level order 排序
+  // deptTree:[{id:string,name:'root1',children:[...],...},{id:'',name:'root2',...}]
+}
+```
 
 # set cookies 格式
 

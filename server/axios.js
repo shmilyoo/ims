@@ -14,7 +14,7 @@ const configureAxios = () => {
       return response.data;
     },
     error => {
-      console.log(error);
+      console.log(`error at axios response, error message is ${error.message}`);
       return {
         success: false,
         error: error.message,

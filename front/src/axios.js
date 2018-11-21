@@ -49,23 +49,12 @@ const configureAxios = (dispatch, history) => {
         dispatch(accountActions.clearAuth());
         NProgress.done();
         return { success: false, error: error.message };
-        // 这里throw错误需要在saga中处理，要不然saga会死掉
-        // throw new axios.Cancel('cancel request and redirect');
       }
-      // dispatch(
-      //   commonActions.showMessage(
-      //     process.env.NODE_ENV === 'production' ? '请求失败' : error.message,
-      //     'error'
-      //   )
-      // );
-      // 请求结束，蓝色过渡滚动条消失
-      // 即使出现异常，也要调用关闭方法，否则一直处于加载状态很奇怪
       NProgress.done();
-      // return Promise.reject(error);
       console.log(error.response.data, error.response.status);
       return { success: false, error: error.message };
       // 如果是在saga调用，throw会导致saga死掉
-      throw new axios.Cancel('cancel request and redirect');
+      // throw new axios.Cancel('cancel request and redirect');
     }
   );
 };

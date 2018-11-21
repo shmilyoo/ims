@@ -113,12 +113,7 @@ function* loginFlow() {
     if (response.success) {
       yield call(resolve);
       yield put(
-        accountActions.loginSuccess(
-          response.data.id,
-          'local',
-          username,
-          response.data.active
-        )
+        accountActions.authSuccess(response.data.authType, response.data.user)
       );
       yield call(history.push, redirect); // 根据url的redirect进行跳转
     } else {
@@ -141,7 +136,7 @@ function* checkAuthFlow() {
     if (hasCookie) {
       const res = yield axios.get('/auth/check-auth');
       if (res.success) {
-        // user.keys='id', username', 'active', 'name', 'sex', 'dept_id','authType'
+        // user.keys='id', username', 'active', 'name', 'sex', 'deptId','authType',
         yield put(accountActions.authSuccess(res.data.authType, res.data.user));
       } else {
         // 后台验证失败，重定向到登录页，清除cookie(http响应中做)

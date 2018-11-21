@@ -46,15 +46,15 @@ class RenderSelectDeptField extends React.PureComponent {
     const nodeId = this.state.selectedNode.id;
     if (!this.nodes) {
       this.nodes = {};
-      this.state.treeArray.forEach(({ id, parent_id, name }) => {
-        this.nodes[id] = { id, parent_id, name };
+      this.state.treeArray.forEach(({ id, parentId, name }) => {
+        this.nodes[id] = { id, parentId, name };
       });
     }
     let titles = [];
     let current = nodeId;
     while (true) {
       titles.unshift(this.nodes[current].name);
-      current = this.nodes[current].parent_id;
+      current = this.nodes[current].parentId;
       if (current === '0') break;
     }
     //store存储数据格式为{id:deptId,names:'rootName-childName-...-deptName'}

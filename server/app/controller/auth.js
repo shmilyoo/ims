@@ -41,9 +41,11 @@ class AuthController extends Controller {
       const localUser = await ctx.model.User.findOne({
         where: { id },
       });
-      response.data.user.isSuperAdmin = localUser.is_super_admin;
+      response.data.user.isSuperAdmin = localUser.isSuperAdmin;
+      // 用户实际工作所在部门id
+      response.data.user.deptId = localUser.deptId;
       // 系统发送给sso的验证信息，确认正确
-      // response.data.user.keys=['id', 'username', 'active', 'name', 'sex', 'dept_id','authType' ]
+      // response.data.user.keys=['id', 'username', 'active', 'name', 'sex', 'deptId','authType' ]
       ctx.body = ctx.helper.getRespBody(true, response.data);
     } else {
       ctx.helper.clearCookie();
@@ -71,7 +73,7 @@ class AuthController extends Controller {
     }
     const {
       authType,
-      user: { active, id, sex, dept_id, name },
+      user: { active, id, sex, deptId, name },
       remember,
     } = checkResult;
     const [ expires, maxAge ] = ctx.helper.getExpiresAndMaxAge('week', 1);
@@ -87,7 +89,8 @@ class AuthController extends Controller {
     // 所以要尝试创建相应的用户
     const [ localUser ] = await ctx.model.User.findOrCreate({
       where: { id },
-      defaults: { id },
+      // 如果没有对应条目，创建一个user，将用户实际工作部门设置为统一认证系统中所在部门
+      defaults: { id, deptId },
     });
     // todo todo 两种登录方式，通过的时候都要获取本地用户数据库的一些信息
     ctx.body = await ctx.helper.getRespBody(true, {
@@ -96,9 +99,9 @@ class AuthController extends Controller {
         active,
         id,
         sex,
-        dept_id,
+        deptId: localUser.deptId,
         name,
-        isSuperAdmin: localUser.is_super_admin,
+        isSuperAdmin: localUser.isSuperAdmin,
       },
     });
   }

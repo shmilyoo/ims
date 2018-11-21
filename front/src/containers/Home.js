@@ -6,6 +6,8 @@ import { withStyles } from '@material-ui/core';
 import LeftNav from '../components/LeftNav';
 import AppHead from './AppHead';
 import { sysName, leftMenu } from '../config';
+import SuperAdmin from './sa';
+import Brief from './brief';
 
 const drawerWidth = 250;
 
@@ -67,7 +69,8 @@ class Home extends React.Component {
           <AppHead type="user" onMenuClick={this.handleMenuClick} />
           <div className={classes.main}>
             <Switch>
-              {/* <Route path="/account/info" component={Info} /> */}
+              <Route path="/brief" component={Brief} />
+              <Route path="/sa" component={SuperAdmin} />
               {/* <Route path="/account/passwd" component={null} /> */}
               {/* <Route path="/sso/reg" component={null} /> */}
               <Route path="/about" component={null} />
