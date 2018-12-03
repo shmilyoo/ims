@@ -1,9 +1,9 @@
 import { all } from 'redux-saga/effects';
 import accountSaga from './account';
-// import routeSaga from "./route";
+import systemSaga from './system';
 
 export default function* rootSaga() {
-  yield all([...accountSaga]);
+  yield all([...accountSaga, ...systemSaga]);
 }
 
 export const getAuth = state => state.account.auth;

@@ -1,0 +1,72 @@
+export const types = {
+  SAGA_GET_TAGS: 'SYSTEM/SAGA_GET_TAGS',
+  SAGA_UPDATE_TAG: 'SYSTEM/SAGA_UPDATE_TAG',
+  SAGA_ADD_TAG: 'SYSTEM/SAGA_ADD_TAG',
+  SAGA_DELETE_TAG: 'SYSTEM/SAGA_DELETE_TAG',
+  SAGA_GET_SYSTEM_CONFIG: 'SYSTEM/SAGA_GET_SYSTEM_CONFIG',
+  SAGA_SAVE_TIME_SCALE: 'SYSTEM/SAGA_SAVE_TIME_SCALE',
+  SET_TIME_SCALE: 'SYSTEM/SET_TIME_SCALE',
+  SET_TAGS: 'SYSTEM/SET_TAGS'
+};
+export const actions = {
+  sagaGetTags: () => ({
+    type: types.SAGA_GET_TAGS
+  }),
+  sagaAddTag: (name, color, order) => ({
+    type: types.SAGA_ADD_TAG,
+    name,
+    order,
+    color
+  }),
+  sagaUpdateTag: (id, name, color, order) => ({
+    type: types.SAGA_UPDATE_TAG,
+    id,
+    name,
+    order,
+    color
+  }),
+  sagaDeleteTag: id => ({
+    type: types.SAGA_DELETE_TAG,
+    id
+  }),
+  setTags: tags => ({
+    type: types.SET_TAGS,
+    tags
+  }),
+  sagaSaveTimeScale: (resolve, values) => ({
+    type: types.SAGA_SAVE_TIME_SCALE,
+    values,
+    resolve
+  }),
+  sagaGetSystemConfig: () => ({
+    type: types.SAGA_GET_SYSTEM_CONFIG
+  }),
+  setTimeScale: timeScale => ({
+    type: types.SET_TIME_SCALE,
+    timeScale
+  })
+};
+
+const initState = {
+  tags: null,
+  // 默认上午8点到11:30，下午14:30到17:30。数字是从0点经过的秒数
+  // { amFrom: 28800, amTo: 41400, pmFrom: 52200, pmTo: 63000 }
+  timeScale: null
+};
+
+export default (state = initState, action) => {
+  switch (action.type) {
+    case types.SET_TAGS:
+      return {
+        ...state,
+        tags: action.tags
+      };
+    case types.SET_TIME_SCALE:
+      return {
+        ...state,
+        timeScale: action.timeScale
+      };
+    default:
+      return state;
+  }
+};

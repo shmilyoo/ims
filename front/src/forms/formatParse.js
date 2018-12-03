@@ -27,3 +27,24 @@ export const formatUnixTsToMoment = ts => {
 export const parseMomentToUnixTs = m => {
   return moment(m).unix();
 };
+
+/**
+ * 将从0点起经历的秒数转化为Date
+ * @param {number} seconds 从0点起经历的秒数
+ */
+export const formatSecondsToDate = seconds => {
+  if (seconds === undefined) seconds = 0;
+  const now = new Date();
+  const ts = now.setHours(0, 0, 0, 0);
+  return new Date(ts + seconds * 1000);
+};
+
+/**
+ * 将日期实例转化成从当日0点起经历的秒数
+ * @param {Date} date 日期实例
+ */
+export const parseDateToSeconds = date => {
+  if (!(date instanceof Date)) return;
+  // console.log('parseDateToSeconds ', typeof date, date);
+  return Math.floor((date.getTime() - new Date().setHours(0, 0, 0, 0)) / 1000);
+};

@@ -47,6 +47,20 @@ export const asyncCheckUsername = (values, dispatch) => {
   });
 };
 
+export const syncCheckTimeScale = values => {
+  const errors = {};
+  const { amFrom, amTo, pmFrom, pmTo } = values;
+  if (amTo <= amFrom || pmTo <= pmFrom) {
+    errors._error = '结束时间应大于起始时间';
+    return errors;
+  }
+  if (amTo > 43200 || pmFrom < 43200) {
+    errors._error = '上午结束时间和下午开始时间不能越过中午12时';
+    return errors;
+  }
+  return errors;
+};
+
 /**
  * deptForm的同步验证函数
  * @param {object} values form values

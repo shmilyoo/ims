@@ -134,6 +134,23 @@ class AccountController extends Controller {
       ctx.body = ctx.helper.getRespBody(false, '用户名或密码不正确');
     }
   }
+
+  async logout() {
+    const ctx = this.ctx;
+    const { kind } = ctx.request.body;
+    // kind: all || system
+    if (kind === 'system') {
+      // 本系统退出，删除redis的session缓存即可
+      await ctx.app.redis.del(`ims:user:${ctx.user.id}`);
+    } else if (kind === 'local') {
+      // 什么都不做，统一清除cookie即可
+    } else {
+      // 全统一系统退出，发送请求,kind==='all'
+      await axios.post();
+    }
+    ctx.helper.clearCookie();
+    ctx.body = ctx.helper.getRespBody(true);
+  }
 }
 
 module.exports = AccountController;

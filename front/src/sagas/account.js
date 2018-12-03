@@ -7,6 +7,7 @@ import { actions as accountActions } from '../reducers/account';
 import history from '../history';
 import { ssoLoginPage } from '../config';
 import { getAuth } from '.';
+import Cookies from 'js-cookie';
 
 /**
  * auth/ok 页面发出的验证请求
@@ -129,7 +130,7 @@ function* checkAuthFlow() {
   const { redirect } = yield take(accountTypes.SAGA_CHECK_AUTH);
   const auth = yield select(getAuth);
   if (auth === false) {
-    history.push(`/login?redirect=${redirect}`);
+    yield call(history.push, `/login?redirect=${redirect}`);
   } else {
     // auth为初始化状态，undefined，在此进行用户权限校验
     const hasCookie = checkCookieLocal();
@@ -140,12 +141,21 @@ function* checkAuthFlow() {
         yield put(accountActions.authSuccess(res.data.authType, res.data.user));
       } else {
         // 后台验证失败，重定向到登录页，清除cookie(http响应中做)
-        history.push(`/login?redirect=${redirect}`);
+        yield call(history.push, `/login?redirect=${redirect}`);
       }
     } else {
       // 本地cookie不存在或不正确，
-      history.push(`/login?redirect=${redirect}`);
+      yield call(history.push, `/login?redirect=${redirect}`);
     }
+  }
+}
+
+function* logoutFlow() {
+  while (true) {
+    const { kind } = yield take(accountTypes.SAGA_LOGOUT);
+    yield axios.post('/account/logout', { kind });
+    yield put(accountActions.clearAuth());
+    yield call(history.push, `/login`);
   }
 }
 
@@ -155,5 +165,6 @@ export default [
   fork(bindFlow),
   fork(checkUsernameFlow),
   fork(loginFlow),
+  fork(logoutFlow),
   fork(checkAuthFlow)
 ];

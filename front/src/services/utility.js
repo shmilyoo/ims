@@ -4,6 +4,12 @@ import md5 from 'md5';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+export const getRandomIntInclusive = (min, max) => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
+};
+
 /**
  * 本地初步验证cookie是否有效，后续还需要在服务器进一步验证，因为存在httponly的id等
  */
@@ -33,10 +39,10 @@ export const initAuthInfoAtStart = dispatch => {
 /**
  * 重构每个表单的submit函数，避免重复代码
  */
-export const formSubmit = (action, dispatch) => values =>
-  new Promise(resolve => {
-    dispatch({ type: action, resolve, values });
-  });
+// export const formSubmit = (action, dispatch) => values =>
+//   new Promise(resolve => {
+//     dispatch({ type: action, resolve, values });
+//   });
 
 /**
  *
@@ -52,9 +58,11 @@ export const getDeptArray = async () => {
   const response = await axios.get('/dept/all');
   return response;
 };
-
-export const addDept = async (name, intro, parentId) => {
-  const response = await axios.post('/dept/add', { name, intro, parentId });
+/**
+ * @return {Array} 获取部门结构关联关系对象
+ */
+export const getDeptRelations = async () => {
+  const response = await axios.get('/dept/relations');
   return response;
 };
 
@@ -103,21 +111,36 @@ export const makeDeptTree = (deptArray, expanded) => {
   return result;
 };
 
-/**
- *  全部展开或者折叠树
- * @param {Object[]} treeData tree的数据结构
- * @param {boolean} expand 是否展开
- */
-export const toggleExpandTreeData = (treeData, expand) => {
+export const treeDataWithRelation = (treeData, relations, treeDataDic) => {
+  let result = [];
   for (let i = 0; i < treeData.length; i++) {
-    if (treeData[i].children) {
-      treeData[i].expanded = expand;
-      toggleExpandTreeData(treeData[i].children, expand);
+    const node = Object.assign({}, treeData[i]);
+    const toNodeId = relations[node.id];
+    if (toNodeId) {
+      node.title = `${node.title} -> ${treeDataDic[toNodeId].name}`;
     }
+    if (node.children)
+      node.children = treeDataWithRelation(
+        node.children,
+        relations,
+        treeDataDic
+      );
+    result.push(node);
   }
-  return [...treeData];
+  return result;
 };
 
-export const getDeptWithParent = id => {
-  return axios.get(`/dept/${id}?withParent=1`);
-};
+// /**
+//  *  全部展开或者折叠树
+//  * @param {Object[]} treeData tree的数据结构
+//  * @param {boolean} expand 是否展开
+//  */
+// export const toggleExpandTreeData = (treeData, expand) => {
+//   for (let i = 0; i < treeData.length; i++) {
+//     if (treeData[i].children) {
+//       treeData[i].expanded = expand;
+//       toggleExpandTreeData(treeData[i].children, expand);
+//     }
+//   }
+//   return [...treeData];
+// };

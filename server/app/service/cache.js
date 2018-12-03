@@ -3,11 +3,15 @@
 const Service = require('egg').Service;
 
 class CacheService extends Service {
+  async updateAll() {
+    await this.updateDeptArray();
+  }
+
   async getDeptArray() {
     // 从缓存中获取deptArray
-    const result = await this.ctx.app.redis.hget('ims:cache', 'deptArray');
+    const result = await this.getCache('deptArray');
     if (result) return result;
-    return this.updateDeptArray();
+    return await this.updateDeptArray();
   }
 
   /**
@@ -16,12 +20,28 @@ class CacheService extends Service {
    */
   async updateDeptArray() {
     const result = await this.service.dept.getDeptArray();
-    await this.setCache('deptArray', result);
-    return result;
+    if (result.success) {
+      await this.setCache('deptArray', result.data);
+      const deptDic = {};
+      result.data.forEach(dept => {
+        deptDic[dept.id] = dept;
+      });
+      await this.setCache('deptDic', deptDic);
+    }
+    return result.success ? result.data : null;
   }
 
-  async setCache(key, value) {
-    await this.ctx.app.redis.hset('ims:cache', key, value);
+  async setCache(key, value, serialze = true) {
+    await this.ctx.app.redis.hset(
+      'ims:cache',
+      key,
+      serialze ? JSON.stringify(value) : value
+    );
+  }
+
+  async getCache(key, serialze = true) {
+    const value = await this.ctx.app.redis.hget('ims:cache', key);
+    return serialze ? JSON.parse(value) : value;
   }
 }
 

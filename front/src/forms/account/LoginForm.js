@@ -18,7 +18,6 @@ const styles = theme => ({
 });
 const LoginForm = props => {
   const { pristine, submitting, error, classes, handleSubmit } = props;
-  console.log('login form render');
   return (
     <form onSubmit={handleSubmit}>
       <div>{error && <strong>{error}</strong>}</div>
@@ -30,6 +29,7 @@ const LoginForm = props => {
           label="用户名"
           normalize={trim}
           validate={required}
+          autoComplete="username"
         />
       </div>
       <div>
@@ -39,6 +39,7 @@ const LoginForm = props => {
           type="password"
           label="密码"
           validate={required}
+          autoComplete="current-password"
         />
       </div>
       <div className={classes.buttonLine}>

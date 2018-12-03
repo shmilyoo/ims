@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { Link, Redirect } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import qs from 'qs';
 import {
   Grid,
@@ -15,6 +14,7 @@ import axios from 'axios';
 import LoginForm from '../../forms/account/LoginForm';
 import history from '../../history';
 import { types as accountTypes } from '../../reducers/account';
+import Cookies from 'js-cookie';
 
 const style = theme => ({
   card: {
@@ -30,6 +30,13 @@ const style = theme => ({
 });
 
 class Login extends PureComponent {
+  constructor(props) {
+    super(props);
+    if (Cookies.get('ims_authType')) {
+      history.push('/');
+    }
+  }
+
   handleSubmit = values => {
     const { redirect } = qs.parse(this.props.location.search, {
       ignoreQueryPrefix: true

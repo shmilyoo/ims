@@ -18,10 +18,19 @@ export const pathTitle = {
   '/brief/mine': '我的概况',
   '/brief/department': '我的部门',
   '/brief/schedule': '我的日程',
-  '/account/info': '资料',
-  '/account/changePasswd': '修改密码',
-  '/account/changePasswd2': '修改密码2',
-  '/account/changePasswd3': '修改密码3',
+  '/dept': '我的部门',
+  '/dept/work': '部门工作',
+  '/dept-admin/announcement': '部门公告',
+  '/dept-admin/work': '部门工作',
+  '/dept-admin/work/add': '发布工作',
+  '/dept-admin/work/edit': '编辑工作',
+  '/dept-admin/news': '部门文章',
+  '/dept-admin/news/add': '发布文章',
+  '/dept-admin/news/category': '文章分类',
+  '/dept-admin/news/edit': '编辑文章',
+  '/user/info': '我的资料',
+  '/user/dept/change': '更改部门',
+  '/user/changePasswd': '修改密码',
   '/about': '关于',
   '/sa/system': '系统设置',
   '/sa/admin': '权限管理',
@@ -31,32 +40,58 @@ export const pathTitle = {
 // 没有children就有path属性，反之则有state属性表明类别
 export const leftMenu = [
   {
-    title: '概况',
+    title: '我的面板',
     state: 'brief', // 用于有子元素的菜单，在this.state中标记下拉是否展开
     icon: AccountBox,
     children: [
       { title: pathTitle['/brief/mine'], path: '/brief/mine' },
-      { title: pathTitle['/brief/schedule'], path: '/brief/schedule' },
-      { title: pathTitle['/brief/department'], path: '/brief/department' }
+      { title: pathTitle['/brief/schedule'], path: '/brief/schedule' }
     ]
   },
   {
-    title: '用户',
-    state: 'account',
+    title: '我的部门',
+    state: 'dept', // 用于有子元素的菜单，在this.state中标记下拉是否展开
     icon: AccountBox,
     children: [
-      { title: pathTitle['/account/info'], path: '/account/info' },
+      { title: pathTitle['/dept'], path: '/dept' },
+      { title: pathTitle['/dept/work'], path: '/dept/work' }
+    ]
+  },
+  {
+    title: '部门管理',
+    state: 'dept-admin', // 用于有子元素的菜单，在this.state中标记下拉是否展开
+    icon: AccountBox,
+    children: [
       {
-        title: pathTitle['/account/changePasswd'],
-        path: '/account/changePasswd'
+        title: pathTitle['/dept-admin/announcement'],
+        path: '/dept-admin/announcement'
+      },
+      { title: pathTitle['/dept-admin/work'], path: '/dept-admin/work' },
+      {
+        title: pathTitle['/dept-admin/work/add'],
+        path: '/dept-admin/work/add'
+      },
+      { title: pathTitle['/dept-admin/news'], path: '/dept-admin/news' },
+      {
+        title: pathTitle['/dept-admin/news/category'],
+        path: '/dept-admin/news/category'
+      },
+      { title: pathTitle['/dept-admin/news/add'], path: '/dept-admin/news/add' }
+    ]
+  },
+  {
+    title: '用户设置',
+    state: 'user',
+    icon: AccountBox,
+    children: [
+      { title: pathTitle['/user/info'], path: '/user/info' },
+      {
+        title: pathTitle['/user/dept/change'],
+        path: '/user/dept/change'
       },
       {
-        title: pathTitle['/account/changePasswd2'],
-        path: '/account/changePasswd2'
-      },
-      {
-        title: pathTitle['/account/changePasswd3'],
-        path: '/account/changePasswd3'
+        title: pathTitle['/user/changePasswd'],
+        path: '/user/changePasswd'
       }
     ]
   },

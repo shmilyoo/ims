@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import DeptBrief from './DeptBrief';
 import ScheduleBrief from './ScheduleBrief';
-import MineBrief from './MineBrief';
+import MyBrief from './MyBrief';
 
 class Brief extends PureComponent {
   render() {
@@ -11,7 +11,7 @@ class Brief extends PureComponent {
     return (
       <Switch>
         <Route exact path={`${match.path}/department`} component={DeptBrief} />
-        <Route exact path={`${match.path}/mine`} component={MineBrief} />
+        <Route exact path={`${match.path}/mine`} component={MyBrief} />
         <Route
           exact
           path={`${match.path}/schedule`}

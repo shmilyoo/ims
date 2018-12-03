@@ -14,4 +14,16 @@ module.exports = app => {
   router.post('/account/bind', controller.account.bind);
   router.get('/account/check/:username', controller.account.checkUser);
   router.post('/account/login', controller.account.login);
+  router.post('/account/logout', checkUser, controller.account.logout);
+  router.get('/dept/all', controller.dept.all);
+  router.get('/dept/relations', controller.dept.relations);
+  router.post('/dept/relations/bind', controller.dept.relationsBind);
+  router.post('/dept/relations/unbind', controller.dept.relationsUnbind);
+  router.post('/cache/updateAll', controller.cache.updateAll);
+  router.get('/system/all', controller.system.allConfig);
+  router.get('/system/tag/all', controller.system.tags);
+  router.post('/system/tag/add', controller.system.addTag);
+  router.post('/system/tag/update', controller.system.updateTag);
+  router.post('/system/tag/delete', controller.system.deleteTag);
+  router.post('/system/time-scale', controller.system.timeScale);
 };

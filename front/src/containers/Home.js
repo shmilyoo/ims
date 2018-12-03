@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Switch, withRouter } from 'react-router-dom';
+import { Route, Switch, withRouter, Redirect } from 'react-router-dom';
 import compose from 'recompose/compose';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core';
@@ -8,6 +8,8 @@ import AppHead from './AppHead';
 import { sysName, leftMenu } from '../config';
 import SuperAdmin from './sa';
 import Brief from './brief';
+import Dept from './dept';
+import User from './user';
 
 const drawerWidth = 250;
 
@@ -37,7 +39,8 @@ const style = theme => ({
   },
   main: {
     padding: 20,
-    flex: 'auto'
+    flex: 'auto',
+    display: 'flex'
   },
   footer: {
     padding: 10,
@@ -70,10 +73,11 @@ class Home extends React.Component {
           <div className={classes.main}>
             <Switch>
               <Route path="/brief" component={Brief} />
+              <Route path="/dept" component={Dept} />
               <Route path="/sa" component={SuperAdmin} />
-              {/* <Route path="/account/passwd" component={null} /> */}
-              {/* <Route path="/sso/reg" component={null} /> */}
+              <Route path="/user" component={User} />
               <Route path="/about" component={null} />
+              <Route path="/" component={() => <Redirect to="/brief/mine" />} />
             </Switch>
           </div>
           <div className={classes.footer}>@copyright 2018</div>
