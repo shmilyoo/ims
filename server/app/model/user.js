@@ -9,9 +9,20 @@ module.exports = app => {
     // 添加user的时候需要指定id，此id为sso系统的user id，存在绑定关系
     username: { type: STRING(16), unique: true, allowNull: true }, // 用户名
     password: { type: STRING, allowNull: true }, // 密码
+    name: { type: STRING(16), defaultValue: '' },
     deptId: { type: CHAR(32), defaultValue: '' }, // 用户实际所在部门，初始化为统一验证系统的deptId
     isSuperAdmin: { type: BOOLEAN, defaultValue: false }, // 是否是超级管理员
+    status: { type: STRING(16), defaultValue: 'other' },
+    position: { type: STRING(16), defaultValue: '' },
   });
+
+  User.associate = function() {
+    User.hasMany(app.model.DeptManager, {
+      as: 'manageDepts',
+      foreignKey: 'userId',
+      constraints: false,
+    });
+  };
 
   // User.associate = function() {
   //   User.belongsTo(app.model.Dept, {

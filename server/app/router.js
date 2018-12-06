@@ -15,7 +15,15 @@ module.exports = app => {
   router.get('/account/check/:username', controller.account.checkUser);
   router.post('/account/login', controller.account.login);
   router.post('/account/logout', checkUser, controller.account.logout);
+  router.get('/account/info', checkUser, controller.account.accountInfo);
+  router.post('/account/info', checkUser, controller.account.setUserInfo);
+  router.get(
+    '/dept/depts-and-relation',
+    checkUser,
+    controller.dept.deptsAndRelation
+  );
   router.get('/dept/all', controller.dept.all);
+  // router.get('/dept/workDept', controller.dept.getWorkDeptInfo);
   router.get('/dept/relations', controller.dept.relations);
   router.post('/dept/relations/bind', controller.dept.relationsBind);
   router.post('/dept/relations/unbind', controller.dept.relationsUnbind);

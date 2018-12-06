@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Route, Switch, withRouter, Redirect } from 'react-router-dom';
 import compose from 'recompose/compose';
 import classNames from 'classnames';
@@ -10,6 +11,9 @@ import SuperAdmin from './sa';
 import Brief from './brief';
 import Dept from './dept';
 import User from './user';
+import { actions as accountActions } from '../reducers/account';
+import { actions as systemActions } from '../reducers/system';
+import Work from './work';
 
 const drawerWidth = 250;
 
@@ -55,6 +59,10 @@ class Home extends React.Component {
   state = {
     leftOpen: true
   };
+  componentDidMount() {
+    this.props.dispatch(accountActions.sagaGetAccountInfo());
+    this.props.dispatch(systemActions.sagaGetDepts());
+  }
   handleMenuClick = () => {
     this.setState({ leftOpen: !this.state.leftOpen });
   };
@@ -73,11 +81,12 @@ class Home extends React.Component {
           <div className={classes.main}>
             <Switch>
               <Route path="/brief" component={Brief} />
+              <Route path="/work" component={Work} />
               <Route path="/dept" component={Dept} />
               <Route path="/sa" component={SuperAdmin} />
               <Route path="/user" component={User} />
               <Route path="/about" component={null} />
-              <Route path="/" component={() => <Redirect to="/brief/mine" />} />
+              <Route path="/" component={() => <Redirect to="/brief" />} />
             </Switch>
           </div>
           <div className={classes.footer}>@copyright 2018</div>
@@ -86,8 +95,14 @@ class Home extends React.Component {
     );
   }
 }
+function mapStateToProps(state) {
+  return {
+    // id: state.account.id
+  };
+}
 
 export default compose(
   withRouter,
-  withStyles(style)
+  withStyles(style),
+  connect(mapStateToProps)
 )(Home);

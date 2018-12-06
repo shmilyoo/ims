@@ -8,7 +8,7 @@ module.exports = app => {
 
   const UserWorkPhase = db.defineModel(app, 'userWorkPhase', {
     userId: { type: CHAR(32) },
-    workPhaseId: { type: CHAR(32) },
+    workPhaseId: { type: CHAR(32) }, // ？这里好像有问题，怎么区别work和phase
     isInCharge: { type: BOOLEAN, defaultValue: false }, // 是否负责人
     order: { type: INTEGER, defaultValue: 1 }, // 负责人或者参与人的排序
   });

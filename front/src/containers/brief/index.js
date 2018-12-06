@@ -10,8 +10,8 @@ class Brief extends PureComponent {
     const { match } = this.props;
     return (
       <Switch>
+        <Route exact path={`${match.path}`} component={MyBrief} />
         <Route exact path={`${match.path}/department`} component={DeptBrief} />
-        <Route exact path={`${match.path}/mine`} component={MyBrief} />
         <Route
           exact
           path={`${match.path}/schedule`}

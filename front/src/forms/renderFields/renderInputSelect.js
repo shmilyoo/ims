@@ -3,6 +3,7 @@ import { TextField, MenuItem } from '@material-ui/core';
 
 const RenderInputSelectField = ({
   input,
+  readOnly,
   label,
   data, //[{label,value},...]
   meta: { touched, error },
@@ -13,8 +14,11 @@ const RenderInputSelectField = ({
       select
       label={label}
       fullWidth
-      error={!!(touched && error)}
-      helperText={touched && error ? error : ' '}
+      error={!readOnly && !!(touched && error)}
+      helperText={!readOnly && touched && error ? error : ' '}
+      InputProps={{
+        readOnly
+      }}
       {...input}
       {...rest}
     >

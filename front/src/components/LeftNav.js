@@ -77,7 +77,15 @@ class LeftNav extends React.PureComponent {
   };
 
   render() {
-    const { classes, open, location, header, menu, isSuperAdmin } = this.props;
+    const {
+      classes,
+      open,
+      location,
+      header,
+      menu,
+      isSuperAdmin,
+      manageDept
+    } = this.props;
     console.log('home left render');
     return (
       <div className={classes.left}>
@@ -98,7 +106,8 @@ class LeftNav extends React.PureComponent {
           <List component="nav">
             {menu.map(
               ele =>
-                (!ele.superAdmin || isSuperAdmin) && (
+                (!ele.superAdmin || isSuperAdmin) &&
+                (!ele.manageDept || !!manageDept) && (
                   <div key={ele.title}>
                     <ListItem
                       button
@@ -183,7 +192,8 @@ LeftNav.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    isSuperAdmin: state.account.isSuperAdmin
+    isSuperAdmin: state.account.isSuperAdmin,
+    manageDept: state.account.manageDept
   };
 }
 

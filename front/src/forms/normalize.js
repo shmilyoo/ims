@@ -2,5 +2,6 @@
 
 export const trim = value => {
   // console.log(`trim normalize =${value}=`);
+  console.log(value);
   return value && value.trim();
 };

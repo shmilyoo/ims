@@ -7,3 +7,4 @@ export default function* rootSaga() {
 }
 
 export const getAuth = state => state.account.auth;
+export const getId = state => state.account.id;

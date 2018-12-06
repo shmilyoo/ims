@@ -10,7 +10,8 @@ module.exports = app => {
     scheduleId: { type: CHAR(32) },
     from: { type: INTEGER, allowNull: true }, // 开始时间，秒，unix时间戳
     to: { type: INTEGER, allowNull: true }, // 结束时间，秒，unix时间戳，from to在同一天
-    comment: { type: STRING(64), defaultValue: '' },
+    content: { type: STRING(64), defaultValue: '' },
+    longTerm: { type: BOOLEAN, defaultValue: false }, // 是否长期日程，比如多日出差，出海，跨度为多于一天的
   });
 
   return TimeScale;

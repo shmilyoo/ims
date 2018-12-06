@@ -72,6 +72,7 @@ export const getDeptRelations = async () => {
  * @return {{string:boolean}} {1stLevel1Id:true,2ndLevel1Id:true...}
  */
 export const getLevel1ExpandsfromTreeArray = treeArray => {
+  if (!treeArray) return null;
   let level1Expands = {};
   const length = treeArray.length;
   for (let i = 0; i < length; i++) {

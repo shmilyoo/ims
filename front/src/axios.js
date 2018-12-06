@@ -51,6 +51,7 @@ const configureAxios = (dispatch, history) => {
         return { success: false, error: error.message };
       }
       NProgress.done();
+      // todo 后续根据status不同值，导向不同的页面 404 500等
       console.log(error.response.data, error.response.status);
       return { success: false, error: error.message };
       // 如果是在saga调用，throw会导致saga死掉

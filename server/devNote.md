@@ -20,6 +20,7 @@ Object 格式为：
 {
   // deptArray 和 deptTree 在后台定时更新,deptTree可以由前台自己计算
   deptArray:[{id:string,name:string,...},...], // 部门结构列表，按照level order 排序
+  deptDic:{id1:dept1,id2:dept2,...}
   // deptTree:[{id:string,name:'root1',children:[...],...},{id:'',name:'root2',...}]
 }
 ```

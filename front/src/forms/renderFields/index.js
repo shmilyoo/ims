@@ -1,19 +1,19 @@
-// import RenderInputSelect from './renderInputSelect';
+import RenderInputSelect from './renderInputSelect';
 import RenderSwitch from './renderSwitch';
 import RenderTextField from './renderTextField';
 import RenderTextFieldAsync from './renderTextFieldAsync';
 import RenderDatePicker from './renderDatePicker';
-// import RenderSelectDeptField from './renderSelectDeptField';
+import RenderSelectDeptField from './renderSelectDeptField';
 // import RenderExps from './renderExps';
 // import RenderRandomCode from './renderRandomCode';
 
 export {
-  // RenderInputSelect,
+  RenderInputSelect,
   RenderSwitch,
   RenderTextField,
   RenderTextFieldAsync,
-  RenderDatePicker
-  // RenderSelectDeptField,
+  RenderDatePicker,
+  RenderSelectDeptField
   // RenderExps,
   // RenderRandomCode
 };

@@ -41,6 +41,7 @@ class AccountController extends Controller {
           await ctx.model.User.create({
             username,
             password: passwordCrypto,
+            name: res.data.name,
             deptId: res.data.deptId,
             id, // 创建本地用户和绑定的cas用户id一致
           });
@@ -150,6 +151,61 @@ class AccountController extends Controller {
     }
     ctx.helper.clearCookie();
     ctx.body = ctx.helper.getRespBody(true);
+  }
+
+  /**
+   * 在用户进入系统的home页面获取用户的一些信息，包括
+   * info用户资料 {name,status,position}
+   * dept用户组织关系部门信息，workDept实际工作部门信息 {id,name,names}
+   * 用户担任管理角色的部门id列表 [id1,id2]
+   */
+  async accountInfo() {
+    const ctx = this.ctx;
+    const id = ctx.user.id;
+    const user = await ctx.model.User.findOne({
+      include: [
+        {
+          model: ctx.model.DeptManager,
+          attributes: [ 'deptId' ],
+          as: 'manageDepts',
+          required: false,
+        },
+      ],
+      where: { id },
+      attributes: [ 'name', 'deptId', 'status', 'position' ],
+    });
+    const deptDic = await ctx.service.cache.getDeptDic();
+    const dept = deptDic[user.deptId];
+    const deptNames = ctx.service.dept.getDeptNamesSync(user.deptId, deptDic);
+    const workDept = await ctx.service.dept.getRelationDept(dept.id, deptDic);
+    const manageDepts = user.manageDepts.map(mDept => mDept.deptId);
+
+    ctx.body = ctx.helper.getRespBody(true, {
+      info: {
+        name: user.name,
+        status: user.status,
+        position: user.position,
+      },
+      dept: { id: dept.id, name: dept.name, names: deptNames.join('-') },
+      workDept,
+      manageDepts,
+    });
+  }
+
+  async setUserInfo() {
+    const ctx = this.ctx;
+    const {
+      values: { dept, status, position },
+      id,
+    } = ctx.request.body;
+    if (id !== ctx.user.id) throw '提交修改资料的用户id与cookie中id不一致';
+    await ctx.model.User.update(
+      { deptId: dept.id, status, position },
+      { where: { id } }
+    );
+    const workDept = await ctx.service.dept.getRelationDept(dept.id);
+    ctx.body = ctx.helper.getRespBody(true, { workDept });
+    // todotodo 返回添加了workdept，在front的saga中更新store中的workdept
   }
 }
 

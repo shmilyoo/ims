@@ -14,6 +14,14 @@ class CacheService extends Service {
     return await this.updateDeptArray();
   }
 
+  async getDeptDic() {
+    // 从缓存中获取deptArray
+    const result = await this.getCache('deptDic');
+    if (result) return result;
+    await this.updateDeptArray();
+    return await this.getCache('deptDic');
+  }
+
   /**
    * 从CAS获取并更新本地缓存的deptArray
    * @return {Array} deptArray

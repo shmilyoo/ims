@@ -93,11 +93,28 @@ function* getSystemConfig() {
   }
 }
 
+/**
+ * 用户进入系统主页面home，初始化获取deptArray、deptDic和deptRelation信息
+ */
+function* getDepts() {
+  yield take(systemTypes.SAGA_GET_DEPTS);
+  const res = yield axios.get('/dept/depts-and-relation');
+  if (res.success) {
+    const { deptArray, deptRelation } = res.data;
+    const deptDic = {};
+    deptArray.forEach(dept => {
+      deptDic[dept.id] = dept;
+    });
+    yield put(systemActions.setDepts(deptArray, deptDic, deptRelation));
+  }
+}
+
 export default [
   fork(getTags),
   fork(updateTag),
   fork(addTag),
   fork(deleteTag),
   fork(saveTimeScale),
-  fork(getSystemConfig)
+  fork(getSystemConfig),
+  fork(getDepts)
 ];

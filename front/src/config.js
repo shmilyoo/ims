@@ -12,12 +12,27 @@ export const ssoAuthLoginPage = 'http://localhost:3000/auth/login';
 export const ssoLoginPage = 'http://localhost:3000/login';
 export const ssoCheckPage = 'http://localhost:3000/auth/check';
 export const ssoAuthOk = 'http://localhost:4000/auth/ok'; // sso认证成功后，重定向到本地此页面进行cookie和缓存的操作
+export const userStatusDic = {
+  ONDUTY: 'onDuty',
+  ONHOLIDAY: 'onHoliday',
+  ONTRIP: 'onTrip',
+  ONSEA: 'onSea',
+  ONEXCHANGE: 'onExchange',
+  OTHER: 'other'
+};
+export const userStatus = [
+  { label: '在位', value: userStatusDic.ONDUTY },
+  { label: '休假', value: userStatusDic.ONHOLIDAY },
+  { label: '出差', value: userStatusDic.ONTRIP },
+  { label: '出海', value: userStatusDic.ONSEA },
+  { label: '代职', value: userStatusDic.ONEXCHANGE },
+  { label: '其他', value: userStatusDic.OTHER }
+];
 
 export const pathTitle = {
-  '/': '首页',
-  '/brief/mine': '我的概况',
-  '/brief/department': '我的部门',
-  '/brief/schedule': '我的日程',
+  '/work': '我的工作',
+  '/work/schedule': '我的日程',
+  '/work/schedule/manage': '日程管理',
   '/dept': '我的部门',
   '/dept/work': '部门工作',
   '/dept-admin/announcement': '部门公告',
@@ -29,7 +44,6 @@ export const pathTitle = {
   '/dept-admin/news/category': '文章分类',
   '/dept-admin/news/edit': '编辑文章',
   '/user/info': '我的资料',
-  '/user/dept/change': '更改部门',
   '/user/changePasswd': '修改密码',
   '/about': '关于',
   '/sa/system': '系统设置',
@@ -40,12 +54,21 @@ export const pathTitle = {
 // 没有children就有path属性，反之则有state属性表明类别
 export const leftMenu = [
   {
-    title: '我的面板',
-    state: 'brief', // 用于有子元素的菜单，在this.state中标记下拉是否展开
+    title: '我的页面',
+    path: '/brief',
+    icon: AccountBox
+  },
+  {
+    title: '工作日程',
+    state: 'work', // 用于有子元素的菜单，在this.state中标记下拉是否展开
     icon: AccountBox,
     children: [
-      { title: pathTitle['/brief/mine'], path: '/brief/mine' },
-      { title: pathTitle['/brief/schedule'], path: '/brief/schedule' }
+      { title: pathTitle['/work'], path: '/work' },
+      { title: pathTitle['/work/schedule'], path: '/work/schedule' },
+      {
+        title: pathTitle['/work/schedule/manage'],
+        path: '/work/schedule/manage'
+      }
     ]
   },
   {
@@ -61,6 +84,7 @@ export const leftMenu = [
     title: '部门管理',
     state: 'dept-admin', // 用于有子元素的菜单，在this.state中标记下拉是否展开
     icon: AccountBox,
+    manageDept: true,
     children: [
       {
         title: pathTitle['/dept-admin/announcement'],
@@ -85,10 +109,6 @@ export const leftMenu = [
     icon: AccountBox,
     children: [
       { title: pathTitle['/user/info'], path: '/user/info' },
-      {
-        title: pathTitle['/user/dept/change'],
-        path: '/user/dept/change'
-      },
       {
         title: pathTitle['/user/changePasswd'],
         path: '/user/changePasswd'

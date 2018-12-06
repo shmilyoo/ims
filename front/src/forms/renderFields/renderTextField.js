@@ -11,8 +11,8 @@ const RenderTextField = ({
   return (
     <TextField
       label={label}
-      error={!!(touched && error)}
-      helperText={touched && error ? error : ' '}
+      error={!readOnly && !!(touched && error)}
+      helperText={!readOnly && touched && error ? error : ' '}
       InputProps={{ readOnly }}
       fullWidth
       {...input}

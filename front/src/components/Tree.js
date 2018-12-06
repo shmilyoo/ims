@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import SortableTree from 'react-sortable-tree';
-import { withStyles } from '@material-ui/core';
-import { Typography, IconButton } from '@material-ui/core';
+import { withStyles, Typography, IconButton } from '@material-ui/core';
 import Autorenew from '@material-ui/icons/Autorenew';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import 'react-sortable-tree/style.css';
 import '../assets/css/customDeptTree.css'; // 自定义的一些样式
+import { makeDeptTree } from '../services/utility';
 
 const style = {
   refreshBtn: { padding: '0.5rem' },
@@ -17,12 +17,27 @@ const style = {
   tree: { flex: '1', display: 'flex', flexDirection: 'column' }
 };
 class Tree extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      treeNodeSelectedId: '',
-      treeNodeSelectedTitle: ''
-    };
+  state = {
+    treeNodeSelectedId: '',
+    treeNodeSelectedTitle: ''
+    // treeData: null,
+    // treeDataList: null, // 用在getDerivedStateFromProps中辅助判断是否需要计算treedata
+    // expands: null // 用在getDerivedStateFromProps中辅助判断是否需要计算treedata
+  };
+
+  static getDerivedStateFromProps(nextProps, preState) {
+    const { treeDataList, expands } = nextProps;
+    if (
+      treeDataList !== preState.treeDataList ||
+      expands !== preState.expands
+    ) {
+      return {
+        treeData: treeDataList ? makeDeptTree(treeDataList, expands) : null,
+        treeDataList: treeDataList,
+        expands: expands
+      };
+    }
+    return null;
   }
 
   handleRefreshClick = e => {
@@ -43,7 +58,6 @@ class Tree extends React.PureComponent {
    */
   handleSelected = (id, title) => {
     // 选中节点，并激活上级组件事件
-    console.log('tree selected');
     this.props.onTreeNodeSelected && this.props.onTreeNodeSelected(id, title);
     this.setState({
       treeNodeSelectedId: id,
@@ -52,7 +66,6 @@ class Tree extends React.PureComponent {
   };
   handleUnSelected = () => {
     // 取消选中节点 ，并激活上级组件事件
-    console.log('tree unselected');
     this.props.onTreeNodeUnSelected && this.props.onTreeNodeUnSelected();
     this.setState({
       treeNodeSelectedId: '',
@@ -61,19 +74,22 @@ class Tree extends React.PureComponent {
   };
 
   handleExpandAllClick = e => {
-    this.toogleExpandAll(e, true);
+    e.stopPropagation();
+    this.props.onExpandsChange(true);
   };
   handleCollapseAllClick = e => {
-    this.toogleExpandAll(e, false);
-  };
-  /**
-   * 全部展开和全部折叠事件处理函数
-   * @param {Event} e event
-   * @param {boolean} expand 全部展开还是折叠
-   */
-  toogleExpandAll = (e, expand) => {
     e.stopPropagation();
-    this.props.onExpandCollapseAll(expand);
+    this.props.onExpandsChange(false);
+  };
+
+  /**
+   * 点击节点旁按钮展开收缩节点时，回调 expands change 事件
+   */
+  handleVisibilityToggle = ({ node: { id: nodeId }, expanded }) => {
+    const { expands, onExpandsChange } = this.props;
+    typeof expands === 'boolean'
+      ? onExpandsChange({ [nodeId]: expanded })
+      : onExpandsChange({ ...expands, [nodeId]: expanded });
   };
 
   generateNodeProps = ({ node }) => {
@@ -93,6 +109,9 @@ class Tree extends React.PureComponent {
         ) {
           return; // 略过点击折叠按钮/移动手柄 触发选择事件
         }
+        const { canSelectIdList, cantSelectIdList } = this.props;
+        if (canSelectIdList && !canSelectIdList.includes(node.id)) return;
+        if (cantSelectIdList && cantSelectIdList.includes(node.id)) return;
         if (node.id === this.state.treeNodeSelectedId) {
           // 点击的节点id等于已经选中的id，触发取消选中事件
           this.handleUnSelected && this.handleUnSelected();
@@ -104,20 +123,21 @@ class Tree extends React.PureComponent {
     };
   };
 
+  handleTreeChange = treeData => {
+    this.setState({ treeData });
+  };
+
   render() {
     const {
       classes,
       hideHead,
       hideRefresh,
       hideExpandCollapse,
-      treeData,
-      onChange,
-      onVisibilityToggle,
       onMoveNode,
       title,
       ...rest
     } = this.props;
-    console.log('tree render');
+    // console.log(title, 'tree render');
     return (
       <div className={classes.root} onClick={this.rootDivClickHandle}>
         {!hideHead && (
@@ -160,10 +180,10 @@ class Tree extends React.PureComponent {
         <div className={classes.tree}>
           <SortableTree
             {...rest}
-            treeData={treeData}
+            treeData={this.state.treeData || []}
             rowHeight={50}
-            onChange={onChange}
-            onVisibilityToggle={onVisibilityToggle}
+            onChange={this.handleTreeChange}
+            onVisibilityToggle={this.handleVisibilityToggle}
             onMoveNode={onMoveNode}
             getNodeKey={({ node }) => node.id}
             generateNodeProps={this.generateNodeProps}
@@ -176,14 +196,18 @@ class Tree extends React.PureComponent {
 
 Tree.propTypes = {
   title: PropTypes.string, // 标题
-  treeData: PropTypes.array.isRequired, // 控件树形数据
+  treeDataList: PropTypes.array, // 树形节点数据列表
+  expands: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]), // 展开数据
   onTreeNodeSelected: PropTypes.func, // 选中节点，并激活上级组件事件
   onTreeNodeUnSelected: PropTypes.func, // 取消选中节点，并激活上级组件事件
   onRefreshData: PropTypes.func, // 刷新按钮事件
-  onChange: PropTypes.func.isRequired,
-  onVisibilityToggle: PropTypes.func,
+  // onChange: PropTypes.func.isRequired, // treeData在change的时候回调
+  onExpandsChange: PropTypes.func, // 在expands变化的时候回调
   onExpandCollapseAll: PropTypes.func,
   onMoveNode: PropTypes.func,
+  // 以下两个props不可同时存在
+  canSelectIdList: PropTypes.array, // 允许选择的节点，其余为不可选择
+  cantSelectIdList: PropTypes.array, // 不允许选择的节点，其余为可选择
   hideHead: PropTypes.bool,
   hideRefresh: PropTypes.bool,
   hideExpandCollapse: PropTypes.bool,

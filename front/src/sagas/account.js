@@ -6,7 +6,7 @@ import { types as accountTypes } from '../reducers/account';
 import { actions as accountActions } from '../reducers/account';
 import history from '../history';
 import { ssoLoginPage } from '../config';
-import { getAuth } from '.';
+import { getAuth, getId } from '.';
 import Cookies from 'js-cookie';
 
 /**
@@ -159,6 +159,45 @@ function* logoutFlow() {
   }
 }
 
+function* getUserInfoFlow() {
+  // 在用户初次mount 进入home的时候获取一次
+  yield take(accountTypes.SAGA_GET_ACCOUNT_INFO);
+  // const id = yield select(getId);
+  const {
+    success,
+    data: { dept, info, workDept, manageDepts }
+  } = yield axios.get('/account/info');
+  if (success) {
+    // data/相当于state的account:
+    //  {dept:{id,name,names},info:{status,position},...}
+    yield put(accountActions.setAccountInfo(dept, info, workDept, manageDepts));
+  }
+}
+
+function* setAccountInfoFlow() {
+  while (true) {
+    const { resolve, values, id } = yield take(
+      accountTypes.SAGA_SET_ACCOUNT_INFO
+    );
+    const { success } = yield axios.post('/account/info', {
+      values,
+      id
+    });
+    if (success) {
+      yield put(
+        accountActions.setAccountInfo(
+          values.dept,
+          {
+            status: values.status,
+            position: values.position
+          } //
+        )
+      );
+      yield call(resolve);
+    }
+  }
+}
+
 export default [
   fork(ssoAuth),
   fork(regFlow),
@@ -166,5 +205,7 @@ export default [
   fork(checkUsernameFlow),
   fork(loginFlow),
   fork(logoutFlow),
-  fork(checkAuthFlow)
+  fork(checkAuthFlow),
+  fork(getUserInfoFlow),
+  fork(setAccountInfoFlow)
 ];

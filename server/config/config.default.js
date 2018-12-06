@@ -1,5 +1,8 @@
 'use strict';
 
+const CASURL = 'http://localhost:3000';
+const IMSURL = 'http://localhost:4000';
+
 exports.keys = 'ims-backend_1540020800270_169';
 exports.middleware = [];
 exports.sequelize = {
@@ -42,10 +45,10 @@ exports.cluster = {
   },
 };
 exports.sysName = 'ims';
-exports.ssoKey = '111111'; // sso服务器生成的和本服务端之间的通信密钥
-exports.ssoAuthLoginPage = 'http://localhost:3000/auth/login';
-exports.ssoCheckPage = 'http://localhost:3000/auth/check';
-exports.ssoCheckBind = 'http://localhost:3000/auth/check/bind';
-exports.ssoUserBind = 'http://localhost:3000/auth/user/bind';
-exports.ssoAuthOk = 'http://localhost:4000/auth/ok';
-exports.ssoDepts = 'http://localhost:3000/sso-api/depts'; // sso获取deptArray地址
+exports.ssoKey = '111111'; // sso服务器生成的和本服务端之间的通信密钥/认证密码
+exports.ssoAuthLoginPage = `${CASURL}/auth/login`;
+exports.ssoCheckPage = `${CASURL}/auth/check`;
+exports.ssoCheckBind = `${CASURL}/auth/check/bind`;
+exports.ssoUserBind = `${CASURL}/auth/user/bind`;
+exports.ssoAuthOk = `${IMSURL}/auth/ok`; // 用户单点登录认证时发送给CAS的本机auth-ok地址，以便成功后回调
+exports.ssoDepts = `${CASURL}/sso-api/depts`; // sso获取deptArray地址

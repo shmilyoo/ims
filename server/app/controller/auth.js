@@ -90,7 +90,7 @@ class AuthController extends Controller {
     const [ localUser ] = await ctx.model.User.findOrCreate({
       where: { id },
       // 如果没有对应条目，创建一个user，将用户实际工作部门设置为统一认证系统中所在部门
-      defaults: { id, deptId },
+      defaults: { id, deptId, name },
     });
     // todo todo 两种登录方式，通过的时候都要获取本地用户数据库的一些信息
     ctx.body = await ctx.helper.getRespBody(true, {
