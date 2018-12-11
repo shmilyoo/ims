@@ -1,75 +1,84 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { Grid, Button, Divider, Typography } from '@material-ui/core';
 import Tree from '../../components/Tree';
 import {
   makeDeptTree,
-  getLevel1ExpandsfromTreeArray
+  getLevel1ExpandsfromTreeArray,
+  getNewExpands,
+  getExpandsToNode
 } from '../../services/utility';
 import Axios from 'axios';
-import compose from 'recompose/compose';
 import { actions as systemActions } from '../../reducers/system';
 
 class DeptRelation extends Component {
   constructor(props) {
     super(props);
+    const { deptArray, deptDic, deptRelation } = props;
+    // let deptArrayLeft = JSON.parse(JSON.stringify(deptArray));
+    const deptArrayLeft = deptArray.map(node => ({
+      ...node,
+      name: deptRelation[node.id]
+        ? `${node.name} -> ${deptDic[deptRelation[node.id]].name}`
+        : node.name
+    }));
+    const expandsLeft = getLevel1ExpandsfromTreeArray(deptArrayLeft);
+    const treeDataLeft = makeDeptTree(deptArrayLeft, expandsLeft);
+    const treeDataRight = makeDeptTree(deptArray, expandsLeft);
     this.state = {
-      // 按照level和order排序的节点数组，非树形数据,左边的树因为要改变文字，所以单独变量
-      treeDataListLeft: null,
-      // treeDataListRight 就是store中的deptArray
+      treeDataListLeft: deptArrayLeft,
+      treeDataLeft: treeDataLeft,
+      treeDataRight: treeDataRight,
       nodeSelectedLeft: null,
       nodeSelectedRight: null,
-      expandsLeft: null,
-      expandsRight: null,
+      expandsLeft: expandsLeft,
+      expandsRight: { ...expandsLeft },
       shineNodeRightId: '' // 左边节点选中时，右边绑定的节点开始闪光
     };
-  }
-
-  static getDerivedStateFromProps(nextProps, preState) {
-    if (!preState.treeDataListLeft && nextProps.deptArray) {
-      console.log('deptrelation getDerivedStateFromProps 计算');
-      const { deptArray, deptDic, deptRelation } = nextProps;
-      let deptArrayLeft = JSON.parse(JSON.stringify(deptArray));
-      deptArrayLeft = deptArray.map(node => ({
-        ...node,
-        name: deptRelation[node.id]
-          ? `${node.name} -> ${deptDic[deptRelation[node.id]].name}`
-          : node.name
-      }));
-      const _expands = getLevel1ExpandsfromTreeArray(deptArrayLeft);
-      return {
-        treeDataListLeft: deptArrayLeft,
-        expandsLeft: _expands,
-        expandsRight: { ..._expands }
-      };
-    }
-    return null;
   }
 
   /**
    * 左边选择节点后，右边绑定到的节点，一路展开，如果有必要的话
    */
   expandRightTreeToNode = _id => {
-    const { deptDic } = this.props;
-    let expandsRight = { ...this.state.expandsRight };
-    let needChange = false; // 是否有必要展开
-    let node = deptDic[deptDic[_id].parentId];
-    while (node) {
-      // 如果对应展开项不是true（undefined or false）
-      if (!expandsRight[node.id]) needChange = true;
-      expandsRight[node.id] = true;
-      node = deptDic[node.parentId];
-    }
-    if (needChange) {
-      this.setState({ expandsRight });
+    if (this.state.expandsRight === true) return;
+    const { deptDic, deptArray } = this.props;
+    const { hasExpandsChange, newExpands } = getExpandsToNode(
+      _id,
+      deptDic,
+      this.state.expandsRight
+    );
+    if (hasExpandsChange) {
+      this.setState({
+        expandsRight: newExpands,
+        treeDataRight: makeDeptTree(deptArray, newExpands)
+      });
     }
   };
+
   handleExpandsLeftChange = expands => {
-    this.setState({ expandsLeft: expands });
+    if (this.state.expandsLeft === expands) return;
+    const newExpands = getNewExpands(this.state.expandsLeft, expands);
+    typeof expands === 'boolean'
+      ? this.setState({
+          expandsLeft: newExpands,
+          treeDataLeft: makeDeptTree(this.state.treeDataListLeft, newExpands)
+        })
+      : this.setState({
+          expandsLeft: newExpands
+        });
   };
+
   handleExpandsRightChange = expands => {
-    this.setState({ expandsRight: expands });
+    if (this.state.expandsRight === expands) return;
+    const newExpands = getNewExpands(this.state.expandsRight, expands);
+    typeof expands === 'boolean'
+      ? this.setState({
+          expandsRight: newExpands,
+          treeDataRight: makeDeptTree(this.props.deptArray, newExpands)
+        })
+      : this.setState({
+          expandsRight: newExpands
+        });
   };
 
   handleTreeNodeLeftSelected = id => {
@@ -106,6 +115,13 @@ class DeptRelation extends Component {
     });
   };
 
+  handleTreeDataLeftChange = treeData => {
+    this.setState({ treeDataLeft: treeData });
+  };
+  handleTreeDataRightChange = treeData => {
+    this.setState({ treeDataRight: treeData });
+  };
+
   /**
    * 根据节点间的绑定关系计算出左侧节点列表
    */
@@ -121,7 +137,7 @@ class DeptRelation extends Component {
 
   bind = () => {
     const { deptRelation, deptArray, deptDic, dispatch } = this.props;
-    const { nodeSelectedLeft, nodeSelectedRight } = this.state;
+    const { nodeSelectedLeft, nodeSelectedRight, expandsLeft } = this.state;
     if (
       nodeSelectedLeft &&
       nodeSelectedRight &&
@@ -134,16 +150,18 @@ class DeptRelation extends Component {
       }).then(res => {
         if (res.success) {
           const { fromDeptId } = res.data;
-          this.setState({ shineNodeRightId: '' });
           // 更改store中的deptRelation 更新左侧树的deptArray
           const newRelation = { ...deptRelation };
           delete newRelation[fromDeptId];
+          const newDataList = this.getDeptArrayLeft(
+            deptArray,
+            newRelation,
+            deptDic
+          );
           this.setState({
-            treeDataListLeft: this.getDeptArrayLeft(
-              deptArray,
-              newRelation,
-              deptDic
-            )
+            treeDataListLeft: newDataList,
+            treeDataLeft: makeDeptTree(newDataList, expandsLeft),
+            shineNodeRightId: ''
           });
           dispatch(systemActions.setDeptRelation(newRelation));
         }
@@ -158,13 +176,15 @@ class DeptRelation extends Component {
           const { fromDeptId, toDeptId } = res.data;
           const newRelation = { ...deptRelation };
           newRelation[fromDeptId] = toDeptId;
-          this.setState({ shineNodeRightId: nodeSelectedRight.id });
+          const newDataList = this.getDeptArrayLeft(
+            deptArray,
+            newRelation,
+            deptDic
+          );
           this.setState({
-            treeDataListLeft: this.getDeptArrayLeft(
-              deptArray,
-              newRelation,
-              deptDic
-            )
+            treeDataListLeft: newDataList,
+            treeDataLeft: makeDeptTree(newDataList, expandsLeft),
+            shineNodeRightId: nodeSelectedRight.id
           });
           dispatch(systemActions.setDeptRelation(newRelation));
         }
@@ -173,15 +193,14 @@ class DeptRelation extends Component {
   };
 
   updateLeftTree = () => {
-    const { treeDataListLeft, treeDataDic } = this.state;
+    const { deptDic, deptRelation, expandsLeft } = this.props;
+    const { treeDataListLeft } = this.state;
     treeDataListLeft.forEach(node => {
-      node.name = this.deptRelations[node.id]
-        ? `${treeDataDic[node.id].name} -> ${
-            treeDataDic[this.deptRelations[node.id]].name
-          }`
-        : treeDataDic[node.id].name;
+      node.name = deptRelation[node.id]
+        ? `${deptDic[node.id].name} -> ${deptDic[deptRelation[node.id]].name}`
+        : deptDic[node.id].name;
     });
-    let treeDataLeft = makeDeptTree(treeDataListLeft, this.expandsLeft);
+    let treeDataLeft = makeDeptTree(treeDataListLeft, expandsLeft);
     this.setState({
       treeDataListLeft,
       treeDataLeft
@@ -190,14 +209,13 @@ class DeptRelation extends Component {
 
   render() {
     const {
-      treeDataListLeft,
-      expandsLeft,
-      expandsRight,
+      treeDataLeft,
+      treeDataRight,
       shineNodeRightId,
       nodeSelectedLeft,
       nodeSelectedRight
     } = this.state;
-    const { deptArray, deptRelation } = this.props;
+    const { deptRelation } = this.props;
     return (
       <Grid container direction="column">
         <Grid item>
@@ -211,17 +229,15 @@ class DeptRelation extends Component {
         </Grid>
         <Grid item xs container>
           <Grid item xs={5}>
-            {treeDataListLeft && (
-              <Tree
-                title="部门绑定结果"
-                hideRefresh={true}
-                treeDataList={treeDataListLeft}
-                expands={expandsLeft}
-                onExpandsChange={this.handleExpandsLeftChange}
-                onTreeNodeSelected={this.handleTreeNodeLeftSelected}
-                onTreeNodeUnSelected={this.handleTreeNodeLeftUnSelected}
-              />
-            )}
+            <Tree
+              title="部门绑定结果"
+              hideRefresh={true}
+              treeData={treeDataLeft}
+              onChange={this.handleTreeDataLeftChange}
+              onExpandsChange={this.handleExpandsLeftChange}
+              onTreeNodeSelected={this.handleTreeNodeLeftSelected}
+              onTreeNodeUnSelected={this.handleTreeNodeLeftUnSelected}
+            />
           </Grid>
           <Grid item xs={2} container direction="column" alignItems="center">
             <Grid item>
@@ -246,18 +262,16 @@ class DeptRelation extends Component {
             </Grid>
           </Grid>
           <Grid item xs={5}>
-            {deptArray && (
-              <Tree
-                title="部门架构"
-                hideRefresh={true}
-                shineNodeId={shineNodeRightId}
-                treeDataList={deptArray}
-                expands={expandsRight}
-                onExpandsChange={this.handleExpandsRightChange}
-                onTreeNodeSelected={this.handleTreeNodeRightSelected}
-                onTreeNodeUnSelected={this.handleTreeNodeRightUnSelected}
-              />
-            )}
+            <Tree
+              title="部门架构"
+              hideRefresh={true}
+              shineNodeId={shineNodeRightId}
+              treeData={treeDataRight}
+              onChange={this.handleTreeDataRightChange}
+              onExpandsChange={this.handleExpandsRightChange}
+              onTreeNodeSelected={this.handleTreeNodeRightSelected}
+              onTreeNodeUnSelected={this.handleTreeNodeRightUnSelected}
+            />
           </Grid>
         </Grid>
       </Grid>
@@ -265,14 +279,4 @@ class DeptRelation extends Component {
   }
 }
 
-DeptRelation.propTypes = {};
-
-function mapStateToProps(state) {
-  return {
-    deptArray: state.system.deptArray,
-    deptDic: state.system.deptDic,
-    deptRelation: state.system.deptRelation
-  };
-}
-
-export default compose(connect(mapStateToProps))(DeptRelation);
+export default DeptRelation;

@@ -1,6 +1,7 @@
 'use strict';
 
 const Service = require('egg').Service;
+const axios = require('axios');
 
 class CacheService extends Service {
   async updateAll() {
@@ -11,7 +12,8 @@ class CacheService extends Service {
     // 从缓存中获取deptArray
     const result = await this.getCache('deptArray');
     if (result) return result;
-    return await this.updateDeptArray();
+    await this.updateDeptArray();
+    return (await this.getCache('deptArray')) || [];
   }
 
   async getDeptDic() {
@@ -23,20 +25,45 @@ class CacheService extends Service {
   }
 
   /**
-   * 从CAS获取并更新本地缓存的deptArray
-   * @return {Array} deptArray
+   * 从CAS获取并更新本地缓存deptArray和dept数据表的
    */
   async updateDeptArray() {
-    const result = await this.service.dept.getDeptArray();
-    if (result.success) {
-      await this.setCache('deptArray', result.data);
-      const deptDic = {};
-      result.data.forEach(dept => {
-        deptDic[dept.id] = dept;
-      });
-      await this.setCache('deptDic', deptDic);
+    const { config, ctx, service } = this;
+    const updateTimeConfig = await service.cache.getDeptUpdateTime();
+    const imsDeptUpdateTime = updateTimeConfig || '1'; // 随便起一个值
+    const reqConfig = await service.auth.addSsoTokenToConfig();
+    const res = await axios.get(
+      `${config.ssoDepts}?time=${imsDeptUpdateTime}`,
+      reqConfig
+    );
+    if (res.success) {
+      if (res.data.hasChanged) {
+        const transaction = await ctx.model.transaction();
+        try {
+          const num = res.data.deptArray.length;
+          await ctx.model.Dept.destroy({ where: {} });
+          const createDepts = await ctx.model.Dept.bulkCreate(
+            res.data.deptArray
+          );
+          if (num !== createDepts.length) {
+            throw '获取的depts长度与本地添加不一致，撤回事物';
+          }
+          await service.system.setDeptUpdateTime(res.data.time);
+          await this.setCache('deptArray', res.data.deptArray);
+          await transaction.commit();
+          // log 本地dept缓存和表与CAS不一致，成功更新
+        } catch (error) {
+          console.log(error);
+          await transaction.rollback();
+          // log 与CAS更新本地dept缓存和表时在写本地数据时出错，事物已回滚 error.message
+        }
+      } else {
+        console.log('自上次更新以后，cas的dept表没有变化');
+        // log 自上次更新以后，cas的dept表没有变化
+      }
+    } else {
+      // log 与CAS更新本地dept缓存和表时CAS返回错误信号
     }
-    return result.success ? result.data : null;
   }
 
   async setCache(key, value, serialze = true) {

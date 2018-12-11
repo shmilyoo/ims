@@ -60,6 +60,7 @@ class Home extends React.Component {
     leftOpen: true
   };
   componentDidMount() {
+    console.log('home mount!!!!!!!!!!!!!!!!!!!!!!!!!!!');
     this.props.dispatch(accountActions.sagaGetAccountInfo());
     this.props.dispatch(systemActions.sagaGetDepts());
   }

@@ -15,7 +15,9 @@ export const types = {
   AUTH_SUCCESS: 'ACCOUNT/AUTH_SUCCESS',
   CHECK_AUTH_FAILURE: 'ACCOUNT/CHECK_AUTH_FAILURE',
   LOGIN_SUCCESS: 'ACCOUNT/LOGIN_SUCCESS',
-  SET_ACCOUNT_INFO: 'ACCOUNT/SET_ACCOUNT_INFO'
+  SET_ACCOUNT_INFO: 'ACCOUNT/SET_ACCOUNT_INFO', // 进入主页面的时候初始化用户相关信息
+  UPDATE_ACCOUNT_INFO: 'ACCOUNT/UPDATE_ACCOUNT_INFO', // 只更新info
+  UPDATE_ACCOUNT_DEPT: 'ACCOUNT/UPDATE_ACCOUNT_DEPT' // 更新dept和workDept
 };
 
 export const actions = {
@@ -47,6 +49,12 @@ export const actions = {
     info,
     workDept,
     manageDepts
+  }),
+  updateInfo: info => ({ type: types.UPDATE_ACCOUNT_INFO, info }),
+  updateDept: (dept, workDept = {}) => ({
+    type: types.UPDATE_ACCOUNT_DEPT,
+    dept,
+    workDept
   }),
   authSuccess: (authType, user) => ({
     // 'id', 'username', 'active', 'name', 'sex', 'deptId','authType'
@@ -107,6 +115,17 @@ export default function accountReducer(state = initState, action) {
         workDept: { ...state.workDept, ...action.workDept },
         manageDept: action.manageDepts.length ? action.manageDepts[0] : '',
         manageDepts: action.manageDepts
+      };
+    case types.UPDATE_ACCOUNT_INFO:
+      return {
+        ...state,
+        info: { ...state.info, ...action.info }
+      };
+    case types.UPDATE_ACCOUNT_DEPT:
+      return {
+        ...state,
+        dept: { ...state.dept, ...action.dept },
+        workDept: { ...state.workDept, ...action.workDept }
       };
     case types.CLEAR_AUTH:
       return initState;

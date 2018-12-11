@@ -32,23 +32,40 @@ class DeptController extends Controller {
   //   const deptDic = await ctx.service.cache;
   // }
 
-  async relations() {
-    const ctx = this.ctx;
-    const result = await ctx.service.dept.getDeptRelation();
-    ctx.body = ctx.helper.getRespBody(true, result);
-  }
+  // async relations() {
+  //   const ctx = this.ctx;
+  //   const result = await ctx.service.dept.getDeptRelation();
+  //   ctx.body = ctx.helper.getRespBody(true, result);
+  // }
 
-  async relationsBind() {
+  // async relationsBind() {
+  //   const ctx = this.ctx;
+  //   const { fromDeptId, toDeptId } = ctx.request.body;
+  //   await ctx.model.DeptRelation.upsert({ fromDeptId, toDeptId });
+  //   ctx.body = ctx.helper.getRespBody(true, { fromDeptId, toDeptId });
+  // }
+  // async relationsUnbind() {
+  //   const ctx = this.ctx;
+  //   const { fromDeptId, toDeptId } = ctx.request.body;
+  //   await ctx.model.DeptRelation.destroy({ where: { fromDeptId, toDeptId } });
+  //   ctx.body = ctx.helper.getRespBody(true, { fromDeptId, toDeptId });
+  // }
+
+  async deptUsers() {
+    // todo relation 废弃后，使用关联deptId level order 来查找user
     const ctx = this.ctx;
-    const { fromDeptId, toDeptId } = ctx.request.body;
-    await ctx.model.DeptRelation.upsert({ fromDeptId, toDeptId });
-    ctx.body = ctx.helper.getRespBody(true, { fromDeptId, toDeptId });
-  }
-  async relationsUnbind() {
-    const ctx = this.ctx;
-    const { fromDeptId, toDeptId } = ctx.request.body;
-    await ctx.model.DeptRelation.destroy({ where: { fromDeptId, toDeptId } });
-    ctx.body = ctx.helper.getRespBody(true, { fromDeptId, toDeptId });
+    const { offspring, id } = ctx.query;
+    if (!id) throw '错误的请求参数';
+    const ids = [ id ];
+    if (offspring === '1') {
+      // const fromDeptIds = await ctx.service.dept.getRelationDeptsFrom(id);
+      // ids = ids.concat(fromDeptIds);
+    }
+    const users = await ctx.model.User.findAll({
+      attributes: [ 'id', 'name', 'deptId' ],
+      where: { deptId: { [ctx.model.Op.in]: ids } },
+    });
+    ctx.body = ctx.helper.getRespBody(true, users);
   }
 }
 

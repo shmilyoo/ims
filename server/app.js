@@ -61,10 +61,10 @@ module.exports = app => {
         name: '网络2',
         deptId: 'c360d5f0ceef11e8b013f53754442666',
       });
-      app.model.DeptRelation.create({
-        fromDeptId: 'c360d5f0ceef11e8b013f53754442dd5',
-        toDeptId: 'c360d5f0ceef11e8b013f53754442dd4',
-      });
+      // app.model.DeptRelation.create({
+      //   fromDeptId: 'c360d5f0ceef11e8b013f53754442dd5',
+      //   toDeptId: 'c360d5f0ceef11e8b013f53754442dd4',
+      // });
       app.model.Tag.create({ name: '其他', color: '#666', order: 1000 });
       app.logger.info('同步数据库表完毕');
     });

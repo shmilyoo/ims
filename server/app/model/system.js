@@ -7,7 +7,7 @@ module.exports = app => {
 
   const System = db.defineModel(app, 'System', {
     name: { type: STRING(16), unique: true },
-    value: { type: STRING(64) },
+    value: { type: STRING(64), defaultValue: '' },
   });
 
   return System;

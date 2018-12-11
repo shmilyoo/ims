@@ -7,6 +7,7 @@ module.exports = app => {
   const { STRING, INTEGER, DATE, ENUM, BOOLEAN, CHAR } = app.Sequelize;
 
   const Work = db.defineModel(app, 'work', {
+    deptId: { type: CHAR(32) }, // 大项工作关联的部门id
     title: { type: STRING(32) }, // 大项工作名称
     publisherId: { type: CHAR(32) }, // 发布工作的用户
     from: { type: INTEGER }, // 工作开始时间，unix时间戳，秒

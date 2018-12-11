@@ -25,20 +25,20 @@ class Tree extends React.PureComponent {
     // expands: null // 用在getDerivedStateFromProps中辅助判断是否需要计算treedata
   };
 
-  static getDerivedStateFromProps(nextProps, preState) {
-    const { treeDataList, expands } = nextProps;
-    if (
-      treeDataList !== preState.treeDataList ||
-      expands !== preState.expands
-    ) {
-      return {
-        treeData: treeDataList ? makeDeptTree(treeDataList, expands) : null,
-        treeDataList: treeDataList,
-        expands: expands
-      };
-    }
-    return null;
-  }
+  // static getDerivedStateFromProps(nextProps, preState) {
+  //   const { treeDataList, expands } = nextProps;
+  //   if (
+  //     treeDataList !== preState.treeDataList ||
+  //     expands !== preState.expands
+  //   ) {
+  //     return {
+  //       treeData: treeDataList ? makeDeptTree(treeDataList, expands) : null,
+  //       treeDataList: treeDataList,
+  //       expands: expands
+  //     };
+  //   }
+  //   return null;
+  // }
 
   handleRefreshClick = e => {
     e.stopPropagation();
@@ -86,10 +86,7 @@ class Tree extends React.PureComponent {
    * 点击节点旁按钮展开收缩节点时，回调 expands change 事件
    */
   handleVisibilityToggle = ({ node: { id: nodeId }, expanded }) => {
-    const { expands, onExpandsChange } = this.props;
-    typeof expands === 'boolean'
-      ? onExpandsChange({ [nodeId]: expanded })
-      : onExpandsChange({ ...expands, [nodeId]: expanded });
+    this.props.onExpandsChange({ [nodeId]: expanded });
   };
 
   generateNodeProps = ({ node }) => {
@@ -123,13 +120,15 @@ class Tree extends React.PureComponent {
     };
   };
 
-  handleTreeChange = treeData => {
-    this.setState({ treeData });
-  };
+  // handleTreeChange = treeData => {
+  //   this.setState({ treeData });
+  // };
 
   render() {
     const {
       classes,
+      treeData,
+      onChange,
       hideHead,
       hideRefresh,
       hideExpandCollapse,
@@ -180,9 +179,9 @@ class Tree extends React.PureComponent {
         <div className={classes.tree}>
           <SortableTree
             {...rest}
-            treeData={this.state.treeData || []}
+            treeData={treeData || []}
             rowHeight={50}
-            onChange={this.handleTreeChange}
+            onChange={onChange}
             onVisibilityToggle={this.handleVisibilityToggle}
             onMoveNode={onMoveNode}
             getNodeKey={({ node }) => node.id}
@@ -196,8 +195,8 @@ class Tree extends React.PureComponent {
 
 Tree.propTypes = {
   title: PropTypes.string, // 标题
-  treeDataList: PropTypes.array, // 树形节点数据列表
-  expands: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]), // 展开数据
+  treeData: PropTypes.array, // 树形节点数据列表
+  // expands: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]), // 展开数据
   onTreeNodeSelected: PropTypes.func, // 选中节点，并激活上级组件事件
   onTreeNodeUnSelected: PropTypes.func, // 取消选中节点，并激活上级组件事件
   onRefreshData: PropTypes.func, // 刷新按钮事件

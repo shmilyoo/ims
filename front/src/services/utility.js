@@ -85,6 +85,39 @@ export const getLevel1ExpandsfromTreeArray = treeArray => {
 };
 
 /**
+ * 从旧的expands和新更新的expands生成新的expands
+ * @param {boolean|object} oldExpands
+ * @param {boolean|object} expands
+ * @return {boolean|object} 返回新的expands
+ */
+export const getNewExpands = (oldExpands, expands) => {
+  if (typeof expands === 'boolean') return expands;
+  return typeof oldExpands === 'boolean'
+    ? expands
+    : { ...oldExpands, ...expands };
+};
+
+/**
+ *
+ * @param {string} toNodeId 要展开到的节点id
+ * @param {object} deptDic 节点的对象集合
+ * @param {any} expands 原先的展开对象
+ */
+export const getExpandsToNode = (toNodeId, deptDic, expands = {}) => {
+  if (expands === true) return { hasExpandsChange: false, newExpands: true };
+  let newExpands = { ...expands };
+  let hasExpandsChange = false;
+  let node = deptDic[deptDic[toNodeId].parentId];
+  while (node) {
+    // 如果对应展开项不是true（undefined or false）
+    if (!newExpands[node.id]) hasExpandsChange = true;
+    newExpands[node.id] = true;
+    node = deptDic[node.parentId];
+  }
+  return { hasExpandsChange: hasExpandsChange, newExpands: newExpands };
+};
+
+/**
  *
  * @param {Array} deptArray 按照level从小到大排列的dept object数组
  * @param {(boolean|Object)} expanded id:bool 对象 设置各个节点是否展开,如果是Boolean则代表全展开或全折叠
@@ -92,6 +125,7 @@ export const getLevel1ExpandsfromTreeArray = treeArray => {
  */
 export const makeDeptTree = (deptArray, expanded) => {
   // [{name,intro,parent,path,level,id,sid},{},{}]
+  console.log('计算makeDeptTree');
   const result = [];
   const tmp = {};
   for (let i = 0; i < deptArray.length; i++) {

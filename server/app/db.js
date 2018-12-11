@@ -15,7 +15,7 @@ const { generateUUID } = require('./utils');
 function defineModel(app, name, attributes, option, isIdPrimaryKey = true) {
   const defaultOption = {
     timestamps: false,
-    version: true,
+    version: false,
     freezeTableName: true,
   };
   const { CHAR } = app.Sequelize;

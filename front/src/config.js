@@ -48,7 +48,8 @@ export const pathTitle = {
   '/about': '关于',
   '/sa/system': '系统设置',
   '/sa/admin': '权限管理',
-  '/sa/deptRelation': '部门关系'
+  '/sa/deptRelation': '部门关系',
+  '/sa/deptAdmin': '部门设置'
 };
 
 // 没有children就有path属性，反之则有state属性表明类别
@@ -123,6 +124,7 @@ export const leftMenu = [
     children: [
       { title: pathTitle['/sa/system'], path: '/sa/system' },
       { title: pathTitle['/sa/deptRelation'], path: '/sa/deptRelation' },
+      { title: pathTitle['/sa/deptAdmin'], path: '/sa/deptAdmin' },
       { title: pathTitle['/sa/admin'], path: '/sa/admin' }
     ]
   },

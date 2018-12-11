@@ -1,4 +1,5 @@
 'use strict';
+// 废弃，本地同步一份最新的dept数据表，不需要部门关系表了
 
 const db = require('../db');
 

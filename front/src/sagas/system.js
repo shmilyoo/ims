@@ -73,23 +73,25 @@ function* saveTimeScale() {
 }
 
 function* getSystemConfig() {
-  yield take(systemTypes.SAGA_GET_SYSTEM_CONFIG);
-  const res = yield axios.get('/system/all');
-  const configs = {};
-  if (res.success) {
-    res.data.forEach(config => {
-      configs[config.name] = config.value;
-    });
-    const { amFrom, amTo, pmFrom, pmTo } = configs;
-    if (amTo)
-      yield put(
-        systemActions.setTimeScale({
-          amFrom: Number.parseInt(amFrom) || 0,
-          amTo: Number.parseInt(amTo) || 0,
-          pmFrom: Number.parseInt(pmFrom) || 0,
-          pmTo: Number.parseInt(pmTo) || 0
-        })
-      );
+  while (true) {
+    yield take(systemTypes.SAGA_GET_SYSTEM_CONFIG);
+    const res = yield axios.get('/system/all');
+    const configs = {};
+    if (res.success) {
+      res.data.forEach(config => {
+        configs[config.name] = config.value;
+      });
+      const { amFrom, amTo, pmFrom, pmTo } = configs;
+      if (amTo)
+        yield put(
+          systemActions.setTimeScale({
+            amFrom: Number.parseInt(amFrom) || 0,
+            amTo: Number.parseInt(amTo) || 0,
+            pmFrom: Number.parseInt(pmFrom) || 0,
+            pmTo: Number.parseInt(pmTo) || 0
+          })
+        );
+    }
   }
 }
 
@@ -97,15 +99,17 @@ function* getSystemConfig() {
  * 用户进入系统主页面home，初始化获取deptArray、deptDic和deptRelation信息
  */
 function* getDepts() {
-  yield take(systemTypes.SAGA_GET_DEPTS);
-  const res = yield axios.get('/dept/depts-and-relation');
-  if (res.success) {
-    const { deptArray, deptRelation } = res.data;
-    const deptDic = {};
-    deptArray.forEach(dept => {
-      deptDic[dept.id] = dept;
-    });
-    yield put(systemActions.setDepts(deptArray, deptDic, deptRelation));
+  while (true) {
+    yield take(systemTypes.SAGA_GET_DEPTS);
+    const res = yield axios.get('/dept/depts-and-relation');
+    if (res.success) {
+      const { deptArray, deptRelation } = res.data;
+      const deptDic = {};
+      deptArray.forEach(dept => {
+        deptDic[dept.id] = dept;
+      });
+      yield put(systemActions.setDepts(deptArray, deptDic, deptRelation));
+    }
   }
 }
 

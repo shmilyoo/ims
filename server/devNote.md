@@ -1,3 +1,15 @@
+# todo
+
+把 cas 的 dept 表定时复制过来，json 格式存缓存，每次同步复制和 json 格式对比，不相同则更新；
+本地建立 dept 表，有利于层次管理， deptrelation 不需要了， work 直接设置 deptId，
+部门取其 work 的时候，可以直接检索包含所有下级目录的 work，（因为有 dept 表）
+----done------
+UserPicker 组件完善，后台 deptUsers controller 完善
+
+## front 前台系统
+
+前台系统，也就没有 workDept 的概念了，用户可以修改自己的 dept，表示实际工作地变化
+
 # redis 缓存格式
 
 ## 针对每个登录用户的 session
@@ -20,7 +32,7 @@ Object 格式为：
 {
   // deptArray 和 deptTree 在后台定时更新,deptTree可以由前台自己计算
   deptArray:[{id:string,name:string,...},...], // 部门结构列表，按照level order 排序
-  deptDic:{id1:dept1,id2:dept2,...}
+  deptDic:{id1:dept1,id2:dept2,...},
   // deptTree:[{id:string,name:'root1',children:[...],...},{id:'',name:'root2',...}]
 }
 ```

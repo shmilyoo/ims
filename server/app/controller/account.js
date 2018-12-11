@@ -126,6 +126,7 @@ class AccountController extends Controller {
         username: user.username,
         // 用户实际工作所在部门
         deptId: user.deptId,
+        id: user.id,
       });
       ctx.body = ctx.helper.getRespBody(true, {
         authType,

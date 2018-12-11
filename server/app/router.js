@@ -24,9 +24,10 @@ module.exports = app => {
   );
   router.get('/dept/all', controller.dept.all);
   // router.get('/dept/workDept', controller.dept.getWorkDeptInfo);
-  router.get('/dept/relations', controller.dept.relations);
-  router.post('/dept/relations/bind', controller.dept.relationsBind);
-  router.post('/dept/relations/unbind', controller.dept.relationsUnbind);
+  // router.get('/dept/relations', controller.dept.relations);
+  router.get('/dept/users', checkUser, controller.dept.deptUsers);
+  // router.post('/dept/relations/bind', controller.dept.relationsBind);
+  // router.post('/dept/relations/unbind', controller.dept.relationsUnbind);
   router.post('/cache/updateAll', controller.cache.updateAll);
   router.get('/system/all', controller.system.allConfig);
   router.get('/system/tag/all', controller.system.tags);
