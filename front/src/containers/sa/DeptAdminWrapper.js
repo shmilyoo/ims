@@ -6,12 +6,7 @@ import DeptAdmin from './DeptAdmin';
 
 const DeptAdminWrapper = ({ deptArray, deptDic, deptRelation, dispatch }) => {
   return deptArray ? (
-    <DeptAdmin
-      deptArray={deptArray}
-      deptDic={deptDic}
-      // deptRelation={deptRelation}
-      dispatch={dispatch}
-    />
+    <DeptAdmin deptArray={deptArray} deptDic={deptDic} dispatch={dispatch} />
   ) : (
     <Loading />
   );

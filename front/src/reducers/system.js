@@ -47,15 +47,10 @@ export const actions = {
   sagaGetDepts: () => ({
     type: types.SAGA_GET_DEPTS
   }),
-  setDepts: (deptArray, deptDic, deptRelation) => ({
+  setDepts: (deptArray, deptDic) => ({
     type: types.SET_DEPTS,
     deptArray,
-    deptDic,
-    deptRelation
-  }),
-  setDeptRelation: deptRelation => ({
-    type: types.SET_DEPT_RELATION,
-    deptRelation
+    deptDic
   }),
   setTimeScale: timeScale => ({
     type: types.SET_TIME_SCALE,
@@ -89,13 +84,7 @@ export default (state = initState, action) => {
       return {
         ...state,
         deptArray: action.deptArray,
-        deptDic: action.deptDic,
-        deptRelation: action.deptRelation
-      };
-    case types.SET_DEPT_RELATION:
-      return {
-        ...state,
-        deptRelation: action.deptRelation
+        deptDic: action.deptDic
       };
     default:
       return state;

@@ -21,6 +21,12 @@ class CommonService extends Service {
       .update(password + salt)
       .digest('hex');
   }
+
+  async sleep(seconds) {
+    await new Promise(resolve => {
+      setTimeout(resolve, seconds * 1000);
+    });
+  }
 }
 
 module.exports = CommonService;

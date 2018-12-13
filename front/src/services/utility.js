@@ -37,14 +37,6 @@ export const initAuthInfoAtStart = dispatch => {
 };
 
 /**
- * 重构每个表单的submit函数，避免重复代码
- */
-// export const formSubmit = (action, dispatch) => values =>
-//   new Promise(resolve => {
-//     dispatch({ type: action, resolve, values });
-//   });
-
-/**
  *
  * @param {string|Buffer|Array|Uint8Array} message
  * @return {string} md5值，32位
@@ -56,13 +48,6 @@ export const md5Passwd = message => md5(message);
  */
 export const getDeptArray = async () => {
   const response = await axios.get('/dept/all');
-  return response;
-};
-/**
- * @return {Array} 获取部门结构关联关系对象
- */
-export const getDeptRelations = async () => {
-  const response = await axios.get('/dept/relations');
   return response;
 };
 
@@ -146,24 +131,32 @@ export const makeDeptTree = (deptArray, expanded) => {
   return result;
 };
 
-export const treeDataWithRelation = (treeData, relations, treeDataDic) => {
-  let result = [];
-  for (let i = 0; i < treeData.length; i++) {
-    const node = Object.assign({}, treeData[i]);
-    const toNodeId = relations[node.id];
-    if (toNodeId) {
-      node.title = `${node.title} -> ${treeDataDic[toNodeId].name}`;
-    }
-    if (node.children)
-      node.children = treeDataWithRelation(
-        node.children,
-        relations,
-        treeDataDic
-      );
-    result.push(node);
-  }
-  return result;
+/**
+ * 获取指定部门的管理员列表
+ * @param {string} id 部门id
+ */
+export const getDeptManagersAsync = id => {
+  return axios.get(`/dept/managers?id=${id}`);
 };
+
+// export const treeDataWithRelation = (treeData, relations, treeDataDic) => {
+//   let result = [];
+//   for (let i = 0; i < treeData.length; i++) {
+//     const node = Object.assign({}, treeData[i]);
+//     const toNodeId = relations[node.id];
+//     if (toNodeId) {
+//       node.title = `${node.title} -> ${treeDataDic[toNodeId].name}`;
+//     }
+//     if (node.children)
+//       node.children = treeDataWithRelation(
+//         node.children,
+//         relations,
+//         treeDataDic
+//       );
+//     result.push(node);
+//   }
+//   return result;
+// };
 
 // /**
 //  *  全部展开或者折叠树

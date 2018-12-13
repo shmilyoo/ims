@@ -13,6 +13,30 @@ class DeptService extends Service {
   }
 
   /**
+   * 获取节点以及所有后代节点order with level and order
+   * @param {string} id dept id
+   * @return {array} dept and Offspring order with level and order
+   */
+  async getDeptWithOffspring(id) {
+    const deptDic = await this.ctx.service.cache.getCache('deptDic');
+    const dept = deptDic[id];
+    if (!dept) {
+      return [];
+    }
+    const depts = await this.ctx.model.Dept.findAll({
+      where: {
+        [this.ctx.model.Op.or]: [
+          { id },
+          { path: { [this.ctx.model.Op.like]: `${dept.path}${dept.symbol}-%` } },
+        ],
+      },
+      order: [ 'level', 'order' ],
+      raw: true,
+    });
+    return depts;
+  }
+
+  /**
    * 获取被绑定方dept的信息，包括id name names
    * @param {string} fromDeptId 绑定起始方的dept id
    * @param {object} deptDic dept dic 信息

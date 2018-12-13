@@ -75,18 +75,19 @@ class Tree extends React.PureComponent {
 
   handleExpandAllClick = e => {
     e.stopPropagation();
-    this.props.onExpandsChange(true);
+    this.props.onExpandsChange && this.props.onExpandsChange(true);
   };
   handleCollapseAllClick = e => {
     e.stopPropagation();
-    this.props.onExpandsChange(false);
+    this.props.onExpandsChange && this.props.onExpandsChange(false);
   };
 
   /**
    * 点击节点旁按钮展开收缩节点时，回调 expands change 事件
    */
   handleVisibilityToggle = ({ node: { id: nodeId }, expanded }) => {
-    this.props.onExpandsChange({ [nodeId]: expanded });
+    this.props.onExpandsChange &&
+      this.props.onExpandsChange({ [nodeId]: expanded });
   };
 
   generateNodeProps = ({ node }) => {
@@ -201,7 +202,7 @@ Tree.propTypes = {
   onTreeNodeUnSelected: PropTypes.func, // 取消选中节点，并激活上级组件事件
   onRefreshData: PropTypes.func, // 刷新按钮事件
   // onChange: PropTypes.func.isRequired, // treeData在change的时候回调
-  onExpandsChange: PropTypes.func, // 在expands变化的时候回调
+  onExpandsChange: PropTypes.func, // 在expands变化的时候回调,如果上级组件不定义此函数，则全部展开收缩按钮也不可用
   onExpandCollapseAll: PropTypes.func,
   onMoveNode: PropTypes.func,
   // 以下两个props不可同时存在

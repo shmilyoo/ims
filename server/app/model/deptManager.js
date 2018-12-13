@@ -11,5 +11,13 @@ module.exports = app => {
     userId: { type: CHAR(32), unique: 'uniqueRelation' },
   });
 
+  // DeptManager.associate = function() {
+  //   DeptManager.hasMany(app.model.User, {
+  //     as: 'manageDepts',
+  //     foreignKey: 'userId',
+  //     constraints: false,
+  //   });
+  // };
+
   return DeptManager;
 };

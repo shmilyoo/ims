@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { SubmissionError } from 'redux-form';
 import { connect } from 'react-redux';
 import { Grid, Button, Divider, Typography } from '@material-ui/core';
 import Tree from '../../components/Tree';
@@ -7,26 +8,27 @@ import {
   makeDeptTree,
   getLevel1ExpandsfromTreeArray,
   getNewExpands,
-  getExpandsToNode
+  getDeptManagersAsync,
+  setDeptManagersAsync
 } from '../../services/utility';
 import Axios from 'axios';
 import compose from 'recompose/compose';
 import { actions as systemActions } from '../../reducers/system';
 import DeptAdminForm from '../../forms/system/DeptAdminForm';
 import UserPicker from '../../components/common/UserPicker';
+import { actions as deptActions } from '../../reducers/dept';
 
 class DeptAdmin extends Component {
   constructor(props) {
     super(props);
-    const { deptArray, deptDic } = props;
+    const { deptArray } = props;
     const expands = getLevel1ExpandsfromTreeArray(deptArray);
     const treeData = makeDeptTree(deptArray, expands);
     this.state = {
       treeData: treeData,
       nodeSelected: null,
       expands: expands,
-      admins: null, // 部门管理员 [{id,name},{id,name}...]
-      deptUsers: null
+      admins: null // 部门管理员 [{id,name},{id,name}...]
     };
   }
 
@@ -43,13 +45,13 @@ class DeptAdmin extends Component {
         });
   };
 
-  handleTreeNodeSelected = id => {
-    const { deptDic } = this.props;
-    let node = deptDic[id];
-    this.setState({
-      nodeSelected: {
-        id: node.id,
-        title: node.name
+  handleTreeNodeSelected = (id, title) => {
+    getDeptManagersAsync(id).then(res => {
+      if (res.success) {
+        this.setState({
+          nodeSelected: { id, title },
+          admins: res.data.managers
+        });
       }
     });
   };
@@ -57,19 +59,28 @@ class DeptAdmin extends Component {
   handleTreeNodeUnSelected = () => {
     this.setState({
       nodeSelected: null,
-      deptUsers: null,
       admins: null
     });
   };
 
   handleTreeDataChange = treeData => {
-    this.setState({ treeData: treeData });
+    this.setState({ treeData });
   };
 
-  handleUserPickerChange = values => {};
+  handleAdminFormSubmit = values => {
+    return new Promise(resolve => {
+      this.props.dispatch(
+        deptActions.sagaSetDeptManager(
+          resolve,
+          this.state.nodeSelected.id,
+          values.admins
+        )
+      );
+    });
+  };
 
   render() {
-    const { treeData, admins, nodeSelected, deptUsers } = this.state;
+    const { treeData, admins, nodeSelected } = this.state;
     const { deptArray } = this.props;
     return (
       <Grid container direction="column" wrap="nowrap">
@@ -96,28 +107,17 @@ class DeptAdmin extends Component {
               onTreeNodeUnSelected={this.handleTreeNodeUnSelected}
             />
           </Grid>
-          <Grid item xs container direction="column">
-            <Grid item>
-              <UserPicker
-                disabled={!nodeSelected}
-                deptArray={deptArray}
-                label={`选择作为${
-                  nodeSelected ? nodeSelected.title : '部门'
-                }管理员的用户`}
-                onChange={this.handleUserPickerChange}
-              />
-            </Grid>
-          </Grid>
-          {/* <Grid item xs>
+          <Grid item xs>
             <DeptAdminForm
               enableReinitialize
-              users={deptUsers}
-              deptId={nodeSelected && nodeSelected.id}
+              onSubmit={this.handleAdminFormSubmit}
+              nodeSelected={nodeSelected}
+              deptArray={deptArray}
               initialValues={{
-                admins: admins
+                admins: admins || []
               }}
             />
-          </Grid> */}
+          </Grid>
         </Grid>
       </Grid>
     );

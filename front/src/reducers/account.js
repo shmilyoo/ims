@@ -17,7 +17,7 @@ export const types = {
   LOGIN_SUCCESS: 'ACCOUNT/LOGIN_SUCCESS',
   SET_ACCOUNT_INFO: 'ACCOUNT/SET_ACCOUNT_INFO', // 进入主页面的时候初始化用户相关信息
   UPDATE_ACCOUNT_INFO: 'ACCOUNT/UPDATE_ACCOUNT_INFO', // 只更新info
-  UPDATE_ACCOUNT_DEPT: 'ACCOUNT/UPDATE_ACCOUNT_DEPT' // 更新dept和workDept
+  UPDATE_ACCOUNT_DEPT: 'ACCOUNT/UPDATE_ACCOUNT_DEPT' // 更新dept
 };
 
 export const actions = {
@@ -43,18 +43,16 @@ export const actions = {
     values,
     id
   }),
-  setAccountInfo: (dept, info, workDept, manageDepts) => ({
+  setAccountInfo: (dept, info, manageDepts) => ({
     type: types.SET_ACCOUNT_INFO,
     dept,
     info,
-    workDept,
     manageDepts
   }),
   updateInfo: info => ({ type: types.UPDATE_ACCOUNT_INFO, info }),
-  updateDept: (dept, workDept = {}) => ({
+  updateDept: dept => ({
     type: types.UPDATE_ACCOUNT_DEPT,
-    dept,
-    workDept
+    dept
   }),
   authSuccess: (authType, user) => ({
     // 'id', 'username', 'active', 'name', 'sex', 'deptId','authType'
@@ -83,7 +81,6 @@ const initState = {
   isSuperAdmin: false,
   info: { name: '', sex: 0 }, // {basic:{},work:[],education,[]} 从sso中获取的用户详细资料
   dept: {},
-  workDept: {},
   manageDept: '', // 用户选中管理的部门id
   manageDepts: [] // 用户具有管理权限的部门id列表
 };
@@ -112,7 +109,6 @@ export default function accountReducer(state = initState, action) {
         ...state,
         dept: { ...state.dept, ...action.dept },
         info: { ...state.info, ...action.info },
-        workDept: { ...state.workDept, ...action.workDept },
         manageDept: action.manageDepts.length ? action.manageDepts[0] : '',
         manageDepts: action.manageDepts
       };
@@ -124,8 +120,7 @@ export default function accountReducer(state = initState, action) {
     case types.UPDATE_ACCOUNT_DEPT:
       return {
         ...state,
-        dept: { ...state.dept, ...action.dept },
-        workDept: { ...state.workDept, ...action.workDept }
+        dept: { ...state.dept, ...action.dept }
       };
     case types.CLEAR_AUTH:
       return initState;

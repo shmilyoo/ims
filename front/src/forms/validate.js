@@ -2,9 +2,26 @@ import axios from 'axios';
 import { types as accountTypes } from '../reducers/account';
 
 export const required = value => {
-  // console.log(`check required =${value}=`);
-  if (value === 0) return;
-  if (!value) return '不能为空';
+  console.log('check required', value);
+  if (value === undefined || value === null) return '不能为空';
+  const type = typeof value;
+  switch (type) {
+    case 'object':
+      // 针对数组或者plain object
+      return Array.isArray(value)
+        ? value.length
+          ? undefined
+          : '不能为空'
+        : Object.keys(value).length
+          ? undefined
+          : '不能为空';
+    case 'number':
+      return isNaN(value) ? '不能为空' : undefined;
+    case 'string':
+      return !!value.trim() ? undefined : '不能为空';
+    default:
+      return;
+  }
 };
 
 export const checkUsername = value => {

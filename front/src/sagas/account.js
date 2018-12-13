@@ -166,14 +166,12 @@ function* getUserInfoFlow() {
     // const id = yield select(getId);
     const {
       success,
-      data: { dept, info, workDept, manageDepts }
+      data: { dept, info, manageDepts }
     } = yield axios.get('/account/info');
     if (success) {
       // data/相当于state的account:
       //  {dept:{id,name,names},info:{status,position},...}
-      yield put(
-        accountActions.setAccountInfo(dept, info, workDept, manageDepts)
-      );
+      yield put(accountActions.setAccountInfo(dept, info, manageDepts));
     }
   }
 }
@@ -188,14 +186,13 @@ function* setAccountInfoFlow() {
       id
     });
     if (res.success) {
-      // 更新用户资料后，要更新store中的相应项，包括workdept
+      // 更新用户资料后，要更新store中的相应项
       const dept = values.dept;
       const info = {
         status: values.status,
         position: values.position
       };
-      const workDept = res.data.workDept;
-      yield put(accountActions.updateDept(dept, workDept));
+      yield put(accountActions.updateDept(dept));
       yield put(accountActions.updateInfo(info));
       yield call(resolve);
     }

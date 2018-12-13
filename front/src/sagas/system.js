@@ -101,14 +101,14 @@ function* getSystemConfig() {
 function* getDepts() {
   while (true) {
     yield take(systemTypes.SAGA_GET_DEPTS);
-    const res = yield axios.get('/dept/depts-and-relation');
+    const res = yield axios.get('/dept/all');
     if (res.success) {
-      const { deptArray, deptRelation } = res.data;
+      const deptArray = res.data;
       const deptDic = {};
       deptArray.forEach(dept => {
         deptDic[dept.id] = dept;
       });
-      yield put(systemActions.setDepts(deptArray, deptDic, deptRelation));
+      yield put(systemActions.setDepts(deptArray, deptDic));
     }
   }
 }

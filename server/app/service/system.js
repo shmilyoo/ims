@@ -10,7 +10,7 @@ class SystemService extends Service {
     const config = await this.ctx.model.System.findOne({
       where: { name: 'deptUpdateTime' },
     });
-    return config ? config.value : null;
+    return config ? config.value : '1';
   }
 }
 

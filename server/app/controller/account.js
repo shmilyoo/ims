@@ -178,7 +178,7 @@ class AccountController extends Controller {
     const deptDic = await ctx.service.cache.getDeptDic();
     const dept = deptDic[user.deptId];
     const deptNames = ctx.service.dept.getDeptNamesSync(user.deptId, deptDic);
-    const workDept = await ctx.service.dept.getRelationDept(dept.id, deptDic);
+    // const workDept = await ctx.service.dept.getRelationDept(dept.id, deptDic);
     const manageDepts = user.manageDepts.map(mDept => mDept.deptId);
 
     ctx.body = ctx.helper.getRespBody(true, {
@@ -188,7 +188,7 @@ class AccountController extends Controller {
         position: user.position,
       },
       dept: { id: dept.id, name: dept.name, names: deptNames.join('-') },
-      workDept,
+      // workDept,
       manageDepts,
     });
   }
@@ -204,8 +204,7 @@ class AccountController extends Controller {
       { deptId: dept.id, status, position },
       { where: { id } }
     );
-    const workDept = await ctx.service.dept.getRelationDept(dept.id);
-    ctx.body = ctx.helper.getRespBody(true, { workDept });
+    ctx.body = ctx.helper.getRespBody(true);
     // todotodo 返回添加了workdept，在front的saga中更新store中的workdept
   }
 }

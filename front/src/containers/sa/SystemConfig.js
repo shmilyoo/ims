@@ -14,6 +14,7 @@ class SystemConfig extends PureComponent {
     this.props.dispatch(systemActions.sagaGetSystemConfig());
   }
   updateAllCache = () => {
+    // todo 更改store
     Axios.post('/cache/updateAll').then();
   };
   handleTimeScaleSubmit = values => {

@@ -1,33 +1,35 @@
 import React from 'react';
-import { Grid, Typography, Button } from '@material-ui/core';
+import { Grid, Button } from '@material-ui/core';
 import { Field, reduxForm } from 'redux-form';
 import compose from 'recompose/compose';
-import { required, syncCheckTimeScale } from '../validate';
-import { RenderDatePicker } from '../renderFields';
-import { formatSecondsToDate, parseDateToSeconds } from '../formatParse';
-import RenderChips from '../renderFields/renderChips';
+import RenderUserPicker from '../renderFields/renderUserPicker';
 
 class DeptAdminForm extends React.PureComponent {
   render() {
-    const { pristine, submitting, error, reset, handleSubmit } = this.props;
+    const {
+      pristine,
+      submitting,
+      error,
+      reset,
+      handleSubmit,
+      nodeSelected,
+      deptArray
+    } = this.props;
     return (
       <form onSubmit={handleSubmit}>
-        <Grid item container direction="column" spacing={8}>
-          <Grid item>
-            <Typography align="center" variant="h6">
-              更改部门管理人员
-            </Typography>
-          </Grid>
-          <Grid item style={{ minHeight: '5rem' }}>
+        <Grid container spacing={8} alignItems="center">
+          <Grid item xs>
             <Field
               name="admins"
-              component={RenderChips}
-              // format={formatSecondsToDate}
-              // parse={parseDateToSeconds}
-              validate={required}
+              deptArray={deptArray}
+              label={`选择作为${
+                nodeSelected ? nodeSelected.title : '部门'
+              }管理员的用户`}
+              disabled={!nodeSelected}
+              component={RenderUserPicker}
             />
           </Grid>
-          <Grid item xs>
+          <Grid item>
             <Button
               type="submit"
               variant="contained"
@@ -42,7 +44,7 @@ class DeptAdminForm extends React.PureComponent {
               onClick={reset}
               disabled={pristine || submitting}
             >
-              清除
+              撤销
             </Button>
           </Grid>
         </Grid>

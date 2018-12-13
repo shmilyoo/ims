@@ -26,11 +26,15 @@ class CacheService extends Service {
 
   /**
    * 从CAS获取并更新本地缓存deptArray和dept数据表的
+   * @param {bool} force 是否强制更新dept结构
    */
-  async updateDeptArray() {
+  async updateDeptArray(force = false) {
+    console.log('-----------------更新dept array同步----------------');
     const { config, ctx, service } = this;
-    const updateTimeConfig = await service.cache.getDeptUpdateTime();
-    const imsDeptUpdateTime = updateTimeConfig || '1'; // 随便起一个值
+    // 如果force为true，强制更新缓存，用户管理员界面强制更新缓存，force为false默认用于计划任务
+    const imsDeptUpdateTime = force
+      ? '1'
+      : await service.system.getDeptUpdateTime();
     const reqConfig = await service.auth.addSsoTokenToConfig();
     const res = await axios.get(
       `${config.ssoDepts}?time=${imsDeptUpdateTime}`,
@@ -49,20 +53,29 @@ class CacheService extends Service {
             throw '获取的depts长度与本地添加不一致，撤回事物';
           }
           await service.system.setDeptUpdateTime(res.data.time);
+          const deptDic = {};
+          res.data.deptArray.forEach(dept => {
+            deptDic[dept.id] = dept;
+          });
           await this.setCache('deptArray', res.data.deptArray);
+          await this.setCache('deptDic', deptDic);
           await transaction.commit();
+          return res.data.deptArray;
           // log 本地dept缓存和表与CAS不一致，成功更新
         } catch (error) {
           console.log(error);
           await transaction.rollback();
+          return null;
           // log 与CAS更新本地dept缓存和表时在写本地数据时出错，事物已回滚 error.message
         }
       } else {
         console.log('自上次更新以后，cas的dept表没有变化');
         // log 自上次更新以后，cas的dept表没有变化
+        return await this.getCache('deptArray');
       }
     } else {
       // log 与CAS更新本地dept缓存和表时CAS返回错误信号
+      return null;
     }
   }
 

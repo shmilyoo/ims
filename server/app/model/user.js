@@ -22,6 +22,11 @@ module.exports = app => {
       foreignKey: 'userId',
       constraints: false,
     });
+    User.belongsTo(app.model.Dept, {
+      as: 'dept',
+      foreignKey: 'deptId',
+      constraints: false,
+    });
   };
 
   // User.associate = function() {

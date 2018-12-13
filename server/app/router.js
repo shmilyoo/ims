@@ -17,15 +17,12 @@ module.exports = app => {
   router.post('/account/logout', checkUser, controller.account.logout);
   router.get('/account/info', checkUser, controller.account.accountInfo);
   router.post('/account/info', checkUser, controller.account.setUserInfo);
-  router.get(
-    '/dept/depts-and-relation',
-    checkUser,
-    controller.dept.deptsAndRelation
-  );
   router.get('/dept/all', controller.dept.all);
   // router.get('/dept/workDept', controller.dept.getWorkDeptInfo);
   // router.get('/dept/relations', controller.dept.relations);
   router.get('/dept/users', checkUser, controller.dept.deptUsers);
+  router.get('/dept/managers', checkUser, controller.dept.deptManagers);
+  router.post('/dept/managers', checkUser, controller.dept.setDeptManagers);
   // router.post('/dept/relations/bind', controller.dept.relationsBind);
   // router.post('/dept/relations/unbind', controller.dept.relationsUnbind);
   router.post('/cache/updateAll', controller.cache.updateAll);

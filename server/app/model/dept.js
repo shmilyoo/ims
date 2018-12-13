@@ -20,5 +20,14 @@ module.exports = app => {
     { indexes: [{ unique: true, fields: [ 'symbol' ] }] }
   );
 
+  Dept.associate = function() {
+    Dept.belongsToMany(app.model.User, {
+      as: 'managers',
+      constraints: false,
+      through: app.model.DeptManager,
+      foreignKey: 'deptId',
+      otherKey: 'userId',
+    });
+  };
   return Dept;
 };
