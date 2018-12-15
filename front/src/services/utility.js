@@ -105,12 +105,13 @@ export const getExpandsToNode = (toNodeId, deptDic, expands = {}) => {
 /**
  *
  * @param {Array} deptArray 按照level从小到大排列的dept object数组
- * @param {(boolean|Object)} expanded id:bool 对象 设置各个节点是否展开,如果是Boolean则代表全展开或全折叠
+ * @param {(boolean|Object)} expanded 可选,id:bool 对象 设置各个节点是否展开,如果是Boolean则代表全展开或全折叠
  * @return {Array} [符合react-sortable-tree数据格式的数组,如果是第一次mount后返回的新expands值]
  */
 export const makeDeptTree = (deptArray, expanded) => {
   // [{name,intro,parent,path,level,id,sid},{},{}]
-  console.log('计算makeDeptTree');
+  if (expanded === undefined)
+    expanded = getLevel1ExpandsfromTreeArray(deptArray);
   const result = [];
   const tmp = {};
   for (let i = 0; i < deptArray.length; i++) {
@@ -137,6 +138,23 @@ export const makeDeptTree = (deptArray, expanded) => {
  */
 export const getDeptManagersAsync = id => {
   return axios.get(`/dept/managers?id=${id}`);
+};
+
+/**
+ * 获取部门层次名称，比如 技术部-科技处-质量办
+ * @param {string} id dept id
+ * @param {object} deptDic dept plain object
+ * @returns {array} 部门层次名称字符串列表
+ */
+export const getDeptNamesArraySync = (id, deptDic) => {
+  const names = [];
+  let dept = deptDic[id];
+  while (true) {
+    names.push(dept.name);
+    if (dept.parentId === '0') break;
+    dept = deptDic[dept.parentId];
+  }
+  return names.reverse();
 };
 
 // export const treeDataWithRelation = (treeData, relations, treeDataDic) => {

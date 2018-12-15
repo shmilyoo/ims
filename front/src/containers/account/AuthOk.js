@@ -6,6 +6,7 @@ import { Grid, Typography, CircularProgress } from '@material-ui/core';
 import compose from 'recompose/compose';
 import history from '../../history';
 import { actions as accountActions } from '../../reducers/account';
+import Loading from '../../components/common/Loading';
 
 class AuthOk extends PureComponent {
   constructor(props) {
@@ -29,23 +30,7 @@ class AuthOk extends PureComponent {
   }
 
   render() {
-    return (
-      <Grid
-        style={{ height: '70%' }}
-        container
-        justify="center"
-        alignItems="center"
-      >
-        <Grid item xs={3} container direction="column">
-          <Grid item>
-            <Typography color="primary" variant="h4" align="center">
-              正在验证授权
-              <CircularProgress style={{ marginLeft: '2rem' }} size="2rem" />
-            </Typography>
-          </Grid>
-        </Grid>
-      </Grid>
-    );
+    return <Loading title="正在验证授权" />;
   }
 }
 

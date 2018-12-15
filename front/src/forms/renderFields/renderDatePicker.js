@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import DatePicker, { registerLocale } from 'react-datepicker';
-import moment from 'moment';
 import zhCN from 'date-fns/locale/zh-CN';
 import '../../assets/css/datePicker.css';
 import { TextField, InputAdornment } from '@material-ui/core';
@@ -9,7 +8,8 @@ import Cancel from '@material-ui/icons/Cancel';
 registerLocale('zh-CN', zhCN);
 
 class CustomInput extends React.PureComponent {
-  handleClearClick = () => {
+  handleClearClick = e => {
+    e.stopPropagation();
     this.props.onInputChange(null);
   };
   render() {
@@ -70,14 +70,14 @@ const RenderDatePicker = ({
           <CustomInput
             label={label}
             canClear={canClear}
-            // onInputChange={onChange}
+            onInputChange={onChange}
             nullText={nullText}
             input={inputRest}
             meta={meta}
           />
         }
         locale="zh-CN"
-        selected={value} // value是input.value
+        selected={value || null} // value是input.value
         onChange={onChange}
         // yearDropdownItemNumber={100} // 设置合适的数值，这个要不然得一个一个点，不方便
         // scrollableYearDropdown

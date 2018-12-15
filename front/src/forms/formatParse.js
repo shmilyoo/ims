@@ -1,5 +1,6 @@
 // redux-form field的format和parse 帮助函数
 import moment from 'moment';
+import { isNumber } from 'util';
 
 export const formatSex = value => {
   // 用户性别：1男性, 2女性, 0未知
@@ -33,10 +34,10 @@ export const parseMomentToUnixTs = m => {
  * @param {number} seconds 从0点起经历的秒数
  */
 export const formatSecondsToDate = seconds => {
-  if (seconds === undefined) seconds = 0;
-  const now = new Date();
-  const ts = now.setHours(0, 0, 0, 0);
-  return new Date(ts + seconds * 1000);
+  if (Number.isInteger(seconds)) {
+    return new Date(new Date().setHours(0, 0, 0, 0) + seconds * 1000);
+  }
+  return null;
 };
 
 /**
@@ -44,7 +45,26 @@ export const formatSecondsToDate = seconds => {
  * @param {Date} date 日期实例
  */
 export const parseDateToSeconds = date => {
-  if (!(date instanceof Date)) return;
-  // console.log('parseDateToSeconds ', typeof date, date);
+  if (!(date instanceof Date)) return '';
   return Math.floor((date.getTime() - new Date().setHours(0, 0, 0, 0)) / 1000);
+};
+
+/**
+ * 将unix 时间戳转化为Date
+ * @param {number} time unix 时间戳
+ */
+export const formatUnixTimeToDate = time => {
+  if (Number.isInteger(time)) return new Date(time * 1000);
+  return null;
+};
+
+/**
+ * 将日期实例转化成unix 时间戳
+ * @param {Date} date 日期实例
+ */
+export const parseDateToUnixTime = date => {
+  // 此处返回''才可以在redux-form的value中把这个field 值清除掉，
+  // 返回NaN或者null，这个值都会变成null，影响form的pristine判断
+  if (!(date instanceof Date)) return '';
+  return Math.floor(date.getTime() / 1000);
 };

@@ -5,6 +5,8 @@
 部门取其 work 的时候，可以直接检索包含所有下级目录的 work，（因为有 dept 表）
 ----done------
 UserPicker 组件完善，后台 deptUsers controller 完善
+----done------
+开始做 发布工作
 
 ## front 前台系统
 

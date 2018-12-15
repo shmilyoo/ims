@@ -3,7 +3,12 @@ import { Grid, Typography, CircularProgress } from '@material-ui/core';
 
 const Loading = ({ showTitle, title }) => {
   return (
-    <Grid container justify="center" alignItems="center">
+    <Grid
+      container
+      justify="center"
+      alignItems="center"
+      style={{ height: '100%' }}
+    >
       <Grid item container alignItems="center" direction="column">
         {showTitle && (
           <Grid item>

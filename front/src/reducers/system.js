@@ -64,8 +64,7 @@ const initState = {
   // { amFrom: 28800, amTo: 41400, pmFrom: 52200, pmTo: 63000 }
   timeScale: null,
   deptArray: null,
-  deptDic: null,
-  deptRelation: null
+  deptDic: null
 };
 
 export default (state = initState, action) => {

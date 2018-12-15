@@ -35,14 +35,14 @@ export const pathTitle = {
   '/work/schedule/manage': '日程管理',
   '/dept': '我的部门',
   '/dept/work': '部门工作',
-  '/dept-admin/announcement': '部门公告',
-  '/dept-admin/work': '部门工作',
-  '/dept-admin/work/add': '发布工作',
-  '/dept-admin/work/edit': '编辑工作',
-  '/dept-admin/news': '部门文章',
-  '/dept-admin/news/add': '发布文章',
-  '/dept-admin/news/category': '文章分类',
-  '/dept-admin/news/edit': '编辑文章',
+  '/dept-manage/announcement': '部门公告',
+  '/dept-manage/work': '部门工作',
+  '/dept-manage/work/add': '发布工作',
+  '/dept-manage/work/edit': '编辑工作',
+  '/dept-manage/news': '部门文章',
+  '/dept-manage/news/add': '发布文章',
+  '/dept-manage/news/category': '文章分类',
+  '/dept-manage/news/edit': '编辑文章',
   '/user/info': '我的资料',
   '/user/changePasswd': '修改密码',
   '/about': '关于',
@@ -83,25 +83,28 @@ export const leftMenu = [
   },
   {
     title: '部门管理',
-    state: 'dept-admin', // 用于有子元素的菜单，在this.state中标记下拉是否展开
+    state: 'dept-manage', // 用于有子元素的菜单，在this.state中标记下拉是否展开
     icon: AccountBox,
     manageDept: true,
     children: [
       {
-        title: pathTitle['/dept-admin/announcement'],
-        path: '/dept-admin/announcement'
+        title: pathTitle['/dept-manage/announcement'],
+        path: '/dept-manage/announcement'
       },
-      { title: pathTitle['/dept-admin/work'], path: '/dept-admin/work' },
+      { title: pathTitle['/dept-manage/work'], path: '/dept-manage/work' },
       {
-        title: pathTitle['/dept-admin/work/add'],
-        path: '/dept-admin/work/add'
+        title: pathTitle['/dept-manage/work/add'],
+        path: '/dept-manage/work/add'
       },
-      { title: pathTitle['/dept-admin/news'], path: '/dept-admin/news' },
+      { title: pathTitle['/dept-manage/news'], path: '/dept-manage/news' },
       {
-        title: pathTitle['/dept-admin/news/category'],
-        path: '/dept-admin/news/category'
+        title: pathTitle['/dept-manage/news/category'],
+        path: '/dept-manage/news/category'
       },
-      { title: pathTitle['/dept-admin/news/add'], path: '/dept-admin/news/add' }
+      {
+        title: pathTitle['/dept-manage/news/add'],
+        path: '/dept-manage/news/add'
+      }
     ]
   },
   {

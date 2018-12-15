@@ -78,9 +78,15 @@ const theme = createMuiTheme({
   sharedClass: {
     link: {
       cursor: 'pointer',
-      color: '#6657F8',
-      '&:hover': { textDecoration: 'underline' },
-      '&:visited': { color: secondaryTextColor }
+      color: '#1e6bb8',
+      '&:visited': { color: secondaryTextColor },
+      '&:hover': { textDecoration: 'underline' }
+    },
+    grayLink: {
+      cursor: 'pointer',
+      color: secondaryTextColor,
+      '&:visited': { color: secondaryTextColor },
+      '&:hover': { textDecoration: 'underline' }
     }
   }
 });

@@ -62,6 +62,9 @@ class AccountController extends Controller {
     );
   }
 
+  /**
+   * 手动绑定CAS用户，绑定成功后，需要修改本地用户的id 为返回的cas新用户id
+   */
   async bind() {
     const { ctx, config } = this;
     const { username, password, casUsername } = ctx.request.body;
@@ -70,6 +73,8 @@ class AccountController extends Controller {
       ctx.body = ctx.helper.getRespBody(false, '用户名密码不正确');
       return;
     }
+    // todotodo 重新绑定的时候，cas应确保username（ims的）对应没有绑定关系，有的话提示用户在cas解除
+    // 然后确保 casUsername也不存在绑定关系，才可以重新绑定
     const reqConfig = await ctx.service.auth.addSsoTokenToConfig();
     const res = await axios.post(
       config.ssoUserBind,
@@ -80,6 +85,14 @@ class AccountController extends Controller {
       },
       reqConfig
     );
+    if (res.success) {
+      // 绑定成功后，更新新的本地用户的id（和cas一致）、deptId、name
+      const { name, id, deptId } = res.data;
+      await ctx.model.User.update(
+        { name, id, deptId },
+        { where: { username } }
+      );
+    }
     ctx.body = ctx.helper.getRespBody(
       res.success,
       res.success ? res.data : res.error

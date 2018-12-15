@@ -23,7 +23,7 @@ class App extends Component {
     return this.props.auth ? (
       <Route path="/" component={Home} />
     ) : (
-      <Loading showTitle={true} title="正在验证" />
+      <Loading showTitle={true} title="正在验证授权" />
     );
   }
 }

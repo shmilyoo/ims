@@ -12,6 +12,7 @@ module.exports = app => {
     publisherId: { type: CHAR(32) }, // 发布工作的用户
     from: { type: INTEGER }, // 工作开始时间，unix时间戳，秒
     to: { type: INTEGER, allowNull: true }, // 工作结束时间
+    content: { type: STRING, defaultValue: '' }, // 大项工作介绍
   });
 
   return Work;

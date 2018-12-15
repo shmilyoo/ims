@@ -1,22 +1,23 @@
 import React from 'react';
-import UserPicker from '../../components/common/UserPicker';
+import DeptPicker from '../../components/common/DeptPicker';
 
-const RenderUserPicker = ({
+const RenderDeptPicker = ({
   input: { value, onChange, ...inputRest },
   disabled,
   label,
   deptArray,
+  deptDic,
   meta: { touched, error },
   ...rest
 }) => {
   return (
-    <UserPicker
+    <DeptPicker
       label={label}
+      id={value}
       disabled={disabled}
-      multiline
-      selectedUsers={value || []}
       deptArray={deptArray}
-      onUserPickerChange={onChange}
+      deptDic={deptDic}
+      onDeptChange={onChange}
       error={!disabled && !!(touched && error)}
       helperText={!disabled && touched && error ? error : ' '}
       {...inputRest}
@@ -25,4 +26,4 @@ const RenderUserPicker = ({
   );
 };
 
-export default RenderUserPicker;
+export default RenderDeptPicker;

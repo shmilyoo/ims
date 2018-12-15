@@ -2,7 +2,7 @@
 
 const db = require('../db');
 
-// 大项工作的分阶段
+// 大项工作的具体子工作
 module.exports = app => {
   const { STRING, INTEGER, DATE, ENUM, BOOLEAN, CHAR } = app.Sequelize;
 

@@ -32,6 +32,10 @@ const styles = theme => ({
   listItem: {
     paddingTop: '0.5rem',
     paddingBottom: '0.5rem'
+  },
+  checkTextLink: {
+    ...theme.sharedClass.grayLink,
+    marginLeft: '0.5rem'
   }
 });
 
@@ -40,8 +44,8 @@ class UserPicker extends PureComponent {
     open: false,
     treeData: null,
     expands: null,
-    users: null
-    // selectedUsers: [] // [user1,user2...], user1= {id,name} 放在props中，做成受控组件
+    users: null,
+    deptId: ''
   };
   initTreeData = () => {
     const expands = getLevel1ExpandsfromTreeArray(this.props.deptArray);
@@ -68,6 +72,7 @@ class UserPicker extends PureComponent {
     this.setState({ treeData: treeData });
   };
   handleTreeNodeSelected = id => {
+    this.setState({ deptId: id });
     axios.get(`/dept/users?offspring=1&id=${id}`).then(res => {
       if (res.success) {
         const users = res.data;
@@ -76,7 +81,7 @@ class UserPicker extends PureComponent {
     });
   };
   handleTreeNodeUnSelected = () => {
-    this.setState({ users: null });
+    this.setState({ users: null, deptId: '' });
   };
   handleClick = () => {
     if (!this.props.deptArray || this.props.disabled) return;
@@ -86,15 +91,82 @@ class UserPicker extends PureComponent {
   handleCloseBtn = () => {
     this.setState({ open: false, users: null });
   };
-  userItemClick = (user, isSelected) => {
+  handleAllCheck = () => {
     const { selectedUsers, onUserPickerChange } = this.props;
+    const { users } = this.state;
+    const result = selectedUsers ? [...selectedUsers] : [];
+    const selectedIdDic = {};
+    result.forEach(user => {
+      selectedIdDic[user.id] = 1;
+    });
+    users.forEach(user => {
+      if (!selectedIdDic[user.id]) result.push(user);
+    });
+    onUserPickerChange && onUserPickerChange(result);
+  };
+  handleNoneCheck = () => {
+    const { selectedUsers, onUserPickerChange } = this.props;
+    const { users } = this.state;
+    const result = [];
+    const selectedIdDic = {}; // 已经选定的用户id对象集合
+    (selectedUsers || []).forEach(user => {
+      selectedIdDic[user.id] = 1;
+    });
+    const selectedIdInUsersDic = {}; // users中已经选择的id对象集合
+    const selectedIdNotInUsersDic = {}; // users中未选择的id对象集合
+    users.forEach(user => {
+      selectedIdDic[user.id]
+        ? (selectedIdInUsersDic[user.id] = 1)
+        : (selectedIdNotInUsersDic[user.id] = 1);
+    });
+    (selectedUsers || []).forEach(user => {
+      !selectedIdInUsersDic[user.id] && result.push(user);
+    });
+    onUserPickerChange && onUserPickerChange(result);
+  };
+  handleReverseCheck = () => {
+    const { selectedUsers, onUserPickerChange } = this.props;
+    const { users } = this.state;
+    const result = [];
+    const selectedIdDic = {}; // 已经选定的用户id对象集合
+    (selectedUsers || []).forEach(user => {
+      selectedIdDic[user.id] = 1;
+    });
+    const selectedIdInUsersDic = {}; // users中已经选择的id对象集合
+    const selectedIdNotInUsersDic = {}; // users中未选择的id对象集合
+    users.forEach(user => {
+      selectedIdDic[user.id]
+        ? (selectedIdInUsersDic[user.id] = 1)
+        : (selectedIdNotInUsersDic[user.id] = user);
+    });
+    (selectedUsers || []).forEach(user => {
+      !selectedIdInUsersDic[user.id] &&
+        !selectedIdNotInUsersDic[user.id] &&
+        result.push(user);
+    });
+    Object.keys(selectedIdNotInUsersDic).forEach(id => {
+      result.push(selectedIdNotInUsersDic[id]);
+    });
+    onUserPickerChange && onUserPickerChange(result);
+  };
+
+  /**
+   * @param {object} user 点中的用户 {id,name,...}
+   * @param {bool} isSelected 点中时此listitem的状态，是否已经被选中
+   */
+  userItemClick = (user, isSelected) => {
+    const { selectedUsers, onUserPickerChange, single } = this.props;
     let newSelectedUsers = null;
-    if (isSelected) {
-      // 已经被选取，这里取消选择
-      newSelectedUsers = selectedUsers.filter(_user => _user.id !== user.id);
+    if (single) {
+      newSelectedUsers = isSelected ? [] : [{ id: user.id, name: user.name }];
     } else {
-      // user对象中还包含dept的键，这里在新选user的时候把无用的value过滤掉
-      newSelectedUsers = [...selectedUsers, { id: user.id, name: user.name }];
+      if (isSelected) {
+        // 已经被选取，这里取消选择
+        newSelectedUsers = selectedUsers.filter(_user => _user.id !== user.id);
+      } else {
+        // user对象中还包含dept的键，这里在新选user的时候把无用的value过滤掉
+        newSelectedUsers = [...selectedUsers, { id: user.id, name: user.name }];
+      }
     }
     onUserPickerChange && onUserPickerChange(newSelectedUsers);
   };
@@ -102,6 +174,7 @@ class UserPicker extends PureComponent {
     const {
       classes,
       label,
+      single,
       disabled,
       // 最上级的selectedUsers或admins 初始化为undefined而不是null，如果是null，这里的默认值不会生效
       selectedUsers = [],
@@ -111,11 +184,12 @@ class UserPicker extends PureComponent {
       error,
       ...rest
     } = this.props;
-    const { treeData, open, users } = this.state;
+    const { treeData, open, users, deptId } = this.state;
     const selectedIds = {};
-    selectedUsers.forEach(user => {
-      selectedIds[user.id] = 1;
-    });
+    selectedUsers &&
+      selectedUsers.forEach(user => {
+        selectedIds[user.id] = 1;
+      });
     return (
       <React.Fragment>
         <TextField
@@ -123,18 +197,20 @@ class UserPicker extends PureComponent {
           fullWidth
           label={label}
           onClick={this.handleClick}
-          value={selectedUsers.map(user => user.name).join(',')}
+          value={
+            selectedUsers ? selectedUsers.map(user => user.name).join(', ') : ''
+          }
           error={error}
           helperText={helperText}
         />
         <Dialog fullWidth open={open} style={{ marginBottom: '10rem' }}>
           <DialogTitle>
             部门用户选择对话框
-            <div>{`已选用户: ${selectedUsers.map(
-              user => user.name + ' '
-            )}`}</div>
+            <div>{`已选用户: ${
+              selectedUsers ? selectedUsers.map(user => user.name + ' ') : ''
+            }`}</div>
           </DialogTitle>
-          <DialogContent style={{ minHeight: '15rem' }}>
+          <DialogContent style={{ minHeight: '30rem' }}>
             <Grid container>
               <Grid item xs={6}>
                 <Tree
@@ -142,6 +218,7 @@ class UserPicker extends PureComponent {
                   isVirtualized={false}
                   hideRefresh={true}
                   treeData={treeData}
+                  selectedId={deptId}
                   canDrag={false}
                   canSelectIdList={canSelectIdList}
                   cantSelectIdList={cantSelectIdList}
@@ -154,10 +231,43 @@ class UserPicker extends PureComponent {
               </Grid>
               <Grid item xs={1} />
               <Grid item xs={5} container direction="column">
-                <Grid item>
+                <Grid item container alignItems="center">
                   <Typography align="center" variant="h6">
                     选择用户
                   </Typography>
+                  {!single &&
+                    users &&
+                    users.length > 1 && (
+                      <React.Fragment>
+                        <Typography
+                          align="center"
+                          color="secondary"
+                          variant="body2"
+                          onClick={this.handleAllCheck}
+                          className={classes.checkTextLink}
+                        >
+                          全选
+                        </Typography>
+                        <Typography
+                          align="center"
+                          color="secondary"
+                          variant="body2"
+                          onClick={this.handleNoneCheck}
+                          className={classes.checkTextLink}
+                        >
+                          全不选
+                        </Typography>
+                        <Typography
+                          align="center"
+                          color="secondary"
+                          variant="body2"
+                          onClick={this.handleReverseCheck}
+                          className={classes.checkTextLink}
+                        >
+                          反选
+                        </Typography>
+                      </React.Fragment>
+                    )}
                 </Grid>
                 <Grid item className={classes.listRoot}>
                   {users && (
@@ -196,19 +306,22 @@ class UserPicker extends PureComponent {
 }
 
 UserPicker.propTypes = {
+  single: PropTypes.bool, // 是否只允许选择一个用户
   selectedUsers: PropTypes.array.isRequired, // 在文本框和对话框中显示的用户列表 [{id,name},{id,name}]
-  label: PropTypes.string, // 显示的提示文字
-  disabled: PropTypes.bool, //
   deptArray: PropTypes.array.isRequired, // 初始赋值的部门列表
   onUserPickerChange: PropTypes.func.isRequired, // 选择变化时调用的函数,参数为selectedUsers
-  canSelectIdList: PropTypes.array, // 允许选择的节点，其余为不可选择
-  cantSelectIdList: PropTypes.array, // 不允许选择的节点，其余为可选择
+  label: PropTypes.string, // 显示的提示文字
+  disabled: PropTypes.bool, // 设置附件是否可用，是否可以点击
+  canSelectIdList: PropTypes.array, // 允许选择的树节点，其余为不可选择，这两个选项互斥
+  cantSelectIdList: PropTypes.array, // 不允许选择的树节点，其余为可选择，这两个选项互斥
   error: PropTypes.bool, // redux-form 的render field空间相关信息
   helperText: PropTypes.string // redux-form 的render field空间相关信息
 };
 
 UserPicker.defaultProps = {
-  label: '选取用户'
+  label: '选取用户',
+  single: false,
+  selectedUsers: []
 };
 
 export default compose(withStyles(styles))(UserPicker);

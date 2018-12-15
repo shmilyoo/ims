@@ -14,6 +14,9 @@ import User from './user';
 import { actions as accountActions } from '../reducers/account';
 import { actions as systemActions } from '../reducers/system';
 import Work from './work';
+import DeptManage from './deptManage';
+import About from './About';
+import Loading from '../components/common/Loading';
 
 const drawerWidth = 250;
 
@@ -43,6 +46,7 @@ const style = theme => ({
   },
   main: {
     padding: 20,
+    height: '100%',
     flex: 'auto',
     display: 'flex'
   },
@@ -69,7 +73,7 @@ class Home extends React.Component {
   };
   render() {
     console.log('render home');
-    const { classes } = this.props;
+    const { classes, deptArray } = this.props;
     return (
       <div className={classes.homeRoot}>
         <LeftNav menu={leftMenu} open={this.state.leftOpen} header={sysName} />
@@ -80,15 +84,20 @@ class Home extends React.Component {
         >
           <AppHead type="user" onMenuClick={this.handleMenuClick} />
           <div className={classes.main}>
-            <Switch>
-              <Route path="/brief" component={Brief} />
-              <Route path="/work" component={Work} />
-              <Route path="/dept" component={Dept} />
-              <Route path="/sa" component={SuperAdmin} />
-              <Route path="/user" component={User} />
-              <Route path="/about" component={null} />
-              <Route path="/" component={() => <Redirect to="/brief" />} />
-            </Switch>
+            {deptArray ? (
+              <Switch>
+                <Route path="/brief" component={Brief} />
+                <Route path="/work" component={Work} />
+                <Route path="/dept" component={Dept} />
+                <Route path="/dept-manage" component={DeptManage} />
+                <Route path="/sa" component={SuperAdmin} />
+                <Route path="/user" component={User} />
+                <Route path="/about" component={About} />
+                <Route path="/" component={() => <Redirect to="/brief" />} />
+              </Switch>
+            ) : (
+              <Loading />
+            )}
           </div>
           <div className={classes.footer}>@copyright 2018</div>
         </div>
@@ -99,6 +108,7 @@ class Home extends React.Component {
 function mapStateToProps(state) {
   return {
     // id: state.account.id
+    deptArray: state.system.deptArray
   };
 }
 

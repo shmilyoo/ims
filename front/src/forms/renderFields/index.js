@@ -5,6 +5,7 @@ import RenderTextFieldAsync from './renderTextFieldAsync';
 import RenderDatePicker from './renderDatePicker';
 import RenderSelectDeptField from './renderSelectDeptField';
 import RenderUserPicker from './renderUserPicker';
+import RenderWorkPhase from './renderWorkPhase';
 // import RenderExps from './renderExps';
 // import RenderRandomCode from './renderRandomCode';
 
@@ -15,7 +16,8 @@ export {
   RenderTextFieldAsync,
   RenderDatePicker,
   RenderSelectDeptField,
-  RenderUserPicker
+  RenderUserPicker,
+  RenderWorkPhase
   // RenderExps,
   // RenderRandomCode
 };

@@ -1,3 +1,5 @@
+// import { types as systemTypes } from './system';
+
 export const types = {
   SAGA_AUTH_REQUEST: 'ACCOUNT/SAGA_AUTH_REQUEST',
   SAGA_CHECK_AUTH: 'ACCOUNT/SAGA_CHECK_AUTH',
@@ -17,7 +19,9 @@ export const types = {
   LOGIN_SUCCESS: 'ACCOUNT/LOGIN_SUCCESS',
   SET_ACCOUNT_INFO: 'ACCOUNT/SET_ACCOUNT_INFO', // 进入主页面的时候初始化用户相关信息
   UPDATE_ACCOUNT_INFO: 'ACCOUNT/UPDATE_ACCOUNT_INFO', // 只更新info
-  UPDATE_ACCOUNT_DEPT: 'ACCOUNT/UPDATE_ACCOUNT_DEPT' // 更新dept
+  UPDATE_ACCOUNT_DEPT: 'ACCOUNT/UPDATE_ACCOUNT_DEPT', // 更新dept
+  SET_DEPT_SHOW: 'ACCOUNT/SET_DEPT_SHOW', // 设置显示哪个部门信息
+  SET_MANAGE_DEPT: 'ACCOUNT/SET_MANAGE_DEPT' // 设置管理哪个部门信息
 };
 
 export const actions = {
@@ -62,6 +66,14 @@ export const actions = {
   }),
   clearAuth: () => ({
     type: types.CLEAR_AUTH
+  }),
+  setDeptShow: id => ({
+    type: types.SET_DEPT_SHOW,
+    id
+  }),
+  setManageDept: id => ({
+    type: types.SET_MANAGE_DEPT,
+    id
   })
   // loginSuccess: (id, authType, username, active) => ({
   //   type: types.LOGIN_SUCCESS,
@@ -81,12 +93,15 @@ const initState = {
   isSuperAdmin: false,
   info: { name: '', sex: 0 }, // {basic:{},work:[],education,[]} 从sso中获取的用户详细资料
   dept: {},
+  deptShow: '', // 在我的部门等地显示的部门id
   manageDept: '', // 用户选中管理的部门id
   manageDepts: [] // 用户具有管理权限的部门id列表
 };
 
 export default function accountReducer(state = initState, action) {
   switch (action.type) {
+    // case systemTypes.SET_DEPTS:
+
     case types.AUTH_SUCCESS:
       return {
         ...state,
@@ -107,9 +122,15 @@ export default function accountReducer(state = initState, action) {
     case types.SET_ACCOUNT_INFO:
       return {
         ...state,
+        // 系统进入主界面home后，获取dept，如果deptShow有的话，就不赋值
+        deptShow: state.deptShow ? state.deptShow : action.dept.id,
         dept: { ...state.dept, ...action.dept },
         info: { ...state.info, ...action.info },
-        manageDept: action.manageDepts.length ? action.manageDepts[0] : '',
+        manageDept: state.manageDept
+          ? state.manageDept
+          : action.manageDepts.length
+            ? action.manageDepts[0]
+            : '',
         manageDepts: action.manageDepts
       };
     case types.UPDATE_ACCOUNT_INFO:
@@ -122,16 +143,19 @@ export default function accountReducer(state = initState, action) {
         ...state,
         dept: { ...state.dept, ...action.dept }
       };
+
+    case types.SET_DEPT_SHOW:
+      return {
+        ...state,
+        deptShow: action.id
+      };
+    case types.SET_MANAGE_DEPT:
+      return {
+        ...state,
+        manageDept: action.id
+      };
     case types.CLEAR_AUTH:
       return initState;
-    // case types.LOGIN_SUCCESS:
-    //   return {
-    //     ...state,
-    //     id: action.id,
-    //     username: action.username,
-    //     active: action.active,
-    //     authType: action.authType
-    //   };
     default:
       return state;
   }

@@ -2,7 +2,6 @@ import axios from 'axios';
 import { types as accountTypes } from '../reducers/account';
 
 export const required = value => {
-  console.log('check required', value);
   if (value === undefined || value === null) return '不能为空';
   const type = typeof value;
   switch (type) {
@@ -22,6 +21,11 @@ export const required = value => {
     default:
       return;
   }
+};
+
+export const checkMaxStringLength = max => value => {
+  if (!value) return;
+  if (value.length > max) return `最大长度不能超过${max}个字符`;
 };
 
 export const checkUsername = value => {
