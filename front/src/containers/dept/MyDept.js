@@ -31,7 +31,7 @@ MyDept.propTypes = {};
 function mapStateToProps(state) {
   return {
     user: state.account,
-    dept: state.account.dept,
+    deptId: state.account.deptId,
     info: state.account.info
   };
 }

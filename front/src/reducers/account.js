@@ -54,9 +54,9 @@ export const actions = {
     manageDepts
   }),
   updateInfo: info => ({ type: types.UPDATE_ACCOUNT_INFO, info }),
-  updateDept: dept => ({
+  updateDept: deptId => ({
     type: types.UPDATE_ACCOUNT_DEPT,
-    dept
+    deptId
   }),
   authSuccess: (authType, user) => ({
     // 'id', 'username', 'active', 'name', 'sex', 'deptId','authType'
@@ -92,7 +92,7 @@ const initState = {
   active: 2, // sso 账户状态: 0正常，1未激活,2禁用
   isSuperAdmin: false,
   info: { name: '', sex: 0 }, // {basic:{},work:[],education,[]} 从sso中获取的用户详细资料
-  dept: {},
+  deptId: '',
   deptShow: '', // 在我的部门等地显示的部门id
   manageDept: '', // 用户选中管理的部门id
   manageDepts: [] // 用户具有管理权限的部门id列表
@@ -100,8 +100,6 @@ const initState = {
 
 export default function accountReducer(state = initState, action) {
   switch (action.type) {
-    // case systemTypes.SET_DEPTS:
-
     case types.AUTH_SUCCESS:
       return {
         ...state,
@@ -112,7 +110,7 @@ export default function accountReducer(state = initState, action) {
         username: action.user.username,
         isSuperAdmin: action.user.isSuperAdmin || false,
         info: { ...state.info, name: action.user.name, sex: action.user.sex },
-        dept: { ...state.dept, id: action.user.deptId }
+        deptId: action.user.deptId
       };
     case types.CHECK_AUTH_FAILURE:
       return {
@@ -124,7 +122,7 @@ export default function accountReducer(state = initState, action) {
         ...state,
         // 系统进入主界面home后，获取dept，如果deptShow有的话，就不赋值
         deptShow: state.deptShow ? state.deptShow : action.dept.id,
-        dept: { ...state.dept, ...action.dept },
+        deptId: action.dept.id,
         info: { ...state.info, ...action.info },
         manageDept: state.manageDept
           ? state.manageDept
@@ -141,7 +139,7 @@ export default function accountReducer(state = initState, action) {
     case types.UPDATE_ACCOUNT_DEPT:
       return {
         ...state,
-        dept: { ...state.dept, ...action.dept }
+        deptId: action.deptId
       };
 
     case types.SET_DEPT_SHOW:

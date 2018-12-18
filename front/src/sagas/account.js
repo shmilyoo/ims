@@ -187,12 +187,12 @@ function* setAccountInfoFlow() {
     });
     if (res.success) {
       // 更新用户资料后，要更新store中的相应项
-      const dept = values.dept;
+      const deptId = values.deptId;
       const info = {
         status: values.status,
         position: values.position
       };
-      yield put(accountActions.updateDept(dept));
+      yield put(accountActions.updateDept(deptId));
       yield put(accountActions.updateInfo(info));
       yield call(resolve);
     }

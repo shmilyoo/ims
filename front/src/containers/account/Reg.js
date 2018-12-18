@@ -8,7 +8,7 @@ import { Card, withStyles, CardContent, Typography } from '@material-ui/core';
 import compose from 'recompose/compose';
 import Cookies from 'js-cookie';
 import history from '../../history';
-import { ssoRegUrl } from '../../config';
+import { ssoRegUrl, sysName } from '../../config';
 
 const styles = theme => ({
   card: {
@@ -43,6 +43,7 @@ class Reg extends React.Component {
   };
 
   render() {
+    document.title = `注册 - ${sysName}`;
     console.log('render reg');
     const { classes, username } = this.props;
     return (

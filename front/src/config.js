@@ -38,6 +38,7 @@ export const pathTitle = {
   '/dept-manage/announcement': '部门公告',
   '/dept-manage/work': '部门工作',
   '/dept-manage/work/add': '发布工作',
+  '/dept-manage/work/add/success': '发布工作成功',
   '/dept-manage/work/edit': '编辑工作',
   '/dept-manage/news': '部门文章',
   '/dept-manage/news/add': '发布文章',

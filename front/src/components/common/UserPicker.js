@@ -86,68 +86,62 @@ class UserPicker extends PureComponent {
   handleClick = () => {
     if (!this.props.deptArray || this.props.disabled) return;
     if (!this.state.treeData) this.initTreeData();
-    this.setState({ open: true });
+    this.setState({ open: true, deptId: '' });
   };
   handleCloseBtn = () => {
     this.setState({ open: false, users: null });
   };
-  handleAllCheck = () => {
+  // todotodo
+  // 把三个部分的用户建立一个统一的用户id:user dic
+  // 同时建立三个 分别的dic
+  // 循环
+
+  handleCheck = type => {
     const { selectedUsers, onUserPickerChange } = this.props;
     const { users } = this.state;
-    const result = selectedUsers ? [...selectedUsers] : [];
-    const selectedIdDic = {};
-    result.forEach(user => {
-      selectedIdDic[user.id] = 1;
+    const allUsers = []; // 包含以下三个
+    const selectedUserDic = {}; // form已经选择的用户
+    const usersSelectedDic = {}; // dialog中list列表中用户已经选择的
+    const usersUnSelectedDic = {}; // dialog中list列表中用户未选择的
+    (selectedUsers || []).forEach(user => {
+      selectedUserDic[user.id] = 1;
+      allUsers.push(user);
     });
     users.forEach(user => {
-      if (!selectedIdDic[user.id]) result.push(user);
+      if (selectedUserDic[user.id]) usersSelectedDic[user.id] = 1;
+      else {
+        usersUnSelectedDic[user.id] = 1;
+        allUsers.push(user);
+      }
     });
+    let result = allUsers;
+    if (type === 'none') {
+      result = allUsers.filter(
+        user =>
+          selectedUserDic[user.id] &&
+          !usersSelectedDic[user.id] &&
+          !usersUnSelectedDic[user.id]
+      );
+    }
+    if (type === 'reverse') {
+      result = allUsers.filter(
+        user =>
+          (selectedUserDic[user.id] &&
+            !usersSelectedDic[user.id] &&
+            !usersUnSelectedDic[user.id]) ||
+          (usersUnSelectedDic[user.id] && !selectedUserDic[user.id])
+      );
+    }
     onUserPickerChange && onUserPickerChange(result);
+  };
+  handleAllCheck = () => {
+    this.handleCheck('all');
   };
   handleNoneCheck = () => {
-    const { selectedUsers, onUserPickerChange } = this.props;
-    const { users } = this.state;
-    const result = [];
-    const selectedIdDic = {}; // 已经选定的用户id对象集合
-    (selectedUsers || []).forEach(user => {
-      selectedIdDic[user.id] = 1;
-    });
-    const selectedIdInUsersDic = {}; // users中已经选择的id对象集合
-    const selectedIdNotInUsersDic = {}; // users中未选择的id对象集合
-    users.forEach(user => {
-      selectedIdDic[user.id]
-        ? (selectedIdInUsersDic[user.id] = 1)
-        : (selectedIdNotInUsersDic[user.id] = 1);
-    });
-    (selectedUsers || []).forEach(user => {
-      !selectedIdInUsersDic[user.id] && result.push(user);
-    });
-    onUserPickerChange && onUserPickerChange(result);
+    this.handleCheck('none');
   };
   handleReverseCheck = () => {
-    const { selectedUsers, onUserPickerChange } = this.props;
-    const { users } = this.state;
-    const result = [];
-    const selectedIdDic = {}; // 已经选定的用户id对象集合
-    (selectedUsers || []).forEach(user => {
-      selectedIdDic[user.id] = 1;
-    });
-    const selectedIdInUsersDic = {}; // users中已经选择的id对象集合
-    const selectedIdNotInUsersDic = {}; // users中未选择的id对象集合
-    users.forEach(user => {
-      selectedIdDic[user.id]
-        ? (selectedIdInUsersDic[user.id] = 1)
-        : (selectedIdNotInUsersDic[user.id] = user);
-    });
-    (selectedUsers || []).forEach(user => {
-      !selectedIdInUsersDic[user.id] &&
-        !selectedIdNotInUsersDic[user.id] &&
-        result.push(user);
-    });
-    Object.keys(selectedIdNotInUsersDic).forEach(id => {
-      result.push(selectedIdNotInUsersDic[id]);
-    });
-    onUserPickerChange && onUserPickerChange(result);
+    this.handleCheck('reverse');
   };
 
   /**

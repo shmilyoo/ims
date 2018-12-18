@@ -69,10 +69,10 @@ class DeptController extends Controller {
         {
           model: ctx.model.Dept,
           as: 'dept',
-          attributes: [ 'name' ],
+          attributes: [ 'name' ], // 为了在用户名后面显示部门名称
         },
       ],
-      attributes: [ 'id', 'name', 'deptId' ],
+      attributes: [ 'id', 'name' ],
       where: { deptId: { [ctx.model.Op.in]: ids } },
       order: [[ ctx.model.Dept, 'level' ], [ ctx.model.Dept, 'order' ]],
     });
@@ -97,7 +97,7 @@ class DeptController extends Controller {
       ],
       where: { id },
     });
-    ctx.body = ctx.helper.getRespBody(true, dept);
+    ctx.body = ctx.helper.getRespBody(!!dept, dept ? dept : '找不到相应的部门');
   }
 
   async setDeptManagers() {

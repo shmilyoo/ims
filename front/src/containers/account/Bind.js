@@ -8,7 +8,7 @@ import { Card, withStyles, CardContent, Typography } from '@material-ui/core';
 import compose from 'recompose/compose';
 import Cookies from 'js-cookie';
 import history from '../../history';
-import { ssoRegUrl } from '../../config';
+import { ssoRegUrl, sysName } from '../../config';
 import BindForm from '../../forms/account/BindForm';
 
 const styles = theme => ({
@@ -44,6 +44,7 @@ class Bind extends React.Component {
   };
 
   render() {
+    document.title = `绑定统一授权系统用户 - ${sysName}`;
     console.log('render bind');
     const { classes, username } = this.props;
     return (

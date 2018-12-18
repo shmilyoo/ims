@@ -25,8 +25,9 @@ const configureAxios = (dispatch, history) => {
   // 添加一个返回拦截器
   axios.interceptors.response.use(
     response => {
+      if (!response) return { success: false, error: '远程服务器没有响应' };
       // 如果请求结果为200，且success为false，在这里统一报错
-      if (!response.data.success) {
+      if (response.data && !response.data.success) {
         // todo 可以在res中多加一个字段 show，代表是否在用户界面显示，还是记在日志中
         dispatch(commonActions.showMessage(response.data.error, 'error'));
       }
@@ -52,7 +53,8 @@ const configureAxios = (dispatch, history) => {
       }
       NProgress.done();
       // todo 后续根据status不同值，导向不同的页面 404 500等
-      console.log(error.response.data, error.response.status);
+      // console.log(error.response.data, error.response.status);
+      dispatch(commonActions.showMessage(error.message, 'error'));
       return { success: false, error: error.message };
       // 如果是在saga调用，throw会导致saga死掉
       // throw new axios.Cancel('cancel request and redirect');

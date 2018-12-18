@@ -29,9 +29,18 @@ class ChangeDept extends PureComponent {
   };
   render() {
     const { edit } = this.state;
-    const { dept, info } = this.props;
+    const { deptId, info, deptArray, deptDic } = this.props;
     return (
       <Grid container direction="column" wrap="nowrap" spacing={8}>
+        <Grid item>
+          <Typography variant="subtitle1">
+            1. 不在位时，在我的位置注明所在地点-联系方式等简要信息
+          </Typography>
+          <Typography variant="subtitle1">2. 222</Typography>
+        </Grid>
+        <Grid item>
+          <Divider />
+        </Grid>
         <Grid item container justify="flex-start">
           <Grid item>
             <FormControlLabel
@@ -55,11 +64,13 @@ class ChangeDept extends PureComponent {
           <UserInfoForm
             edit={edit}
             enableReinitialize
+            deptArray={deptArray}
+            deptDic={deptDic}
             onSubmit={this.handleUserInfoFormSubmit}
             initialValues={{
               status: info.status,
               position: info.position,
-              dept: { id: dept.id, name: dept.name, names: dept.names }
+              deptId: deptId
             }}
           />
         </Grid>
@@ -72,9 +83,11 @@ ChangeDept.propTypes = {};
 
 function mapStateToProps(state) {
   return {
-    dept: state.account.dept,
+    deptId: state.account.deptId,
     info: state.account.info,
-    id: state.account.id
+    id: state.account.id,
+    deptDic: state.system.deptDic,
+    deptArray: state.system.deptArray
   };
 }
 

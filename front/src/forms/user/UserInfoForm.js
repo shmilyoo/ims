@@ -12,6 +12,7 @@ import {
   RenderSelectDeptField
 } from '../../forms/renderFields';
 import { userStatus } from '../../config';
+import RenderDeptPicker from '../renderFields/renderDeptPicker';
 
 const styles = () => ({
   buttonLine: {
@@ -32,7 +33,9 @@ const UserInfoForm = props => {
     classes,
     submitting,
     error,
-    edit
+    edit,
+    deptArray,
+    deptDic
   } = props;
   return (
     <form onSubmit={handleSubmit}>
@@ -53,18 +56,19 @@ const UserInfoForm = props => {
               name="position"
               label="我的位置"
               readOnly={!edit}
-              validate={required}
               component={RenderTextField}
               normalize={trim}
             />
           </Grid>
           <Grid item xs={2}>
             <Field
-              name="dept"
-              label="实际工作部门"
-              readOnly={!edit}
+              name="deptId"
+              deptArray={deptArray}
+              disabled={!edit}
+              deptDic={deptDic}
+              label="实际工作部门*"
+              component={RenderDeptPicker}
               validate={required}
-              component={RenderSelectDeptField}
             />
           </Grid>
         </Grid>
@@ -74,10 +78,10 @@ const UserInfoForm = props => {
               <Button
                 type="submit"
                 variant="contained"
-                color="primary"
+                color="secondary"
                 disabled={pristine || submitting}
               >
-                注册
+                保存
               </Button>
             </Grid>
             <Grid item xs={1} />

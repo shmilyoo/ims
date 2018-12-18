@@ -3,6 +3,8 @@ import { actions as accountActions } from '../reducers/account';
 import md5 from 'md5';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import history from '../history';
+import qs from 'qs';
 
 export const getRandomIntInclusive = (min, max) => {
   min = Math.ceil(min);
@@ -155,6 +157,19 @@ export const getDeptNamesArraySync = (id, deptDic) => {
     dept = deptDic[dept.parentId];
   }
   return names.reverse();
+};
+
+export const toRedirectPage = (content, to, count) => {
+  history.push(
+    `/redirect?${qs.stringify(
+      {
+        content,
+        to,
+        count
+      },
+      { encodeValuesOnly: true }
+    )}`
+  );
 };
 
 // export const treeDataWithRelation = (treeData, relations, treeDataDic) => {

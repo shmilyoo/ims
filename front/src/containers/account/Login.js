@@ -15,6 +15,7 @@ import LoginForm from '../../forms/account/LoginForm';
 import history from '../../history';
 import { types as accountTypes } from '../../reducers/account';
 import Cookies from 'js-cookie';
+import { sysName } from '../../config';
 
 const style = theme => ({
   card: {
@@ -63,6 +64,7 @@ class Login extends PureComponent {
       });
   };
   render() {
+    document.title = `登录 - ${sysName}`;
     const { classes, username } = this.props;
     console.log(`login page username is ${username}`);
     return username ? (

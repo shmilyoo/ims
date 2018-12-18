@@ -1,9 +1,11 @@
 import React, { PureComponent } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles, Grid, Typography } from '@material-ui/core';
 import history from '../history';
 import qs from 'qs';
 import compose from 'recompose/compose';
+import { sysName } from '../config';
 
 const style = theme => ({
   root: {
@@ -15,19 +17,20 @@ const style = theme => ({
   }
 });
 
+/**
+ * /redirect?content=xx&to=xx&count=5
+ */
 class CountDownRedirect extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = {
-      content: '',
-      to: '/'
-    };
-  }
-  componentDidMount() {
-    const { content, to, count = 5 } = qs.parse(this.props.location.search, {
+    const {
+      content = '遇到未知错误，重定向中',
+      to = '/',
+      count = 5
+    } = qs.parse(this.props.location.search, {
       ignoreQueryPrefix: true
     });
-    this.setState({ content, to, countDown: count });
+    this.state = { content, to, countDown: count };
     this.timer = setInterval(this.count, 1000);
   }
 
@@ -45,7 +48,8 @@ class CountDownRedirect extends PureComponent {
   };
 
   render() {
-    const { classes } = this.props;
+    document.title = `页面重定向 - ${sysName}`;
+    const { classes, auth } = this.props;
     const { countDown, content } = this.state;
     if (countDown === 0) {
       clearInterval(this.timer);
@@ -76,32 +80,46 @@ class CountDownRedirect extends PureComponent {
                 <Typography
                   className={classes.link}
                   onClick={() => {
+                    history.goBack();
+                  }}
+                >
+                  返回上一页
+                </Typography>
+              </Grid>
+              <Grid item>
+                <Typography
+                  className={classes.link}
+                  onClick={() => {
                     history.push('/');
                   }}
                 >
                   首页
                 </Typography>
               </Grid>
-              <Grid item>
-                <Typography
-                  className={classes.link}
-                  onClick={() => {
-                    history.push('/reg');
-                  }}
-                >
-                  注册
-                </Typography>
-              </Grid>
-              <Grid item>
-                <Typography
-                  className={classes.link}
-                  onClick={() => {
-                    history.push('/login');
-                  }}
-                >
-                  登录
-                </Typography>
-              </Grid>
+              {!auth && (
+                <React.Fragment>
+                  <Grid item>
+                    <Typography
+                      className={classes.link}
+                      onClick={() => {
+                        history.push('/reg');
+                      }}
+                    >
+                      注册
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Typography
+                      className={classes.link}
+                      onClick={() => {
+                        history.push('/login');
+                      }}
+                    >
+                      登录
+                    </Typography>
+                  </Grid>
+                </React.Fragment>
+              )}
             </Grid>
           </Grid>
         </Grid>
@@ -111,4 +129,13 @@ class CountDownRedirect extends PureComponent {
   }
 }
 
-export default compose(withStyles(style))(CountDownRedirect);
+function mapStateToProps(state) {
+  return {
+    auth: state.account.auth
+  };
+}
+
+export default compose(
+  withStyles(style),
+  connect(mapStateToProps)
+)(CountDownRedirect);

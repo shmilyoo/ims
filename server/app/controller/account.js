@@ -209,12 +209,12 @@ class AccountController extends Controller {
   async setUserInfo() {
     const ctx = this.ctx;
     const {
-      values: { dept, status, position },
+      values: { deptId, status, position },
       id,
     } = ctx.request.body;
     if (id !== ctx.user.id) throw '提交修改资料的用户id与cookie中id不一致';
     await ctx.model.User.update(
-      { deptId: dept.id, status, position },
+      { deptId, status, position },
       { where: { id } }
     );
     ctx.body = ctx.helper.getRespBody(true);
