@@ -10,46 +10,6 @@ class DeptController extends Controller {
     ctx.body = ctx.helper.getRespBody(true, deptArray);
   }
 
-  // /**
-  //  * 用户初次加载主页面时，获取depts列表和dept关系绑定对象
-  //  */
-  // async deptsAndRelation() {
-  //   const ctx = this.ctx;
-  //   const deptArray = await ctx.service.cache.getDeptArray();
-  //   ctx.body = ctx.helper.getRespBody(true, { deptArray });
-  // }
-
-  // async getWorkDeptInfo() {
-  //   // 从query的deptid获取关联的部门相关信息
-  //   const ctx = this.ctx;
-  //   const { fromDeptId } = ctx.query;
-  //   if (!fromDeptId) throw '请求参数部门id不正确';
-  //   const relation = await ctx.model.DeptRelation.findOne({
-  //     where: { fromDeptId },
-  //   });
-  //   const realDeptId = relation ? relation.toDeptId : fromDeptId;
-  //   const deptDic = await ctx.service.cache;
-  // }
-
-  // async relations() {
-  //   const ctx = this.ctx;
-  //   const result = await ctx.service.dept.getDeptRelation();
-  //   ctx.body = ctx.helper.getRespBody(true, result);
-  // }
-
-  // async relationsBind() {
-  //   const ctx = this.ctx;
-  //   const { fromDeptId, toDeptId } = ctx.request.body;
-  //   await ctx.model.DeptRelation.upsert({ fromDeptId, toDeptId });
-  //   ctx.body = ctx.helper.getRespBody(true, { fromDeptId, toDeptId });
-  // }
-  // async relationsUnbind() {
-  //   const ctx = this.ctx;
-  //   const { fromDeptId, toDeptId } = ctx.request.body;
-  //   await ctx.model.DeptRelation.destroy({ where: { fromDeptId, toDeptId } });
-  //   ctx.body = ctx.helper.getRespBody(true, { fromDeptId, toDeptId });
-  // }
-
   /**
    * query: offspring=1 包含下级所有部门的用户
    * query: id 必须，部门id
@@ -117,6 +77,44 @@ class DeptController extends Controller {
       ok = false;
     }
     ctx.body = ctx.helper.getRespBody(ok, ok ? managers : '后台错误');
+  }
+
+  async deptWorks() {
+    const ctx = this.ctx;
+    const {
+      deptId,
+      numberPerPage,
+      currentPage,
+      withDept,
+      withPublisher,
+    } = ctx.request.query;
+    const include = [];
+    if (withDept) {
+      include.push({
+        model: ctx.model.Dept,
+        as: 'dept',
+        attributes: [ 'id', 'name' ],
+      });
+    }
+    if (withPublisher) {
+      include.push({
+        model: ctx.model.User,
+        as: 'publisher',
+        attributes: [ 'id', 'name' ],
+      });
+    }
+    const perPge = Number.parseInt(numberPerPage);
+    const nowPage = Number.parseInt(currentPage);
+    const { count, rows } = await ctx.model.Work.findAndCountAll({
+      include,
+      where: { deptId },
+      limit: perPge,
+      offset: (nowPage - 1) * perPge,
+    });
+    ctx.body = ctx.helper.getRespBody(true, {
+      workList: rows,
+      totalNumber: count,
+    });
   }
 }
 

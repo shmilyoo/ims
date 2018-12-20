@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Route, Switch, withRouter, Redirect } from 'react-router-dom';
 import compose from 'recompose/compose';
 import classNames from 'classnames';
-import { withStyles } from '@material-ui/core';
+import { withStyles, Grid } from '@material-ui/core';
 import LeftNav from '../components/LeftNav';
 import AppHead from './AppHead';
 import { sysName, leftMenu } from '../config';
@@ -45,10 +45,7 @@ const style = theme => ({
     marginLeft: 0
   },
   main: {
-    padding: 20,
-    height: '100%',
-    flex: 'auto',
-    display: 'flex'
+    padding: 20
   },
   footer: {
     padding: 10,
@@ -77,7 +74,40 @@ class Home extends React.Component {
     return (
       <div className={classes.homeRoot}>
         <LeftNav menu={leftMenu} open={this.state.leftOpen} header={sysName} />
-        <div
+
+        <Grid
+          container
+          direction="column"
+          wrap="nowrap"
+          className={classNames(classes.right, {
+            [classes.rightShift]: !this.state.leftOpen
+          })}
+        >
+          <Grid item>
+            <AppHead type="user" onMenuClick={this.handleMenuClick} />
+          </Grid>
+          <Grid item xs className={classes.main}>
+            {deptArray ? (
+              <Switch>
+                <Route path="/brief" component={Brief} />
+                <Route path="/work" component={Work} />
+                <Route path="/dept" component={Dept} />
+                <Route path="/dept-manage" component={DeptManage} />
+                <Route path="/sa" component={SuperAdmin} />
+                <Route path="/user" component={User} />
+                <Route path="/about" component={About} />
+                <Route path="/" component={() => <Redirect to="/brief" />} />
+              </Switch>
+            ) : (
+              <Loading />
+            )}
+          </Grid>
+          <Grid item className={classes.footer}>
+            @copyright 2018
+          </Grid>
+        </Grid>
+
+        {/* <div
           className={classNames(classes.right, {
             [classes.rightShift]: !this.state.leftOpen
           })}
@@ -100,7 +130,7 @@ class Home extends React.Component {
             )}
           </div>
           <div className={classes.footer}>@copyright 2018</div>
-        </div>
+        </div> */}
       </div>
     );
   }

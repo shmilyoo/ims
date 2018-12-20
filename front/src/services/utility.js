@@ -5,6 +5,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import history from '../history';
 import qs from 'qs';
+import { numberPerPage } from '../config';
 
 export const getRandomIntInclusive = (min, max) => {
   min = Math.ceil(min);
@@ -170,6 +171,113 @@ export const toRedirectPage = (content, to, count) => {
       { encodeValuesOnly: true }
     )}`
   );
+};
+
+export const getDeptWorksReq = (
+  deptId,
+  numberPerPage,
+  currentPage,
+  withDept = true,
+  withPublisher = true
+) => {
+  return axios.get(
+    `/dept/works?${qs.stringify(
+      {
+        deptId,
+        numberPerPage,
+        currentPage,
+        withDept: withDept ? '1' : '',
+        withPublisher: withPublisher ? '1' : ''
+      },
+      { encodeValuesOnly: true }
+    )}`
+  );
+};
+
+/**
+ * 获取用户在localstorage设置的numberPerPage，如果没有则
+ */
+export const getNumberPerPage = () => {
+  const _numberPerPage = Number.parseInt(localStorage.getItem('numberPerPage'));
+  return _numberPerPage || numberPerPage;
+};
+export const setNumberPerPage = number => {
+  localStorage.setItem('numberPerPage', number);
+  return number;
+};
+
+/**
+ * 批量删除大项工作
+ * @param {array} ids work id 列表
+ */
+export const delMultiWorks = ids => {
+  return axios.post('/work/del', { ids });
+};
+
+export const timeFunctions = {
+  getNowUnix: () => Math.floor(new Date().getTime() / 1000),
+  /**
+   * 从unix时间戳返回日期字符串
+   * @param {number} unix unix 时间戳
+   * @param {string} type 返回的格式，date,datetime,time
+   */
+  formatFromUnix: (unix, type = 'date') => {
+    const date = new Date(unix * 1000);
+    switch (type) {
+      case 'datetime':
+        return `${date.getFullYear()}-${date.getMonth() +
+          1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
+      case 'time':
+        return `${date.getHours()}:${date.getMinutes()}`;
+      default:
+        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    }
+  }
+};
+
+export const range = (start, end, step) => {
+  var range = [];
+  var typeofStart = typeof start;
+  var typeofEnd = typeof end;
+
+  if (step === 0) {
+    throw TypeError('Step cannot be zero.');
+  }
+
+  if (typeofStart == 'undefined' || typeofEnd == 'undefined') {
+    throw TypeError('Must pass start and end arguments.');
+  } else if (typeofStart != typeofEnd) {
+    throw TypeError('Start and end arguments must be of same type.');
+  }
+
+  typeof step == 'undefined' && (step = 1);
+
+  if (end < start) {
+    step = -step;
+  }
+
+  if (typeofStart == 'number') {
+    while (step > 0 ? end >= start : end <= start) {
+      range.push(start);
+      start += step;
+    }
+  } else if (typeofStart == 'string') {
+    if (start.length != 1 || end.length != 1) {
+      throw TypeError('Only strings with one character are supported.');
+    }
+
+    start = start.charCodeAt(0);
+    end = end.charCodeAt(0);
+
+    while (step > 0 ? end >= start : end <= start) {
+      range.push(String.fromCharCode(start));
+      start += step;
+    }
+  } else {
+    throw TypeError('Only string and number types are supported');
+  }
+
+  return range;
 };
 
 // export const treeDataWithRelation = (treeData, relations, treeDataDic) => {

@@ -9,15 +9,15 @@ import { Grid, Typography } from '@material-ui/core';
 class AddWorkSuccess extends PureComponent {
   constructor(props) {
     super(props);
-    const { id, deptId } = qs.parse(this.props.location.search, {
+    const { workId, deptId } = qs.parse(this.props.location.search, {
       ignoreQueryPrefix: true
     });
-    if (!(id && deptId)) toRedirectPage('错误的url参数');
-    this.state = { id, deptId };
+    if (!(workId && deptId)) toRedirectPage('错误的url参数');
+    this.state = { workId, deptId };
   }
 
   render() {
-    const { id, deptId } = this.state;
+    const { workId, deptId } = this.state;
     return (
       <Grid
         style={{ height: '80%' }}
@@ -32,10 +32,13 @@ class AddWorkSuccess extends PureComponent {
             <Link to="/dept-manage/work/add">继续添加</Link>
           </Grid>
           <Grid item>
-            <Link to={`/dept-manage/work/edit/${id}`}>编辑此项工作</Link>
+            <Link to={`/dept-manage/work/edit/${workId}`}>编辑此项工作</Link>
           </Grid>
           <Grid item>
-            <Link to={`/work/${id}`}>查看此项工作</Link>
+            <Link to={`/work/${workId}`}>查看此项工作</Link>
+          </Grid>
+          <Grid item>
+            <Link to={`/dept-manage/work`}>管理部门工作</Link>
           </Grid>
           <Grid item>
             <Link to={`/dept/${deptId}`}>查看工作所属部门</Link>

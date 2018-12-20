@@ -19,7 +19,7 @@ function* addWorkFlow() {
       yield call(resolve);
       yield call(
         history.push,
-        `/dept-manage/work/add/success?work=${id}&&deptId=${deptId}`
+        `/dept-manage/work/add/success?workId=${id}&&deptId=${deptId}`
       ); // 跳转到成功页，提示 是继续添加 or 查看工作 or 查看部门工作
     } else {
       yield put(stopSubmit('workForm', { _error: res.error }));

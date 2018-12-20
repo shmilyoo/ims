@@ -7,7 +7,12 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 
 const primaryTextColor = 'rgba(0, 0, 0, 0.87)';
 const secondaryTextColor = 'rgba(0, 0, 0, 0.54)';
-
+const error = {
+  main: '#EC2935',
+  light: '#ff6560',
+  dark: '#b1000e',
+  contrastText: '#000'
+};
 const theme = createMuiTheme({
   palette: {
     background: { default: '#eee' },
@@ -35,12 +40,7 @@ const theme = createMuiTheme({
       dark: '#be9900',
       contrastText: '#000'
     },
-    error: {
-      main: '#EC2935',
-      light: '#ff6560',
-      dark: '#b1000e',
-      contrastText: '#000'
-    },
+    error: error,
     text: {
       primary: primaryTextColor,
       secondary: secondaryTextColor
@@ -87,6 +87,14 @@ const theme = createMuiTheme({
       color: secondaryTextColor,
       '&:visited': { color: secondaryTextColor },
       '&:hover': { textDecoration: 'underline' }
+    },
+    onlyLink: {
+      cursor: 'pointer',
+      '&:hover': { textDecoration: 'underline' }
+    },
+    alertBtn: {
+      // color: error.light,
+      '&:hover': { color: error.light }
     }
   }
 });

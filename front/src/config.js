@@ -28,6 +28,7 @@ export const userStatus = [
   { label: '代职', value: userStatusDic.ONEXCHANGE },
   { label: '其他', value: userStatusDic.OTHER }
 ];
+export const numberPerPage = 20; // 列表页默认每页显示多少项
 
 export const pathTitle = {
   '/work': '我的工作',

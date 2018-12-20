@@ -70,6 +70,28 @@ module.exports = app => {
         userId: 'f3762080cb9911e884eec9a890da22bf',
       });
       await app.model.Tag.create({ name: '其他', color: '#666', order: 1000 });
+      const works = new Array(20).fill(0).map(() => ({
+        deptId: 'c360d5f0ceef11e8b013f53754442dd4',
+        title: 'aaa',
+        from: '1545267600',
+        to: '1545267600',
+        createTime: '1545267600',
+        updateTime: '1545267600',
+        publisherId: 'c360d5f0ceef11e8b013f53754442777',
+      }));
+      // console.log(works);
+      await app.model.Work.bulkCreate(works);
+      // await app.model.Work.bulkCreate([
+      //   {
+      //     deptId: 'c360d5f0ceef11e8b013f53754442dd4',
+      //     title: 'aaa',
+      //     from: '1545267600',
+      //     to: '1545267600',
+      //     createTime: '1545267600',
+      //     updateTime: '1545267600',
+      //     publisherId: 'c360d5f0ceef11e8b013f53754442777',
+      //   },
+      // ]);
       await app.runSchedule('updateCache');
       app.logger.info('同步数据库表完毕');
     });

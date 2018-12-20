@@ -21,6 +21,7 @@ module.exports = app => {
   router.get('/dept/users', checkUser, controller.dept.deptUsers);
   router.get('/dept/managers', checkUser, controller.dept.deptManagers);
   router.post('/dept/managers', checkUser, controller.dept.setDeptManagers);
+  router.get('/dept/works', checkUser, controller.dept.deptWorks);
   router.post('/work/add', checkUser, controller.work.addWork);
   router.post('/cache/updateAll', controller.cache.updateAll);
   router.get('/system/all', controller.system.allConfig);

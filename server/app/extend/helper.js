@@ -64,4 +64,8 @@ module.exports = {
     this.setCookie('ims_id', '');
     this.setCookie('ims_authType', '');
   },
+
+  timeFunctions: {
+    getNowUnix: () => Math.floor(new Date().getTime() / 1000),
+  },
 };

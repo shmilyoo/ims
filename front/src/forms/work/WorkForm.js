@@ -36,7 +36,7 @@ class WorkForm extends React.PureComponent {
                 name="title"
                 label="大项工作的标题*"
                 component={RenderTextField}
-                validate={required}
+                validate={[required, checkMaxStringLength(32)]}
                 normalize={trim}
               />
             </Grid>

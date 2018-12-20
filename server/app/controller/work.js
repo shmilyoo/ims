@@ -17,6 +17,7 @@ class WorkController extends Controller {
     } = ctx.request.body;
     const transaction = await ctx.model.transaction();
     try {
+      const now = ctx.helper.timeFunctions.getNowUnix();
       const work = await ctx.model.Work.create({
         publisherId: ctx.user.id,
         title,
@@ -24,6 +25,8 @@ class WorkController extends Controller {
         to,
         deptId,
         content,
+        createTime: now,
+        updateTime: now,
       });
       work.userWorks = await ctx.service.work.addUserWorkTaskWithInChargeAndAttendArray(
         usersInCharge,

@@ -13,7 +13,22 @@ module.exports = app => {
     from: { type: INTEGER }, // 工作开始时间，unix时间戳，秒
     to: { type: INTEGER, allowNull: true }, // 工作结束时间
     content: { type: STRING, defaultValue: '' }, // 大项工作介绍
+    createTime: { type: INTEGER }, // 添加时间
+    updateTime: { type: INTEGER }, // 修改时间
   });
+
+  Work.associate = function() {
+    Work.belongsTo(app.model.User, {
+      as: 'publisher',
+      foreignKey: 'publisherId',
+      constraints: false,
+    });
+    Work.belongsTo(app.model.Dept, {
+      as: 'dept',
+      foreignKey: 'deptId',
+      constraints: false,
+    });
+  };
 
   return Work;
 };

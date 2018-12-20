@@ -7,7 +7,7 @@ const Loading = ({ showTitle, title }) => {
       container
       justify="center"
       alignItems="center"
-      style={{ height: '100%' }}
+      style={{ height: '80%' }}
     >
       <Grid item container alignItems="center" direction="column">
         {showTitle && (
