@@ -44,11 +44,12 @@ const style = theme => ({
     width: '100%',
     marginLeft: 0
   },
+
   main: {
-    padding: 20
+    padding: '4rem'
   },
   footer: {
-    padding: 10,
+    padding: '1rem',
     textAlign: 'right'
   },
   white: {
@@ -61,15 +62,14 @@ class Home extends React.Component {
     leftOpen: true
   };
   componentDidMount() {
-    console.log('home mount!!!!!!!!!!!!!!!!!!!!!!!!!!!');
     this.props.dispatch(accountActions.sagaGetAccountInfo());
     this.props.dispatch(systemActions.sagaGetDepts());
+    this.props.dispatch(systemActions.sagaGetSystemConfig());
   }
   handleMenuClick = () => {
     this.setState({ leftOpen: !this.state.leftOpen });
   };
   render() {
-    console.log('render home');
     const { classes, deptArray } = this.props;
     return (
       <div className={classes.homeRoot}>
@@ -106,31 +106,6 @@ class Home extends React.Component {
             @copyright 2018
           </Grid>
         </Grid>
-
-        {/* <div
-          className={classNames(classes.right, {
-            [classes.rightShift]: !this.state.leftOpen
-          })}
-        >
-          <AppHead type="user" onMenuClick={this.handleMenuClick} />
-          <div className={classes.main}>
-            {deptArray ? (
-              <Switch>
-                <Route path="/brief" component={Brief} />
-                <Route path="/work" component={Work} />
-                <Route path="/dept" component={Dept} />
-                <Route path="/dept-manage" component={DeptManage} />
-                <Route path="/sa" component={SuperAdmin} />
-                <Route path="/user" component={User} />
-                <Route path="/about" component={About} />
-                <Route path="/" component={() => <Redirect to="/brief" />} />
-              </Switch>
-            ) : (
-              <Loading />
-            )}
-          </div>
-          <div className={classes.footer}>@copyright 2018</div>
-        </div> */}
       </div>
     );
   }

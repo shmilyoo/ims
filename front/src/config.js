@@ -31,16 +31,18 @@ export const userStatus = [
 export const numberPerPage = 20; // 列表页默认每页显示多少项
 
 export const pathTitle = {
-  '/work': '我的工作',
+  '/work/mine': '我的工作',
   '/work/schedule': '我的日程',
   '/work/schedule/manage': '日程管理',
+  '/work/info': '查看工作',
+  '/work/edit': '编辑大项工作',
+  '/work/article/add': '添加工作文章',
   '/dept': '我的部门',
   '/dept/work': '部门工作',
   '/dept-manage/announcement': '部门公告',
   '/dept-manage/work': '部门工作',
   '/dept-manage/work/add': '发布工作',
   '/dept-manage/work/add/success': '发布工作成功',
-  '/dept-manage/work/edit': '编辑工作',
   '/dept-manage/news': '部门文章',
   '/dept-manage/news/add': '发布文章',
   '/dept-manage/news/category': '文章分类',
@@ -66,12 +68,14 @@ export const leftMenu = [
     state: 'work', // 用于有子元素的菜单，在this.state中标记下拉是否展开
     icon: AccountBox,
     children: [
-      { title: pathTitle['/work'], path: '/work' },
+      { title: pathTitle['/work/mine'], path: '/work/mine' },
       { title: pathTitle['/work/schedule'], path: '/work/schedule' },
+      { title: pathTitle['/work/info'], path: '/work/info' },
       {
         title: pathTitle['/work/schedule/manage'],
         path: '/work/schedule/manage'
       }
+      // { title: pathTitle['/work/info'], path: '/work/info' }
     ]
   },
   {

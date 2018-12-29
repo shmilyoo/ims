@@ -6,6 +6,7 @@ import RenderDatePicker from './renderDatePicker';
 import RenderSelectDeptField from './renderSelectDeptField';
 import RenderUserPicker from './renderUserPicker';
 import RenderWorkPhase from './renderWorkPhase';
+import RenderFileUpload from './renderFileUpload';
 // import RenderExps from './renderExps';
 // import RenderRandomCode from './renderRandomCode';
 
@@ -17,7 +18,8 @@ export {
   RenderDatePicker,
   RenderSelectDeptField,
   RenderUserPicker,
-  RenderWorkPhase
+  RenderWorkPhase,
+  RenderFileUpload
   // RenderExps,
   // RenderRandomCode
 };

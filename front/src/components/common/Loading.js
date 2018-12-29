@@ -9,7 +9,7 @@ const Loading = ({ showTitle, title }) => {
       alignItems="center"
       style={{ height: '80%' }}
     >
-      <Grid item container alignItems="center" direction="column">
+      <Grid item container alignItems="center" direction="column" spacing={8}>
         {showTitle && (
           <Grid item>
             <Typography color="textSecondary" variant="h4" align="center">

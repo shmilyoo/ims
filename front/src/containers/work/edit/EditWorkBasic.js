@@ -1,19 +1,33 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import compose from 'recompose/compose';
 import { SubmissionError } from 'redux-form';
-import { Grid, Divider, Typography, TextField } from '@material-ui/core';
-import WorkForm from '../../forms/work/WorkForm';
-import { actions as systemActions } from '../../reducers/system';
-import { actions as workActions } from '../../reducers/work';
-import { checkArrayDuplicated, checkFromToDate } from '../../forms/validate';
+import { Grid } from '@material-ui/core';
+import WorkForm from '../../../forms/work/WorkForm';
+import { actions as workActions } from '../../../reducers/work';
+import { checkArrayDuplicated, checkFromToDate } from '../../../forms/validate';
+import { actions as systemActions } from '../../../reducers/system';
+import Axios from 'axios';
 
-class AddWork extends PureComponent {
+class EditWorkBasic extends React.PureComponent {
+  state = {
+    work: null
+  };
   componentDidMount() {
     if (!this.props.tags) {
       this.props.dispatch(systemActions.sagaGetTags());
     }
+    this.getWorkInfo();
   }
+  getWorkInfo = () => {
+    // 获取work基本信息和phase信息
+    Axios.get(`/work/basic?id=${this.props.id}`).then(res => {
+      if (res.success) {
+        this.setState({ work: res.data });
+      }
+    });
+  };
   handleSubmit = values => {
     const { usersInCharge, usersAttend } = values;
     let error;
@@ -33,28 +47,34 @@ class AddWork extends PureComponent {
         from: error
       });
     }
-    return new Promise(resolve => {
-      this.props.dispatch(workActions.sagaAddWork(resolve, values));
+    return new Promise((resolve, reject) => {
+      Axios.post('/work/basic/edit', {
+        id: this.props.id,
+        values
+      }).then(res => {
+        if (res.success) {
+          resolve();
+          this.setState({ work: values });
+        } else {
+          reject(
+            new SubmissionError({
+              _error: res.error
+            })
+          );
+        }
+      });
     });
   };
   render() {
     const { manageDepts, deptDic, deptArray, tags } = this.props;
+    const { work } = this.state;
     return (
       <Grid container direction="column" spacing={8} wrap="nowrap">
         <Grid item>
-          <Typography variant="subtitle1">
-            1.
-            本页面用来发布部门的大项工作，日常工作应作为大项工作的子集进行发布
-          </Typography>
-          <Typography variant="subtitle1">2. 发布工作提醒2</Typography>
-        </Grid>
-        <Grid item>
-          <Divider />
-        </Grid>
-        <Grid item>
           <WorkForm
-            form="addWorkForm"
-            edit={false}
+            form="editWorkBasicForm"
+            edit={true}
+            enableReinitialize
             onSubmit={this.handleSubmit}
             deptArray={deptArray}
             deptDic={deptDic}
@@ -68,12 +88,17 @@ class AddWork extends PureComponent {
                 : []
             }
             canSelectIdList={manageDepts}
+            initialValues={work}
           />
         </Grid>
       </Grid>
     );
   }
 }
+
+EditWorkBasic.propTypes = {
+  id: PropTypes.string.isRequired // 需要编辑的work 的id
+};
 
 function mapStateToProps(state) {
   return {
@@ -84,4 +109,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default compose(connect(mapStateToProps))(AddWork);
+export default compose(connect(mapStateToProps))(EditWorkBasic);

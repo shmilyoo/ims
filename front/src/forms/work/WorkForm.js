@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Grid, Button, Divider } from '@material-ui/core';
 import { Field, FieldArray, reduxForm } from 'redux-form';
 import compose from 'recompose/compose';
@@ -8,10 +9,15 @@ import {
   RenderUserPicker,
   RenderTextField,
   RenderDatePicker,
-  RenderWorkPhase
+  RenderWorkPhase,
+  RenderInputSelect
 } from '../renderFields';
 import { formatUnixTimeToDate, parseDateToUnixTime } from '../formatParse';
-import { required, checkMaxStringLength } from '../validate';
+import {
+  required,
+  checkMaxStringLength32,
+  checkMaxStringLength255
+} from '../validate';
 import { trim } from '../normalize';
 import RenderDeptPicker from '../renderFields/renderDeptPicker';
 
@@ -25,7 +31,9 @@ class WorkForm extends React.PureComponent {
       handleSubmit,
       canSelectIdList,
       deptArray,
-      deptDic
+      deptDic,
+      tags,
+      edit = false
     } = this.props;
     return (
       <form onSubmit={handleSubmit}>
@@ -34,10 +42,19 @@ class WorkForm extends React.PureComponent {
             <Grid item xs>
               <Field
                 name="title"
-                label="大项工作的标题*"
+                label="大项工作的标题(最长32个字符)*"
                 component={RenderTextField}
-                validate={[required, checkMaxStringLength(32)]}
+                validate={[required, checkMaxStringLength32]}
                 normalize={trim}
+              />
+            </Grid>
+            <Grid item xs={2}>
+              <Field
+                name="tagId"
+                label="标签*"
+                data={tags}
+                component={RenderInputSelect}
+                validate={required}
               />
             </Grid>
             <Grid item xs={2}>
@@ -100,12 +117,13 @@ class WorkForm extends React.PureComponent {
             />
           </Grid>
           <Grid item xs>
+            {/* todo 更改为富文本编辑器 */}
             <Field
               name="content"
-              label="大项工作的介绍"
+              label="大项工作的介绍(最长255个字符)"
               multiline
               component={RenderTextField}
-              validate={checkMaxStringLength(255)}
+              validate={checkMaxStringLength255}
               normalize={trim}
             />
           </Grid>
@@ -123,7 +141,7 @@ class WorkForm extends React.PureComponent {
               color="secondary"
               disabled={pristine || submitting || !!error}
             >
-              保存
+              {edit ? '保存' : '添加'}
             </Button>
             <Button
               variant="text"

@@ -12,11 +12,10 @@ import {
   DialogTitle,
   DialogActions
 } from '@material-ui/core';
-import {
-  Menu as MenuIcon,
-  Person as UserIcon,
-  PowerSettingsNew as LogoutIcon
-} from '@material-ui/icons';
+import MenuIcon from '@material-ui/icons/Menu';
+import UserIcon from '@material-ui/icons/Person';
+import LogoutIcon from '@material-ui/icons/PowerSettingsNew';
+import SearchIcon from '@material-ui/icons/Search';
 import { actions as accountActions } from '../reducers/account';
 import compose from 'recompose/compose';
 import { pathTitle, sysName } from '../config';
@@ -55,6 +54,9 @@ class AppHead extends React.PureComponent {
             <Typography style={{ flex: 'auto' }} variant="h6">
               {pathTitle[pathname]}
             </Typography>
+            <IconButton title="搜索">
+              <SearchIcon />
+            </IconButton>
             <IconButton title={name}>
               <UserIcon />
             </IconButton>

@@ -1,7 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import { required } from './forms/validate';
+import {
+  required,
+  checkArrayDuplicated,
+  checkFromToDate
+} from './forms/validate';
 
 // it('renders without crashing', () => {
 //   const div = document.createElement('div');
@@ -19,4 +23,39 @@ it('check required', () => {
   expect(required(0)).toEqual(undefined);
   expect(required('1')).toEqual(undefined);
   expect(required({ a: 1, b: 2 })).toEqual(undefined);
+});
+
+it('check array duplicated', () => {
+  expect(checkArrayDuplicated(v => v, [1, 2, 3], [4, 5, 6])).toEqual(undefined);
+  expect(checkArrayDuplicated(v => v, [1, 2, 3], [3, 5, 6])).toEqual(
+    '列表重复'
+  );
+  expect(
+    checkArrayDuplicated(
+      v => v.id,
+      [{ id: 'a', other: 'b' }, { id: 'b', other: 'c' }],
+      [{ id: 'a', other: 'b' }, { id: 'c', other: 'c' }]
+    )
+  ).toEqual('列表重复');
+  expect(
+    checkArrayDuplicated(
+      v => v.id,
+      [{ id: 'a', other: 'b' }, { id: 'b', other: 'c' }],
+      [{ id: 'd', other: 'b' }, { id: 'c', other: 'c' }]
+    )
+  ).toEqual(undefined);
+});
+
+it('to should be empty or greater than from', () => {
+  expect(checkFromToDate(123456, 123457, true)).toEqual(undefined);
+  expect(checkFromToDate(123456, 123454, true)).toEqual(
+    '结束时间应为空或者大于开始时间'
+  );
+  expect(checkFromToDate(123456, undefined, false)).toEqual('结束时间不能为空');
+  expect(
+    checkFromToDate(new Date(), new Date(new Date().getTime() + 2000), true)
+  ).toEqual(undefined);
+  expect(
+    checkFromToDate(new Date(), new Date(new Date().getTime() - 2000), true)
+  ).toEqual('结束时间应为空或者大于开始时间');
 });

@@ -160,6 +160,23 @@ export const getDeptNamesArraySync = (id, deptDic) => {
   return names.reverse();
 };
 
+/**
+ * 获取部门层次对象列表
+ * @param {string} id dept id
+ * @param {object} deptDic dept plain object
+ * @returns {array} 部门层次对象列表
+ */
+export const getDeptArraySync = (id, deptDic) => {
+  const depts = [];
+  let dept = deptDic[id];
+  while (true) {
+    depts.push({ name: dept.name, id: dept.id });
+    if (dept.parentId === '0') break;
+    dept = deptDic[dept.parentId];
+  }
+  return depts.reverse();
+};
+
 export const toRedirectPage = (content, to, count) => {
   history.push(
     `/redirect?${qs.stringify(
@@ -173,10 +190,68 @@ export const toRedirectPage = (content, to, count) => {
   );
 };
 
+export const getWorkInfo = ({
+  id,
+  withDept,
+  withUsersInCharge,
+  withUsersAttend,
+  withPublisher,
+  withChannels,
+  withTag,
+  withPhases
+}) => {
+  return axios.get(
+    `/work/info?${qs.stringify(
+      {
+        id,
+        withDept,
+        withUsersInCharge,
+        withUsersAttend,
+        withPublisher,
+        withChannels,
+        withTag,
+        withPhases
+      },
+      { encodeValuesOnly: true }
+    )}`
+  );
+};
+
+export const getWorkChannelArticles = (
+  workId,
+  channelId,
+  numberPerPage,
+  currentPage,
+  withChannel = true,
+  withPublisher = true,
+  withWork = false,
+  orderBy = 'createTime',
+  orderDirection = 'desc'
+) => {
+  return axios.get(
+    `/work/channel/articles?${qs.stringify(
+      {
+        workId,
+        channelId,
+        numberPerPage,
+        currentPage,
+        orderBy,
+        direction: orderDirection,
+        withChannel: withChannel ? '1' : '',
+        withWork: withWork ? '1' : '',
+        withPublisher: withPublisher ? '1' : ''
+      },
+      { encodeValuesOnly: true }
+    )}`
+  );
+};
+
 export const getDeptWorksReq = (
   deptId,
   numberPerPage,
   currentPage,
+  orderBy,
+  orderDirection,
   withDept = true,
   withPublisher = true
 ) => {
@@ -187,7 +262,9 @@ export const getDeptWorksReq = (
         numberPerPage,
         currentPage,
         withDept: withDept ? '1' : '',
-        withPublisher: withPublisher ? '1' : ''
+        withPublisher: withPublisher ? '1' : '',
+        orderBy,
+        direction: orderDirection
       },
       { encodeValuesOnly: true }
     )}`

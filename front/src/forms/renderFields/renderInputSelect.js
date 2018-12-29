@@ -1,11 +1,11 @@
 import React from 'react';
 import { TextField, MenuItem } from '@material-ui/core';
 
-const RenderInputSelectField = ({
+const RenderInputSelect = ({
   input,
   readOnly,
   label,
-  data, //[{label,value},...]
+  data = [], //[{label,value},...]
   meta: { touched, error },
   ...rest
 }) => {
@@ -23,7 +23,11 @@ const RenderInputSelectField = ({
       {...rest}
     >
       {data.map(option => (
-        <MenuItem key={option.value} value={option.value}>
+        <MenuItem
+          key={option.value}
+          value={option.value}
+          style={{ color: option.color }}
+        >
           {option.label}
         </MenuItem>
       ))}
@@ -31,4 +35,4 @@ const RenderInputSelectField = ({
   );
 };
 
-export default RenderInputSelectField;
+export default RenderInputSelect;

@@ -22,9 +22,24 @@ function* addWorkFlow() {
         `/dept-manage/work/add/success?workId=${id}&&deptId=${deptId}`
       ); // 跳转到成功页，提示 是继续添加 or 查看工作 or 查看部门工作
     } else {
-      yield put(stopSubmit('workForm', { _error: res.error }));
+      yield put(stopSubmit('addWorkForm', { _error: res.error }));
     }
   }
 }
 
-export default [fork(addWorkFlow)];
+// function* updateWorkBasicFlow() {
+//   while (true) {
+//     const { resolve, id, values } = yield take(
+//       workTypes.SAGA_UPDATE_WORK_BASIC
+//     );
+//     const res = yield axios.post('/work/edit/basic', { id, values });
+//     if(res.success){
+
+//     }
+//   }
+// }
+
+export default [
+  fork(addWorkFlow)
+  // , fork(updateWorkBasicFlow)
+];

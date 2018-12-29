@@ -14,10 +14,8 @@ import {
   Collapse,
   Typography
 } from '@material-ui/core';
-import {
-  ExpandLess as ExpandLessIcon,
-  ExpandMore as ExpandMoreIcon
-} from '@material-ui/icons';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import history from '../history';
 import classnames from 'classnames';
 import account from '../sagas/account';
@@ -132,9 +130,9 @@ class LeftNav extends React.PureComponent {
                       />
                       {ele.children ? (
                         this.state[ele.state] ? (
-                          <ExpandLessIcon />
+                          <ExpandLess />
                         ) : (
-                          <ExpandMoreIcon />
+                          <ExpandMore />
                         )
                       ) : null}
                     </ListItem>

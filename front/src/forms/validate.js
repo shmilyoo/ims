@@ -2,6 +2,7 @@ import axios from 'axios';
 import { types as accountTypes } from '../reducers/account';
 
 export const required = value => {
+  console.log('check required', JSON.stringify(value));
   if (value === undefined || value === null) return '不能为空';
   const type = typeof value;
   switch (type) {
@@ -23,10 +24,24 @@ export const required = value => {
   }
 };
 
+export const checkPositiveInteger = value => {
+  if (!Number.isInteger(value)) return '必须是正整数';
+  if (value < 1) return '必须是正整数';
+};
+
 export const checkMaxStringLength = max => value => {
+  console.log('checkMaxStringLength', JSON.stringify(value));
   if (!value) return;
   if (value.length > max) return `最大长度不能超过${max}个字符`;
 };
+
+// 直接在field的validate中使用checkMaxStringLength(8)等，会造成field组件的频繁render
+// 在field的值或者form的value等变化的时候
+export const checkMaxStringLength8 = checkMaxStringLength(8);
+export const checkMaxStringLength16 = checkMaxStringLength(16);
+export const checkMaxStringLength32 = checkMaxStringLength(32);
+export const checkMaxStringLength64 = checkMaxStringLength(64);
+export const checkMaxStringLength255 = checkMaxStringLength(255);
 
 export const checkUsername = value => {
   // console.log(`checkUsername =${value}=`);
@@ -153,4 +168,64 @@ export const syncCheckExpDate = values => {
       };
   });
   return JSON.stringify(result) === '{}' ? null : result;
+};
+
+/**
+ * 比较多个列表，是否重复，
+ * @param {Function} valueGetFuc  从列表中取出比较关键值的函数
+ * @param {array} arrays 比较的列表合集
+ * @returns {string | undefined} 通过返回空，不通过返回字符串说明
+ */
+export const checkArrayDuplicated = (valueGetFuc, ...arrays) => {
+  let arraysNumberNotEmpty = 0;
+  arrays.forEach(array => {
+    if (array && array.length) {
+      arraysNumberNotEmpty++;
+    }
+  });
+  if (arraysNumberNotEmpty <= 1) return; // 只有一个数组有数据，不需要比较重复
+  const checkValueArrays = arrays.map(array => array.map(valueGetFuc));
+  const conflate = [];
+  checkValueArrays.forEach(array => {
+    array.forEach(value => {
+      conflate.push(value);
+    });
+  });
+  if (new Set(conflate).size !== conflate.length) return '列表重复';
+  return;
+};
+
+/**
+ * 比较开始和结束时间，结束时间为空或者比开始时间大正常
+ * @param {number | Date} from 起始时间
+ * @param {number | Date} to 结束时间
+ * @param {Boolean} allowToEmpty 结束时间是否允许空
+ * @returns {string | undefined} 通过返回空，不通过返回字符串说明
+ */
+export const checkFromToDate = (from, to, allowToEmpty = true) => {
+  if (!to && !allowToEmpty) return '结束时间不能为空';
+  if (from && to && from >= to) return '结束时间应为空或者大于开始时间';
+};
+
+export const checkCommonConfig = values => {
+  const { allowExts } = values;
+  const error = {};
+  if (allowExts) {
+    if (allowExts.includes('；')) {
+      error.allowExts = '不能使用中文分号字符';
+      return error;
+    }
+    const exts = allowExts.split(';');
+    exts.forEach(ext => {
+      if (!ext.startsWith('.')) {
+        error.allowExts = '扩展名需要以 "." 开头';
+        return;
+      }
+      if (ext.length < 2) {
+        error.allowExts = `错误的扩展名 ${ext}`;
+        return;
+      }
+    });
+  }
+  return error;
 };

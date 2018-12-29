@@ -15,13 +15,6 @@ class ColorPicker extends React.PureComponent {
   }
 
   componentDidMount() {
-    const inputDiv = this.inputDiv.current;
-    let top = inputDiv.offsetTop + inputDiv.offsetHeight;
-    if (window.innerHeight - top < 300) top = inputDiv.offsetTop - 300;
-    this.setState({
-      pickerTop: top,
-      pickerLeft: inputDiv.offsetLeft
-    });
     if (this.props.mountWithColor) this.setRandomColor();
   }
 
@@ -46,9 +39,16 @@ class ColorPicker extends React.PureComponent {
   };
 
   handleClick = () => {
+    const inputDiv = this.inputDiv.current;
+    let top = inputDiv.offsetTop + inputDiv.offsetHeight;
+    if (window.innerHeight - top < 300) top = inputDiv.offsetTop - 300;
     this.setState({
+      pickerTop: top,
+      pickerLeft: inputDiv.offsetLeft,
       showPicker: !this.state.showPicker
     });
+    // this.setState({
+    // });
   };
   handlePickerChange = ({ hex, rgb }) => {
     // { r: 51, g: 51, b: 51 }

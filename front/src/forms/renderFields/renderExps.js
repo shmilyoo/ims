@@ -5,10 +5,6 @@ import { Grid, Button, IconButton } from '@material-ui/core';
 import Delete from '@material-ui/icons/Delete';
 import Add from '@material-ui/icons/Add';
 import { RenderDatePicker, RenderTextField } from '.';
-import {
-  formatUnixTsToMoment,
-  parseMomentToUnixTs
-} from '../../services/formatParse';
 import { required } from '../../services/validate';
 
 const renderExps = ({ fields }) => {
@@ -29,7 +25,7 @@ const renderExps = ({ fields }) => {
       </Grid>
       {fields.map((exp, index) => (
         <Grid key={index} item container spacing={24} alignItems="baseline">
-          <Grid item xs={2}>
+          {/* <Grid item xs={2}>
             <Field
               name={`${exp}.from`}
               component={RenderDatePicker}
@@ -38,8 +34,8 @@ const renderExps = ({ fields }) => {
               label="起始日期"
               validate={required}
             />
-          </Grid>
-          <Grid item xs={2}>
+          </Grid> */}
+          {/* <Grid item xs={2}>
             <Field
               name={`${exp}.to`}
               component={RenderDatePicker}
@@ -49,7 +45,7 @@ const renderExps = ({ fields }) => {
               canClear={true}
               label="终结日期"
             />
-          </Grid>
+          </Grid> */}
           <Grid item xs>
             <Field
               name={`${exp}.content`}

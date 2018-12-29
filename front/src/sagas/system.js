@@ -7,6 +7,7 @@ import { actions as accountActions } from '../reducers/account';
 import { types as systemTypes } from '../reducers/system';
 import { actions as systemActions } from '../reducers/system';
 import history from '../history';
+import { checkCommonConfig } from '../forms/validate';
 
 function* getTags() {
   while (true) {
@@ -81,16 +82,30 @@ function* getSystemConfig() {
       res.data.forEach(config => {
         configs[config.name] = config.value;
       });
-      const { amFrom, amTo, pmFrom, pmTo } = configs;
-      if (amTo)
-        yield put(
-          systemActions.setTimeScale({
-            amFrom: Number.parseInt(amFrom) || 0,
-            amTo: Number.parseInt(amTo) || 0,
-            pmFrom: Number.parseInt(pmFrom) || 0,
-            pmTo: Number.parseInt(pmTo) || 0
-          })
-        );
+      configs.amFrom = Number.parseInt(configs.amFrom) || 0;
+      configs.amTo = Number.parseInt(configs.amTo) || 0;
+      configs.pmFrom = Number.parseInt(configs.pmFrom) || 0;
+      configs.pmTo = Number.parseInt(configs.pmTo) || 0;
+      yield put(systemActions.setCommonConfig(configs));
+    }
+  }
+}
+
+function* saveCommonConfig() {
+  while (true) {
+    const {
+      values, // {amFrom,amTo,pmFrom,pmTo}
+      resolve
+    } = yield take(systemTypes.SAGA_SAVE_COMMON_CONFIG);
+    if (values.allowExts) {
+      values.allowExts = values.allowExts.toLowerCase();
+    }
+    const res = yield axios.post('/system/config', values);
+    if (res.success) {
+      yield put(systemActions.setCommonConfig(values));
+      yield call(resolve);
+    } else {
+      yield put(stopSubmit('systemCommonConfigForm', { _error: res.error }));
     }
   }
 }
@@ -120,5 +135,6 @@ export default [
   fork(deleteTag),
   fork(saveTimeScale),
   fork(getSystemConfig),
+  fork(saveCommonConfig),
   fork(getDepts)
 ];

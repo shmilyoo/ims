@@ -50,7 +50,7 @@ class TablePaginationActions extends React.Component {
   }
 
   handlePageClick = (e, n) => {
-    this.props.onChangePage(e, n);
+    n !== this.props.page + 1 && this.props.onChangePage(e, n);
   };
   handleJumpClick = e => {
     const page = Number.parseInt(this.jump.current.value);
@@ -99,6 +99,7 @@ class TablePaginationActions extends React.Component {
           if (typeof n === 'number') {
             return (
               <span
+                key={n}
                 onClick={e => {
                   this.handlePageClick(e, n);
                 }}
@@ -110,7 +111,11 @@ class TablePaginationActions extends React.Component {
               </span>
             );
           } else {
-            return <span className={classes.numberDot}>{n}</span>;
+            return (
+              <span key={n} className={classes.numberDot}>
+                {n}
+              </span>
+            );
           }
         })}
       </div>

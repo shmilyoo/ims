@@ -53,28 +53,24 @@ class SystemConfigTag extends React.PureComponent {
       return;
     }
     const order = Number.parseInt(tagOrder);
-    if (!(order && order > 0)) {
+    if (!(order && order > 0 && order < 1000)) {
       this.props.dispatch(
-        commonAction.showMessage('排序必须是大于0的整数', 'error')
+        commonAction.showMessage('排序必须是大于0小于1000的整数', 'error')
       );
       return;
     }
     if (!!selectId) {
       // 编辑模式
       this.props.dispatch(
-        systemActions.sagaUpdateTag(selectId, tagName, tagColor, tagOrder)
+        systemActions.sagaUpdateTag(selectId, tagName, tagColor, order)
       );
     } else {
       // 添加模式
-      this.props.dispatch(
-        systemActions.sagaAddTag(tagName, tagColor, tagOrder)
-      );
+      this.props.dispatch(systemActions.sagaAddTag(tagName, tagColor, order));
     }
   };
   delTag = id => {
-    if (this.props.tags.length === 1) {
-      this.setState({ selectId: '', tagName: '', tagColor: '', tagOrder: NaN });
-    }
+    this.setState({ selectId: '', tagName: '', tagColor: '', tagOrder: NaN });
     this.props.dispatch(systemActions.sagaDeleteTag(id));
   };
   render() {

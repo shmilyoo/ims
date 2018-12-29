@@ -35,7 +35,7 @@ const Order = ({ orderBy, orderDirection, name }) => {
   return orderBy === name && (orderDirection === 'desc' ? ' ⬇' : ' ⬆');
 };
 
-class WorkList extends React.PureComponent {
+class ArticleList extends React.PureComponent {
   state = {
     selectedIds: []
   };
@@ -77,7 +77,7 @@ class WorkList extends React.PureComponent {
 
   render() {
     const {
-      workList,
+      articleList,
       numberPerPage,
       currentPage,
       totalNumber,
@@ -89,17 +89,17 @@ class WorkList extends React.PureComponent {
       orderDirection,
       classes
     } = this.props;
-    if (!workList) {
+    if (!articleList) {
       return <Loading />;
     }
-    return workList.length > 0 ? (
+    return articleList.length > 0 ? (
       <Table padding="checkbox">
         <TableHead>
           <TableRow>
             {admin && (
               <TableCell padding="checkbox">
                 <Checkbox
-                  checked={selectedIds.length === workList.length}
+                  checked={selectedIds.length === articleList.length}
                   onClick={this.handleAllCheck}
                 />
               </TableCell>
@@ -111,7 +111,7 @@ class WorkList extends React.PureComponent {
                 canChangeOrder && this.handleChangeOrder('title');
               }}
             >
-              大项工作名称
+              文章标题
               {canChangeOrder && (
                 <Order
                   orderBy={orderBy}
@@ -120,25 +120,9 @@ class WorkList extends React.PureComponent {
                 />
               )}
             </TableCell>
-            {!hideColumns.includes('dept') && <TableCell>所属部门</TableCell>}
-            {!hideColumns.includes('from') && (
-              <TableCell
-                className={canChangeOrder ? classes.orderHead : null}
-                onClick={() => {
-                  canChangeOrder && this.handleChangeOrder('from');
-                }}
-              >
-                起始日期
-                {canChangeOrder && (
-                  <Order
-                    orderBy={orderBy}
-                    orderDirection={orderDirection}
-                    name="from"
-                  />
-                )}
-              </TableCell>
+            {!hideColumns.includes('channel') && (
+              <TableCell>所属频道</TableCell>
             )}
-            {!hideColumns.includes('to') && <TableCell>结束日期</TableCell>}
             {!hideColumns.includes('publisher') && (
               <TableCell>添加人</TableCell>
             )}
@@ -180,16 +164,16 @@ class WorkList extends React.PureComponent {
           </TableRow>
         </TableHead>
         <TableBody>
-          {workList.map((work, index) => (
+          {articleList.map((article, index) => (
             <TableRow
-              key={work.id}
+              key={article.id}
               className={classnames({ [classes.alterRow]: index % 2 === 0 })}
             >
               {admin && (
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedIds.includes(work.id)}
-                    onClick={e => this.handleRowClick(e, work.id)}
+                    checked={selectedIds.includes(article.id)}
+                    onClick={e => this.handleRowClick(e, article.id)}
                   />
                 </TableCell>
               )}
@@ -198,36 +182,26 @@ class WorkList extends React.PureComponent {
                   {numberPerPage * (currentPage - 1) + index + 1}
                 </TableCell>
               )}
-              <TableCell title={work.content}>
+              <TableCell title={article.content}>
                 <Typography
                   className={classes.onlyLink}
                   onClick={() => {
-                    history.push(`/work/info?id=${work.id}`);
+                    history.push(`/work/info?id=${article.id}`);
                   }}
                 >
-                  {work.title}
+                  {article.title}
                 </Typography>
               </TableCell>
-              {!hideColumns.includes('dept') && (
+              {!hideColumns.includes('channel') && (
                 <TableCell>
                   <Typography
                     className={classes.onlyLink}
                     onClick={() => {
-                      history.push(`/dept/info?id=${work.dept.id}`);
+                      history.push(`/work/channel?id=${article.channel.id}`);
                     }}
                   >
-                    {work.dept.name}
+                    {article.dept.name}
                   </Typography>
-                </TableCell>
-              )}
-              {!hideColumns.includes('from') && (
-                <TableCell>{timeFunctions.formatFromUnix(work.from)}</TableCell>
-              )}
-              {!hideColumns.includes('to') && (
-                <TableCell>
-                  {work.to
-                    ? timeFunctions.formatFromUnix(work.to)
-                    : '未定/至今'}
                 </TableCell>
               )}
               {!hideColumns.includes('publisher') && (
@@ -235,28 +209,28 @@ class WorkList extends React.PureComponent {
                   <Typography
                     className={classes.onlyLink}
                     onClick={() => {
-                      history.push(`/user/info?id=${work.publisher.id}`);
+                      history.push(`/user/info?id=${article.publisher.id}`);
                     }}
                   >
-                    {work.publisher.name}
+                    {article.publisher.name}
                   </Typography>
                 </TableCell>
               )}
               {!hideColumns.includes('createTime') && (
                 <TableCell>
-                  {timeFunctions.formatFromUnix(work.createTime)}
+                  {timeFunctions.formatFromUnix(article.createTime)}
                 </TableCell>
               )}
               {!hideColumns.includes('updateTime') && (
                 <TableCell>
-                  {timeFunctions.formatFromUnix(work.updateTime)}
+                  {timeFunctions.formatFromUnix(article.updateTime)}
                 </TableCell>
               )}
               {admin && (
                 <TableCell style={{ padding: '0' }}>
                   <IconButton
                     onClick={() => {
-                      history.push(`/work/edit?id=${work.id}`);
+                      history.push(`/work/edit?id=${article.id}`);
                     }}
                   >
                     <Edit />
@@ -270,7 +244,7 @@ class WorkList extends React.PureComponent {
           <TableRow>
             <TablePagination
               rowsPerPageOptions={[1, 5, 10, 20, 50]}
-              colSpan={10 - (admin ? 0 : 2) - hideColumns.length}
+              colSpan={8 - (admin ? 0 : 2) - hideColumns.length}
               count={totalNumber}
               rowsPerPage={numberPerPage}
               labelRowsPerPage="每页显示:"
@@ -293,7 +267,7 @@ class WorkList extends React.PureComponent {
   }
 }
 
-WorkList.propTypes = {
+ArticleList.propTypes = {
   admin: PropTypes.bool, // 是否具有管理权限，是否显示管理列
   hideColumns: PropTypes.array, // 需要隐藏的列名
   totalNumber: PropTypes.number.isRequired, // 一共有多少条work，用于分页
@@ -306,10 +280,10 @@ WorkList.propTypes = {
   onChangeOrder: PropTypes.func // 排序变化的回调函数
 };
 
-WorkList.defaultProps = {
+ArticleList.defaultProps = {
   admin: false,
   hideColumns: [],
   canChangeOrder: false
 };
 
-export default compose(withStyles(style))(WorkList);
+export default compose(withStyles(style))(ArticleList);

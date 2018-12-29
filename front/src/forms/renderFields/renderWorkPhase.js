@@ -12,7 +12,6 @@ import { required } from '../validate';
 import { trim } from '../normalize';
 
 const renderEduExps = ({ fields }) => {
-  console.log('render renderexps');
   return (
     <Grid container direction="column" wrap="nowrap">
       <Grid

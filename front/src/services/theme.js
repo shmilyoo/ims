@@ -7,6 +7,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 
 const primaryTextColor = 'rgba(0, 0, 0, 0.87)';
 const secondaryTextColor = 'rgba(0, 0, 0, 0.54)';
+const thirdTextColor = 'rgba(0, 0, 0, 0.21)';
 const error = {
   main: '#EC2935',
   light: '#ff6560',
@@ -43,7 +44,8 @@ const theme = createMuiTheme({
     error: error,
     text: {
       primary: primaryTextColor,
-      secondary: secondaryTextColor
+      secondary: secondaryTextColor,
+      third: thirdTextColor
     }
   },
   typography: {
@@ -78,9 +80,15 @@ const theme = createMuiTheme({
   sharedClass: {
     link: {
       cursor: 'pointer',
-      color: '#1e6bb8',
+      color: primaryTextColor,
+      textDecoration: 'none',
       '&:visited': { color: secondaryTextColor },
       '&:hover': { textDecoration: 'underline' }
+    },
+    disableLink: {
+      cursor: 'default',
+      color: secondaryTextColor,
+      '&:hover': { textDecoration: 'line-through' }
     },
     grayLink: {
       cursor: 'pointer',

@@ -55,7 +55,7 @@ const RenderDatePicker = ({
   label,
   canClear,
   nullText,
-  input: { value, onChange, ...inputRest }, // value为moment实例
+  input: { value, onChange, ...inputRest },
   meta,
   ...rest
 }) => {

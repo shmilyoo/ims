@@ -123,5 +123,11 @@ class DeptAdmin extends Component {
     );
   }
 }
+function mapStateToProps(state) {
+  return {
+    deptArray: state.system.deptArray,
+    deptDic: state.system.deptDic
+  };
+}
 
-export default DeptAdmin;
+export default compose(connect(mapStateToProps))(DeptAdmin);

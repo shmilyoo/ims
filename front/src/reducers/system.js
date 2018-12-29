@@ -5,7 +5,9 @@ export const types = {
   SAGA_DELETE_TAG: 'SYSTEM/SAGA_DELETE_TAG',
   SAGA_GET_SYSTEM_CONFIG: 'SYSTEM/SAGA_GET_SYSTEM_CONFIG',
   SAGA_SAVE_TIME_SCALE: 'SYSTEM/SAGA_SAVE_TIME_SCALE',
+  SAGA_SAVE_COMMON_CONFIG: 'SYSTEM/SAGA_SAVE_COMMON_CONFIG',
   SAGA_GET_DEPTS: 'SYSTEM/SAGA_GET_DEPTS',
+  SET_COMMON_CONFIG: 'SYSTEM/SET_COMMON_CONFIG',
   SET_DEPTS: 'SYSTEM/SET_DEPTS',
   SET_DEPT_RELATION: 'SYSTEM/SET_DEPT_RELATION',
   SET_TIME_SCALE: 'SYSTEM/SET_TIME_SCALE',
@@ -47,6 +49,11 @@ export const actions = {
   sagaGetDepts: () => ({
     type: types.SAGA_GET_DEPTS
   }),
+  sagaSaveCommonConfig: (resolve, values) => ({
+    type: types.SAGA_SAVE_COMMON_CONFIG,
+    values,
+    resolve
+  }),
   setDepts: (deptArray, deptDic) => ({
     type: types.SET_DEPTS,
     deptArray,
@@ -55,6 +62,10 @@ export const actions = {
   setTimeScale: timeScale => ({
     type: types.SET_TIME_SCALE,
     timeScale
+  }),
+  setCommonConfig: values => ({
+    type: types.SET_COMMON_CONFIG,
+    values
   })
 };
 
@@ -62,7 +73,6 @@ const initState = {
   tags: null,
   // 默认上午8点到11:30，下午14:30到17:30。数字是从0点经过的秒数
   // { amFrom: 28800, amTo: 41400, pmFrom: 52200, pmTo: 63000 }
-  timeScale: null,
   deptArray: null,
   deptDic: null
 };
@@ -77,13 +87,18 @@ export default (state = initState, action) => {
     case types.SET_TIME_SCALE:
       return {
         ...state,
-        timeScale: action.timeScale
+        ...action.timeScale
       };
     case types.SET_DEPTS:
       return {
         ...state,
         deptArray: action.deptArray,
         deptDic: action.deptDic
+      };
+    case types.SET_COMMON_CONFIG:
+      return {
+        ...state,
+        ...action.values
       };
     default:
       return state;

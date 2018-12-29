@@ -36,6 +36,7 @@ const configureAxios = (dispatch, history) => {
       return response.data;
     },
     error => {
+      console.log('error at response interceptor', JSON.stringify(error));
       // 非2xx响应在这里处理
       if (error.response && error.response.status === 402) {
         // 自定义402 重定向代替302重定向,用于服务器主动向客户端发送重定向。
@@ -52,9 +53,15 @@ const configureAxios = (dispatch, history) => {
         return { success: false, error: error.message };
       }
       NProgress.done();
+      if (axios.isCancel(error)) {
+        // fileupload 组件中有cancel 将error传递过去自行处理
+        throw error;
+      }
       // todo 后续根据status不同值，导向不同的页面 404 500等
       // console.log(error.response.data, error.response.status);
-      dispatch(commonActions.showMessage(error.message, 'error'));
+      dispatch(
+        commonActions.showMessage(`请求返回错误：${error.message}`, 'error')
+      );
       return { success: false, error: error.message };
       // 如果是在saga调用，throw会导致saga死掉
       // throw new axios.Cancel('cancel request and redirect');

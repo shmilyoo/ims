@@ -1,18 +1,23 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Grid, Button, Divider, Typography } from '@material-ui/core';
+import { SubmissionError } from 'redux-form';
+import {
+  Grid,
+  Button,
+  Divider,
+  Typography,
+  TextField
+} from '@material-ui/core';
 import Axios from 'axios';
 import SystemConfigTag from './SystemConfigTag';
 import SystemTimeScaleForm from '../../forms/system/SystemTimeScaleForm';
 import compose from 'recompose/compose';
 import { actions as systemActions } from '../../reducers/system';
+import SystemCommonConfigForm from '../../forms/system/SystemCommonConfigForm';
+import { checkCommonConfig } from '../../forms/validate';
 
 class SystemConfig extends PureComponent {
-  componentDidMount() {
-    // 初始化所有配置项
-    this.props.dispatch(systemActions.sagaGetSystemConfig());
-  }
   updateAllCache = () => {
     // todo 更改store
     Axios.post('/cache/updateAll').then();
@@ -22,8 +27,13 @@ class SystemConfig extends PureComponent {
       this.props.dispatch(systemActions.sagaSaveTimeScale(resolve, values));
     });
   };
+  handleCommonConfigSubmit = values => {
+    return new Promise(resolve => {
+      this.props.dispatch(systemActions.sagaSaveCommonConfig(resolve, values));
+    });
+  };
   render() {
-    const { timeScale } = this.props;
+    const { timeScale, allowExts } = this.props;
     return (
       <Grid container direction="column" spacing={16} wrap="nowrap">
         <Grid item>
@@ -50,7 +60,16 @@ class SystemConfig extends PureComponent {
         <Grid item>
           <Divider />
         </Grid>
-        <Grid item>tag管理2222</Grid>
+        <Grid item>
+          <Typography variant="h6">通用配置:</Typography>
+        </Grid>
+        <Grid item>
+          <SystemCommonConfigForm
+            enableReinitialize
+            onSubmit={this.handleCommonConfigSubmit}
+            initialValues={{ allowExts }}
+          />
+        </Grid>
       </Grid>
     );
   }
@@ -60,7 +79,13 @@ SystemConfig.propTypes = {};
 
 function mapStateToProps(state) {
   return {
-    timeScale: state.system.timeScale
+    timeScale: {
+      amFrom: state.system.amFrom,
+      amTo: state.system.amTo,
+      pmFrom: state.system.pmFrom,
+      pmTo: state.system.pmTo
+    },
+    allowExts: state.system.allowExts
   };
 }
 

@@ -32,16 +32,16 @@ class AddWorkSuccess extends PureComponent {
             <Link to="/dept-manage/work/add">继续添加</Link>
           </Grid>
           <Grid item>
-            <Link to={`/dept-manage/work/edit/${workId}`}>编辑此项工作</Link>
+            <Link to={`/work/edit?id=${workId}`}>编辑此项工作</Link>
           </Grid>
           <Grid item>
-            <Link to={`/work/${workId}`}>查看此项工作</Link>
+            <Link to={`/work/info?id=${workId}`}>查看此项工作</Link>
           </Grid>
           <Grid item>
             <Link to={`/dept-manage/work`}>管理部门工作</Link>
           </Grid>
           <Grid item>
-            <Link to={`/dept/${deptId}`}>查看工作所属部门</Link>
+            <Link to={`/dept?id=${deptId}`}>查看工作所属部门</Link>
           </Grid>
         </Grid>
       </Grid>
