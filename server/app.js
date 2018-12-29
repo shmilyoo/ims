@@ -69,18 +69,41 @@ module.exports = app => {
         deptId: 'c360d5f0ceef11e8b013f53754442dd4',
         userId: 'f3762080cb9911e884eec9a890da22bf',
       });
-      await app.model.Tag.create({ name: '其他', color: '#666', order: 1000 });
-      const works = new Array(20).fill(0).map(() => ({
+      const defaultTag = await app.model.Tag.create({
+        name: '其他',
+        color: '#666',
+        order: 1000,
+      });
+      const works = new Array(16).fill(0).map((n, i) => ({
         deptId: 'c360d5f0ceef11e8b013f53754442dd4',
-        title: 'aaa',
+        tagId: defaultTag.id,
+        title: new Array(i + 1).fill('a').join(),
         from: '1545267600',
         to: '1545267600',
         createTime: '1545267600',
         updateTime: '1545267600',
         publisherId: 'c360d5f0ceef11e8b013f53754442777',
       }));
+
       // console.log(works);
-      await app.model.Work.bulkCreate(works);
+      const worksModel = await app.model.Work.bulkCreate(works);
+      await app.model.Phase.bulkCreate([
+        {
+          title: 'phase 1',
+          workId: worksModel[0].id,
+          from: '1545267600',
+        },
+        {
+          title: 'phase 3',
+          workId: worksModel[0].id,
+          from: '1555267602',
+        },
+        {
+          title: 'phase 2',
+          workId: worksModel[0].id,
+          from: '1535267602',
+        },
+      ]);
       // await app.model.Work.bulkCreate([
       //   {
       //     deptId: 'c360d5f0ceef11e8b013f53754442dd4',

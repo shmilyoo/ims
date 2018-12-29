@@ -6,6 +6,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "egg": "^2.2.1",
+    "egg-multipart": "^2.4.0",
     "egg-redis": "^2.0.0",
     "egg-scripts": "^2.5.0",
     "egg-sequelize": "^4.1.0",

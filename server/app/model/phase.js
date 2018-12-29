@@ -12,6 +12,14 @@ module.exports = app => {
     from: { type: INTEGER }, // 阶段开始时间
     to: { type: INTEGER, allowNull: true }, // 阶段结束时间
   });
-
+  // Phase.associate = function() {
+  //   Phase.belongsTo(app.model.Work, {
+  //     as: 'work',
+  //     foreignKey: 'workId',
+  //     constraints: false,
+  //     onDelete: 'CASCADE',
+  //     hooks: true,
+  //   });
+  // };
   return Phase;
 };

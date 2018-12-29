@@ -11,3 +11,7 @@ exports.sequelize = {
   enabled: true,
   package: 'egg-sequelize',
 };
+exports.multipart = {
+  enabled: true,
+  package: 'egg-multipart',
+};

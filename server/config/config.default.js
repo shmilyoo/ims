@@ -1,4 +1,6 @@
 'use strict';
+const path = require('path');
+const os = require('os');
 
 const CASURL = 'http://localhost:3000';
 const IMSURL = 'http://localhost:4000';
@@ -21,6 +23,28 @@ exports.redis = {
     db: '0',
   },
   agent: true,
+};
+exports.multipart = {
+  mode: 'file',
+  tmpdir: path.join(os.tmpdir(), 'egg-multipart-tmp', 'ims'),
+  cleanSchedule: {
+    // run tmpdir clean job on every day 04:30 am
+    // cron style see https://github.com/eggjs/egg-schedule#cron-style-scheduling
+    cron: '0 30 4 * * *',
+  },
+  fileSize: '5000mb',
+  // will append to whilelist
+  fileExtensions: [
+    '.doc',
+    '.docx',
+    '.ppt',
+    '.pptx',
+    '.xls',
+    '.xlsx',
+    '.tar',
+    '.rar',
+    '.7zip',
+  ],
 };
 exports.logger = {
   dir: '/var/log/ims-backend',

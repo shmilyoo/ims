@@ -8,7 +8,7 @@ class WorkService extends Service {
    * @param {array} usersInCharge 工作负责人列表
    * @param {array} usersAttend 工作参加人列表
    * @param {string} workTaskId  work或者task的id
-   * @param {?bool} isWork 是否是work,模式是work
+   * @param {?bool} isWork 是否是work,还是task
    * @return {array} 返回创建的userWork或者userTask 列表
    */
   async addUserWorkTaskWithInChargeAndAttendArray(
@@ -40,9 +40,107 @@ class WorkService extends Service {
   }
 
   async addPhases(phases, workId) {
-    return this.ctx.model.Phase.bulkCreate(
-      phases.map(phase => Object.assign(phase, { workId }))
-    );
+    if (phases && phases.length > 0) {
+      return this.ctx.model.Phase.bulkCreate(
+        phases.map(phase => Object.assign(phase, { workId }))
+      );
+    }
+    return null;
+  }
+  async getWorkChannel(workId) {
+    const channels = await this.ctx.model.WorkChannel.findAll({
+      where: { workId },
+      order: [ 'order' ],
+    });
+    return channels;
+  }
+
+  getArticleIncludeSync(withPublisher, withChannel, withWork) {
+    const ctx = this.ctx;
+    const include = [];
+    if (withPublisher) {
+      include.push({
+        model: ctx.model.User,
+        as: 'publisher',
+        attributes: [ 'id', 'name' ],
+      });
+    }
+    if (withChannel) {
+      include.push({
+        model: ctx.model.WorkChannel,
+        as: 'channel',
+        attributes: [ 'id', 'name' ],
+      });
+    }
+    if (withWork) {
+      include.push({
+        model: ctx.model.Work,
+        as: 'work',
+        attributes: [ 'id', 'title' ],
+      });
+    }
+    return include;
+  }
+
+  getWorkIncludeModelSync({
+    withDept = false,
+    withUsersInCharge = false,
+    withUsersAttend = false,
+    withPublisher = false,
+    withChannels = false,
+    withTag = false,
+    withPhases = false,
+  }) {
+    const ctx = this.ctx;
+    const include = [];
+    if (withDept) {
+      include.push({
+        model: ctx.model.Dept,
+        as: 'dept',
+        attributes: [ 'id', 'name' ],
+      });
+    }
+    if (withUsersInCharge) {
+      include.push({
+        model: ctx.model.User,
+        as: 'usersInCharge',
+        attributes: [ 'id', 'name', 'deptId' ],
+      });
+    }
+    if (withUsersAttend) {
+      include.push({
+        model: ctx.model.User,
+        as: 'usersAttend',
+        attributes: [ 'id', 'name', 'deptId' ],
+      });
+    }
+    if (withPublisher) {
+      include.push({
+        model: ctx.model.User,
+        as: 'publisher',
+        attributes: [ 'id', 'name', 'deptId' ],
+      });
+    }
+    if (withChannels) {
+      include.push({
+        model: ctx.model.WorkChannel,
+        as: 'channels',
+        attributes: [ 'id', 'name' ],
+      });
+    }
+    if (withTag) {
+      include.push({
+        model: ctx.model.Tag,
+        as: 'tag',
+      });
+    }
+    if (withPhases) {
+      include.push({
+        model: ctx.model.Phase,
+        as: 'phases',
+      });
+    }
+    return include;
   }
 }
 

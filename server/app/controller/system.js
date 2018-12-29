@@ -27,8 +27,9 @@ class SystemController extends Controller {
 
   async deleteTag() {
     const ctx = this.ctx;
-    const { name } = ctx.request.body;
-    await ctx.model.Tag.destroy({ where: { name } });
+    const { id } = ctx.request.body;
+    await ctx.model.Tag.destroy({ where: { id } });
+    // todo 把关联到这个tag的work全部转移到其他上
     const tags = await ctx.model.Tag.findAll({ order: [ 'order' ] });
     ctx.body = ctx.helper.getRespBody(true, tags);
   }
@@ -48,6 +49,20 @@ class SystemController extends Controller {
     const data = [];
     for (const key in body) {
       data.push({ name: key, value: body[key] });
+    }
+    await ctx.model.System.bulkCreate(data, {
+      updateOnDuplicate: [ 'name', 'value' ],
+    });
+    ctx.body = ctx.helper.getRespBody(true);
+  }
+
+  async setConfig() {
+    const ctx = this.ctx;
+    // {amFrom,amTo,pmFrom,pmTo}
+    const values = ctx.request.body;
+    const data = [];
+    for (const key in values) {
+      data.push({ name: key, value: values[key] });
     }
     await ctx.model.System.bulkCreate(data, {
       updateOnDuplicate: [ 'name', 'value' ],
