@@ -18,7 +18,6 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import history from '../history';
 import classnames from 'classnames';
-import account from '../sagas/account';
 
 const drawerWidth = 250;
 

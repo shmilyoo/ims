@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { SubmissionError } from 'redux-form';
 import { Grid, Typography, withStyles, Divider } from '@material-ui/core';
 import qs from 'qs';
 import {
@@ -9,65 +10,82 @@ import {
   getDeptArraySync
 } from '../../services/utility';
 import compose from 'recompose/compose';
-import ArticleForm from '../../forms/work/ArticleForm';
+import TaskForm from '../../forms/work/TaskForm';
+import { actions as workActions } from '../../reducers/work';
+import Loading from '../../components/common/Loading';
 
 const style = theme => ({
-  link: theme.sharedClass.link,
-  main: { width: '80%', maxWidth: '100rem' },
-  icon: {
-    content: '\\e90d'
-  }
+  link: theme.sharedClass.link
 });
 
 class AddWorkArticle extends PureComponent {
   constructor(props) {
     super(props);
-    const { workId, channelId } = qs.parse(props.location.search, {
+    const { workId } = qs.parse(props.location.search, {
       ignoreQueryPrefix: true
     });
     if (!workId) toRedirectPage('错误的请求url参数', document.referrer || '/');
-    this.state = { workId, channelId, channels: null, dept: null, work: null };
+    this.state = { workId, dept: null, work: null };
   }
 
   componentDidMount() {
-    getWorkInfo({ id: this.state.workId, withDept: 1, withChannels: 1 }).then(
-      res => {
-        if (res.success) {
-          const work = res.data;
-          this.setState({
-            channels: work.channels.map(channel => ({
-              label: channel.name,
-              value: channel.id
-            })),
-            work,
-            dept: work.dept
-          });
-        }
+    getWorkInfo({ id: this.state.workId, withDept: 1 }).then(res => {
+      if (res.success) {
+        const work = res.data;
+        this.setState({
+          work,
+          dept: work.dept
+        });
+      } else {
+        toRedirectPage('找不到对应的大项工作记录', '/dept/mine');
       }
-    );
+    });
   }
 
+  handleSubmit = values => {
+    if (values.schedules && values.schedules.length > 0) {
+      const error = { schedules: [] };
+      values.schedules.forEach(({ from, to }, index) => {
+        if (to <= from) {
+          error.schedules[index] = { to: '应大于开始' };
+        }
+      });
+      if (error.schedules.length > 0) {
+        throw new SubmissionError(error);
+      }
+    }
+    const { dept, work } = this.state;
+    return new Promise((resolve, reject) => {
+      this.props.dispatch(
+        workActions.sagaAddTask(resolve, values, dept.id, work.id)
+      );
+    });
+  };
+
   render() {
-    const { dept, work, channelId, channels } = this.state;
-    const { deptDic, classes } = this.props;
+    const { dept, work } = this.state;
+    const {
+      deptDic,
+      deptArray,
+      allowExts,
+      amFrom,
+      amTo,
+      pmFrom,
+      pmTo,
+      classes
+    } = this.props;
+    if (!dept || !work) return <Loading />;
     return (
       <Grid container justify="center">
-        <Grid
-          item
-          className={classes.main}
-          container
-          direction="column"
-          wrap="nowrap"
-          spacing={16}
-        >
+        <Grid item container direction="column" wrap="nowrap" spacing={8}>
           <Grid item>
             <Typography variant="h4" align="center">
-              添加大项工作的文章
+              添加大项工作的子工作/任务
             </Typography>
           </Grid>
           <Grid item>
             <Typography variant="h6">
-              部门：
+              所属部门：
               {dept &&
                 getDeptArraySync(dept.id, deptDic).map(
                   ({ id, name }, index) => (
@@ -96,12 +114,16 @@ class AddWorkArticle extends PureComponent {
             <Divider />
           </Grid>
           <Grid item>
-            <ArticleForm
+            <TaskForm
               edit={false}
               enableReinitialize
               onSubmit={this.handleSubmit}
-              channels={channels}
-              initialValues={{ channelId }}
+              deptArray={deptArray}
+              allowExts={allowExts}
+              amFrom={amFrom}
+              amTo={amTo}
+              pmFrom={pmFrom}
+              pmTo={pmTo}
             />
           </Grid>
         </Grid>
@@ -110,9 +132,17 @@ class AddWorkArticle extends PureComponent {
   }
 }
 
+AddWorkArticle.propTypes = {};
+
 function mapStateToProps(state) {
   return {
-    deptDic: state.system.deptDic
+    deptDic: state.system.deptDic,
+    deptArray: state.system.deptArray,
+    allowExts: state.system.allowExts,
+    amFrom: state.system.amFrom,
+    amTo: state.system.amTo,
+    pmFrom: state.system.pmFrom,
+    pmTo: state.system.pmTo
   };
 }
 

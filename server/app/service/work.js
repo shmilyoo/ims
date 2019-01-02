@@ -1,6 +1,9 @@
 'use strict';
 
 const Service = require('egg').Service;
+const shell = require('shelljs');
+const path = require('path');
+const filenamify = require('filenamify');
 
 class WorkService extends Service {
   /**
@@ -55,41 +58,18 @@ class WorkService extends Service {
     return channels;
   }
 
-  getArticleIncludeSync(withPublisher, withChannel, withWork) {
-    const ctx = this.ctx;
-    const include = [];
-    if (withPublisher) {
-      include.push({
-        model: ctx.model.User,
-        as: 'publisher',
-        attributes: [ 'id', 'name' ],
-      });
-    }
-    if (withChannel) {
-      include.push({
-        model: ctx.model.WorkChannel,
-        as: 'channel',
-        attributes: [ 'id', 'name' ],
-      });
-    }
-    if (withWork) {
-      include.push({
-        model: ctx.model.Work,
-        as: 'work',
-        attributes: [ 'id', 'title' ],
-      });
-    }
-    return include;
-  }
-
   getWorkIncludeModelSync({
     withDept = false,
+    // withUsers 和 withUsersInCharge withUsersAttend 没必要重复
+    // withUsers 包括了 withUsersInCharge withUsersAttend
+    withUsers = false,
     withUsersInCharge = false,
     withUsersAttend = false,
     withPublisher = false,
     withChannels = false,
     withTag = false,
     withPhases = false,
+    withAttachments,
   }) {
     const ctx = this.ctx;
     const include = [];
@@ -100,19 +80,36 @@ class WorkService extends Service {
         attributes: [ 'id', 'name' ],
       });
     }
-    if (withUsersInCharge) {
+    if (withUsers) {
       include.push({
         model: ctx.model.User,
-        as: 'usersInCharge',
+        as: 'users',
+        through: {
+          attributes: [ 'isInCharge' ],
+        },
         attributes: [ 'id', 'name', 'deptId' ],
       });
-    }
-    if (withUsersAttend) {
-      include.push({
-        model: ctx.model.User,
-        as: 'usersAttend',
-        attributes: [ 'id', 'name', 'deptId' ],
-      });
+    } else {
+      if (withUsersInCharge) {
+        include.push({
+          model: ctx.model.User,
+          as: 'usersInCharge',
+          through: {
+            attributes: [],
+          },
+          attributes: [ 'id', 'name', 'deptId' ],
+        });
+      }
+      if (withUsersAttend) {
+        include.push({
+          model: ctx.model.User,
+          as: 'usersAttend',
+          through: {
+            attributes: [],
+          },
+          attributes: [ 'id', 'name', 'deptId' ],
+        });
+      }
     }
     if (withPublisher) {
       include.push({
@@ -123,7 +120,7 @@ class WorkService extends Service {
     }
     if (withChannels) {
       include.push({
-        model: ctx.model.WorkChannel,
+        model: ctx.model.Channel,
         as: 'channels',
         attributes: [ 'id', 'name' ],
       });
@@ -140,7 +137,67 @@ class WorkService extends Service {
         as: 'phases',
       });
     }
+    if (withAttachments) {
+      include.push({
+        model: ctx.model.Attachment,
+        as: 'attachments',
+      });
+    }
     return include;
+  }
+
+  /**
+   * 处理提交的附件信息 移动/删除文件 提交数据库等
+   * todo 需要测试
+   * @param {Array} attachments [{path,name,ext,type,id?}...]
+   * @param {String} relativeId attachment 关联的work task article 讨论等的id
+   */
+  async dealAttachments(attachments, relativeId) {
+    const ctx = this.ctx;
+    const toDeal = { add: [], delete: { ids: [], paths: [] } };
+    const uploadRoot = ctx.app.config.uploadRoot;
+    // attach = {path,name,ext,type,id?}
+    // type为add，为新增，type为空表示编辑页面没有动的附件,
+    // type为delete且id不为空表示需要删除的附件，
+    // type为delete且id为空表示前台添加后又取消的附件， 无需处理，tmp定期清除
+    attachments.forEach(attach => {
+      if (attach.type === 'add') toDeal.add.push(attach);
+      if (attach.type === 'delete' && attach.id) {
+        toDeal.delete.ids.push(attach.id);
+        toDeal.delete.paths.push(attach.path);
+      }
+    });
+    if (toDeal.add.length > 0) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const day = now.getDate();
+      const relativeDirectory = path.join(`${year}`, `${month}`, `${day}`);
+      const dir = path.join(uploadRoot, relativeDirectory);
+      if (!shell.test('-e', dir)) shell.mkdir('-p', dir);
+      toDeal.add.forEach(file => {
+        // 避免用户输入非法字符
+        file.name = filenamify(file.name) || path.basename(file.path);
+        const basename = path.basename(file.path);
+        const realPath = path.join(dir, basename);
+        const relativePath = path.join(relativeDirectory, basename); // a/b/c/d.rar
+        shell.mv(file.path, realPath);
+        file.path = relativePath;
+        file.relativeId = relativeId;
+      });
+      await ctx.model.Attachment.bulkCreate(toDeal.add);
+    }
+    if (toDeal.delete.ids.length > 0) {
+      await ctx.model.Attachment.destroy({
+        where: {
+          id: {
+            [ctx.model.Op.in]: toDeal.delete.ids,
+          },
+        },
+      });
+      // 删除本地的文件 toDeal.delete.paths 此处存储的是相对url信息
+      shell.rm(toDeal.delete.paths.map(_path => path.join(uploadRoot, _path)));
+    }
   }
 }
 

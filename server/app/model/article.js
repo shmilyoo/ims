@@ -16,14 +16,19 @@ module.exports = app => {
     publisherId: { type: CHAR(32) }, // 发布文章的用户
   });
   Article.associate = function() {
-    Article.belongsTo(app.model.WorkChannel, {
+    Article.belongsTo(app.model.Channel, {
       as: 'channel',
       foreignKey: 'channelId',
       constraints: false,
     });
     Article.belongsTo(app.model.Work, {
       as: 'work',
-      foreignKey: 'workId',
+      foreignKey: 'relativeId',
+      constraints: false,
+    });
+    Article.belongsTo(app.model.Dept, {
+      as: 'dept',
+      foreignKey: 'relativeId',
       constraints: false,
     });
     Article.belongsTo(app.model.User, {

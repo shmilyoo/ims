@@ -1,9 +1,11 @@
 // 本目录包含个人工作和日程的相关页面
 import React from 'react';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 import WorkInfo from './WorkInfo';
 import WorkEdit from './edit';
 import AddWorkArticle from './AddWorkArticle';
+import AddWorkTask from './AddWorkTask';
+import AddTaskSuccess from './AddTaskSuccess';
 
 const Work = ({ match }) => {
   return (
@@ -17,6 +19,15 @@ const Work = ({ match }) => {
         exact
         path={`${match.path}/article/add`}
         component={AddWorkArticle}
+      />
+      <Route exact path={`${match.path}/article/edit`} component={null} />
+      <Route exact path={`${match.path}/task/add`} component={AddWorkTask} />
+      <Route exact path={`${match.path}/task/edit`} component={null} />
+      <Route exact path={`${match.path}/task/info`} component={null} />
+      <Route
+        exact
+        path={`${match.path}/task/add/success`}
+        component={AddTaskSuccess}
       />
     </Switch>
   );

@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import qs from 'qs';
@@ -9,16 +8,19 @@ import Loading from '../../components/common/Loading';
 import {
   getWorkInfo,
   getDeptArraySync,
-  timeFunctions
+  timeFunctions,
+  checkInUsers
 } from '../../services/utility';
 import compose from 'recompose/compose';
+import TaskListWrapper from './TaskListWrapper';
+
 const style = theme => ({
   link: theme.sharedClass.link,
+  grayLink: theme.sharedClass.grayLink,
   main: { width: '80%', maxWidth: '100rem' },
-  icon: {
-    content: '\\e90d'
-  }
+  workEdit: {}
 });
+
 class WorkInfo extends PureComponent {
   state = {
     id: '',
@@ -36,31 +38,75 @@ class WorkInfo extends PureComponent {
       id: id,
       withDept: 1,
       withChannels: 1,
-      withUsersAttend: 1,
-      withUsersInCharge: 1,
+      withUsers: 1,
       withPublisher: 1,
       withTag: 1,
-      withPhases: 1
+      withPhases: 1,
+      withAttachments: 1
     }).then(res => {
       if (res.success) {
+        // todotodo
+        const work = { ...res.data, usersInCharge: [], usersAttend: [] };
+        res.data.users.forEach(
+          ({ id, name, deptId, userWork: { isInCharge, order } }) => {
+            if (user.userWork.isInCharge) work.usersInCharge.push({});
+          }
+        );
         this.setState({
           work: res.data,
           id
         });
+        this.checkAuthority();
       }
     });
   }
 
-  render() {
+  /**
+   * 获取用户是否有编辑work的权限，以及添加task article的权限
+   * work所属部门管理员和work的负责人可以编辑work
+   * 另外work的参加者可以发article和task
+   * 所有注册用户均可以发讨论
+   */
+  checkAuthority = () => {
+    const { manageDepts, accountId } = this.props;
     const { work } = this.state;
+    let canManage = false; // 是否可以编辑work的主要信息
+    let canAddTaskArticle = false; // 是否可以添加文章，任务，除了管理者外，参与者也可以
+    if (manageDepts.includes(work.dept.id)) {
+      canManage = true;
+    } else {
+      canManage = checkInUsers(work.usersInCharge, accountId);
+      if (!canManage) {
+        // 没有管理work的权限，才有必要验证是否有权限添加task article
+        canAddTaskArticle = checkInUsers(work.usersAttend, accountId);
+      }
+    }
+    this.setState({ canManage, canAddTaskArticle });
+  };
+
+  render() {
+    const { work, canManage, canAddTaskArticle } = this.state;
     const { deptDic, classes } = this.props;
     if (!work) return <Loading />;
     return (
       <Grid container direction="column" wrap="nowrap" spacing={8}>
-        <Grid item>
-          <Typography variant="h3" align="center" paragraph>
-            {work.title}
-          </Typography>
+        <Grid item container justify="center">
+          <Grid item>
+            <Typography variant="h3" align="center" paragraph>
+              {work.title}
+            </Typography>
+          </Grid>
+          {canManage && (
+            <Grid item>
+              {/* // todo 验证下canManage 是否正确 */}
+              <Link
+                className={classes.grayLink}
+                to={`/work/edit?id=${work.id}`}
+              >
+                编辑
+              </Link>
+            </Grid>
+          )}
         </Grid>
         <Grid item container>
           <Grid item xs={6} lg={3}>
@@ -208,14 +254,43 @@ class WorkInfo extends PureComponent {
               </Grid>
             </Grid>
           )}
+        <Grid item>
+          <Typography variant="h6">工作介绍:</Typography>
+        </Grid>
+        <Grid item>{work.content}</Grid>
+        <Grid item>
+          <Divider />
+        </Grid>
+
         <Grid item container direction="column" wrap="nowrap">
           <Grid item container justify="space-between">
             <Grid item>
-              <Typography variant="h6">子项工作/任务:</Typography>
+              <Grid container spacing={16} alignItems="center">
+                <Grid item>
+                  <Typography variant="h6">子项工作/任务:</Typography>
+                </Grid>
+                {(canManage || canAddTaskArticle) && (
+                  <Grid item>
+                    <Link
+                      className={classes.grayLink}
+                      to={`/work/task/add?workId=${work.id}`}
+                    >
+                      添加
+                    </Link>
+                  </Grid>
+                )}
+              </Grid>
             </Grid>
             <Grid item>
               <Typography variant="h6">列表/时间线</Typography>
             </Grid>
+          </Grid>
+          <Grid item>
+            <TaskListWrapper
+              workId={work.id}
+              canChangeOrder={false}
+              admin={false}
+            />
           </Grid>
         </Grid>
       </Grid>
@@ -223,10 +298,11 @@ class WorkInfo extends PureComponent {
   }
 }
 
-WorkInfo.propTypes = {};
 function mapStateToProps(state) {
   return {
-    deptDic: state.system.deptDic
+    deptDic: state.system.deptDic,
+    manageDepts: state.account.manageDepts,
+    accountId: state.account.id
   };
 }
 

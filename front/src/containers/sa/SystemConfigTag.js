@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Grid, Typography, Chip, Button, TextField } from '@material-ui/core';
 import { withTheme } from '@material-ui/core/styles';
@@ -145,8 +144,6 @@ class SystemConfigTag extends React.PureComponent {
     );
   }
 }
-
-SystemConfigTag.propTypes = {};
 
 function mapStateToProps(state) {
   return {

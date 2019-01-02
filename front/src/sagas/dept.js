@@ -1,13 +1,7 @@
-import { fork, take, put, call, select } from 'redux-saga/effects';
+import { fork, take, put, call } from 'redux-saga/effects';
 import { stopSubmit, initialize } from 'redux-form';
-import { md5Passwd, checkCookieLocal } from '../services/utility';
 import axios from 'axios';
-import { types as accountTypes } from '../reducers/account';
-import { actions as accountActions } from '../reducers/account';
-import { types as systemTypes } from '../reducers/system';
-import { actions as systemActions } from '../reducers/system';
 import { types as deptTypes } from '../reducers/dept';
-import history from '../history';
 
 function* setDeptManager() {
   while (true) {

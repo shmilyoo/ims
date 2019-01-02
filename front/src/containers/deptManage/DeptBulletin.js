@@ -6,7 +6,7 @@ import compose from 'recompose/compose';
 import { Grid, Divider } from '@material-ui/core';
 import { actions as accountActions } from '../../reducers/account';
 import WorkList from '../../components/work/WorkList';
-import { getDeptWorksReq, getNumberPerPage } from '../../services/utility';
+import { getDeptWorks, getNumberPerPage } from '../../services/utility';
 
 class DeptBulletin extends PureComponent {
   state = {
@@ -25,14 +25,12 @@ class DeptBulletin extends PureComponent {
   getWorkList = getPage => {
     const { manageDept } = this.props;
     const { numberPerPage } = this.state;
-    getDeptWorksReq(manageDept, numberPerPage, getPage, true, true).then(
-      res => {
-        if (res.success) {
-          const { workList, totalNumber } = res.data;
-          this.setState({ workList, totalNumber, currentPage: getPage });
-        }
+    getDeptWorks(manageDept, numberPerPage, getPage, true, true).then(res => {
+      if (res.success) {
+        const { workList, totalNumber } = res.data;
+        this.setState({ workList, totalNumber, currentPage: getPage });
       }
-    );
+    });
   };
   handleDeptChange = id => {
     this.props.dispatch(accountActions.setManageDept(id));

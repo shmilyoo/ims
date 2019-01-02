@@ -1,13 +1,12 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import DeptHeadChange from '../../components/common/DeptHeadChange';
 import compose from 'recompose/compose';
 import { Grid, Divider, Button, withStyles } from '@material-ui/core';
 import { actions as accountActions } from '../../reducers/account';
 import WorkList from '../../components/work/WorkList';
 import {
-  getDeptWorksReq,
+  getDeptWorks,
   getNumberPerPage,
   setNumberPerPage,
   delMultiWorks
@@ -28,8 +27,8 @@ class DeptWork extends PureComponent {
     currentPage: 1,
     totalNumber: 0,
     selectedIds: [],
-    orderBy: '',
-    orderDirection: 'asc',
+    orderBy: 'createTime',
+    orderDirection: 'desc',
     alertOpen: false // 警告窗口开关
   };
   componentDidMount() {
@@ -42,7 +41,7 @@ class DeptWork extends PureComponent {
   getWorkList = getPage => {
     const { manageDept } = this.props;
     const { numberPerPage, orderBy, orderDirection } = this.state;
-    getDeptWorksReq(
+    getDeptWorks(
       manageDept,
       numberPerPage,
       getPage,
@@ -71,7 +70,7 @@ class DeptWork extends PureComponent {
       }
     );
   };
-  handlePageChagne = page => {
+  handlePageChange = page => {
     this.setState({ workList: null });
     this.getWorkList(page);
   };
@@ -176,7 +175,7 @@ class DeptWork extends PureComponent {
             canChangeOrder={true}
             orderBy={orderBy}
             orderDirection={orderDirection}
-            onPageChange={this.handlePageChagne}
+            onPageChange={this.handlePageChange}
             onSelectedChange={this.handleSelectedChange}
             onChangeRowsPerPage={this.handleChangeRowsPerPage}
             onChangeOrder={this.handleChangeOrder}
@@ -187,8 +186,6 @@ class DeptWork extends PureComponent {
     );
   }
 }
-
-DeptWork.propTypes = {};
 
 function mapStateToProps(state) {
   return {

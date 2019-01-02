@@ -1,10 +1,8 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import qs from 'qs';
-import history from '../../history';
 import { toRedirectPage } from '../../services/utility';
-import { Grid, Typography } from '@material-ui/core';
+import { Grid } from '@material-ui/core';
 
 class AddWorkSuccess extends PureComponent {
   constructor(props) {
@@ -48,7 +46,5 @@ class AddWorkSuccess extends PureComponent {
     );
   }
 }
-
-AddWorkSuccess.propTypes = {};
 
 export default AddWorkSuccess;

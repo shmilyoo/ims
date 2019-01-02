@@ -79,7 +79,7 @@ module.exports = app => {
         tagId: defaultTag.id,
         title: new Array(i + 1).fill('a').join(),
         from: '1545267600',
-        to: '1545267600',
+        to: '1545267700',
         createTime: '1545267600',
         updateTime: '1545267600',
         publisherId: 'c360d5f0ceef11e8b013f53754442777',
@@ -90,18 +90,23 @@ module.exports = app => {
       await app.model.Phase.bulkCreate([
         {
           title: 'phase 1',
-          workId: worksModel[0].id,
+          workId: worksModel[2].id,
           from: '1545267600',
         },
         {
+          title: 'phase 4',
+          workId: worksModel[2].id,
+          from: '1655267602',
+        },
+        {
           title: 'phase 3',
-          workId: worksModel[0].id,
-          from: '1555267602',
+          workId: worksModel[2].id,
+          from: '1565267602',
         },
         {
           title: 'phase 2',
-          workId: worksModel[0].id,
-          from: '1535267602',
+          workId: worksModel[2].id,
+          from: '1555267602',
         },
       ]);
       // await app.model.Work.bulkCreate([

@@ -89,7 +89,7 @@ class FileUpload extends PureComponent {
     }
     let data = new FormData();
     data.append('file', file);
-    data.append('name', fileName);
+    // data.append('name', fileName);
     this.setState({ showProgress: true });
     axios
       .post(apiUrl, data, {
@@ -159,7 +159,9 @@ class FileUpload extends PureComponent {
                     alignItems="center"
                   >
                     <Grid item>
-                      <Link to={file.type ? '#' : file.path}>{file.name}</Link>
+                      <Link to={file.type ? '#' : file.path}>{`${file.name}${
+                        file.ext
+                      }`}</Link>
                     </Grid>
                     <Grid item>
                       <IconButton

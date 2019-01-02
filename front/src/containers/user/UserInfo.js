@@ -1,12 +1,10 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import compose from 'recompose/compose';
 import { actions as accountActions } from '../../reducers/account';
 import {
   Grid,
   Divider,
-  Button,
   FormControlLabel,
   Switch,
   Typography
@@ -78,8 +76,6 @@ class ChangeDept extends PureComponent {
     );
   }
 }
-
-ChangeDept.propTypes = {};
 
 function mapStateToProps(state) {
   return {

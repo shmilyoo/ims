@@ -1,6 +1,5 @@
 // redux-form field的format和parse 帮助函数
 // import moment from 'moment';
-import { isNumber } from 'util';
 
 export const formatSex = value => {
   // 用户性别：1男性, 2女性, 0未知

@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import DeptBrief from './DeptBrief';
 import ScheduleBrief from './ScheduleBrief';
@@ -22,7 +21,4 @@ class Brief extends PureComponent {
     );
   }
 }
-
-Brief.propTypes = {};
-
 export default Brief;

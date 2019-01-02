@@ -33,6 +33,7 @@ exports.multipart = {
     cron: '0 30 4 * * *',
   },
   fileSize: '5000mb',
+  // whitelist:[],  // 会覆盖默认配置，和前端限制保持一致
   // will append to whilelist
   fileExtensions: [
     '.doc',
@@ -70,6 +71,8 @@ exports.cluster = {
 };
 exports.sysName = 'ims';
 exports.ssoKey = '111111'; // sso服务器生成的和本服务端之间的通信密钥/认证密码
+exports.uploadRoot = '/var/www/ims/upload';
+exports.urlRoot = 'http://localhost:4000/static/upload';
 exports.ssoAuthLoginPage = `${CASURL}/auth/login`;
 exports.ssoCheckPage = `${CASURL}/auth/check`;
 exports.ssoCheckBind = `${CASURL}/auth/check/bind`;

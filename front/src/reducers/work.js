@@ -1,12 +1,20 @@
 export const types = {
   SAGA_ADD_WORK: 'WORK/SAGA_ADD_WORK',
-  SAGA_UPDATE_WORK_BASIC: 'WORK/SAGA_UPDATE_WORK_BASIC'
+  SAGA_UPDATE_WORK_BASIC: 'WORK/SAGA_UPDATE_WORK_BASIC',
+  SAGA_ADD_TASK: 'WORK/SAGA_ADD_TASK'
 };
 export const actions = {
   sagaAddWork: (resolve, values) => ({
     type: types.SAGA_ADD_WORK,
     resolve,
     values
+  }),
+  sagaAddTask: (resolve, values, deptId, workId) => ({
+    type: types.SAGA_ADD_TASK,
+    resolve,
+    values,
+    deptId,
+    workId
   })
 };
 

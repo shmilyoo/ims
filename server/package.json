@@ -10,10 +10,12 @@
     "egg-redis": "^2.0.0",
     "egg-scripts": "^2.5.0",
     "egg-sequelize": "^4.1.0",
+    "filenamify": "^2.1.0",
     "jsonwebtoken": "^8.3.0",
     "jwt-simple": "^0.5.5",
     "md5": "^2.2.1",
-    "mysql2": "^1.6.1"
+    "mysql2": "^1.6.1",
+    "shelljs": "^0.8.3"
   },
   "devDependencies": {
     "autod": "^3.0.1",

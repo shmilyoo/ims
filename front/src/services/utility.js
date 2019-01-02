@@ -21,6 +21,18 @@ export const checkCookieLocal = () => {
   return hasCookie;
 };
 
+export const checkInUsers = (users, id) => {
+  let result = false;
+  users.some(({ id: _id }) => {
+    if (id === _id) {
+      result = true;
+      return true;
+    }
+    return false;
+  });
+  return result;
+};
+
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
@@ -193,82 +205,93 @@ export const toRedirectPage = (content, to, count) => {
 export const getWorkInfo = ({
   id,
   withDept,
+  withUsers,
   withUsersInCharge,
   withUsersAttend,
   withPublisher,
   withChannels,
   withTag,
-  withPhases
+  withPhases,
+  withAttachments
 }) => {
-  return axios.get(
-    `/work/info?${qs.stringify(
-      {
-        id,
-        withDept,
-        withUsersInCharge,
-        withUsersAttend,
-        withPublisher,
-        withChannels,
-        withTag,
-        withPhases
-      },
-      { encodeValuesOnly: true }
-    )}`
-  );
+  return axios.post('/work/info', {
+    id,
+    withDept,
+    withUsers,
+    withUsersInCharge,
+    withUsersAttend,
+    withPublisher,
+    withChannels,
+    withTag,
+    withPhases,
+    withAttachments
+  });
 };
 
-export const getWorkChannelArticles = (
+/**
+ * 获取工作下属任务，用在taskList中
+ * @param {Object} param0 task参数
+ */
+export const getWorkTasks = ({
   workId,
-  channelId,
+  numberPerPage,
+  currentPage,
+  orderBy = 'createTime',
+  orderDirection = 'desc'
+}) => {
+  return axios.post('/work/tasks', {
+    workId,
+    numberPerPage,
+    currentPage,
+    orderBy,
+    orderDirection
+  });
+};
+
+export const getArticles = ({
+  from = 'work', // work or dept
+  relativeId, //  work id or dept id
+  channelId, // 是否限定只获取指定channel 的文章
   numberPerPage,
   currentPage,
   withChannel = true,
   withPublisher = true,
-  withWork = false,
+  withRelative = false,
   orderBy = 'createTime',
   orderDirection = 'desc'
-) => {
-  return axios.get(
-    `/work/channel/articles?${qs.stringify(
-      {
-        workId,
-        channelId,
-        numberPerPage,
-        currentPage,
-        orderBy,
-        direction: orderDirection,
-        withChannel: withChannel ? '1' : '',
-        withWork: withWork ? '1' : '',
-        withPublisher: withPublisher ? '1' : ''
-      },
-      { encodeValuesOnly: true }
-    )}`
-  );
+}) => {
+  return axios.post(`/articles`, {
+    from,
+    relativeId,
+    channelId,
+    numberPerPage,
+    currentPage,
+    orderBy,
+    direction: orderDirection,
+    withChannel,
+    withRelative,
+    withPublisher
+  });
 };
 
-export const getDeptWorksReq = (
+export const getDeptWorks = (
   deptId,
   numberPerPage,
   currentPage,
-  orderBy,
-  orderDirection,
+  orderBy = 'createTime',
+  orderDirection = 'desc',
   withDept = true,
   withPublisher = true
 ) => {
-  return axios.get(
-    `/dept/works?${qs.stringify(
-      {
-        deptId,
-        numberPerPage,
-        currentPage,
-        withDept: withDept ? '1' : '',
-        withPublisher: withPublisher ? '1' : '',
-        orderBy,
-        direction: orderDirection
-      },
-      { encodeValuesOnly: true }
-    )}`
-  );
+  return axios.post(`/dept/works`, {
+    deptId,
+    numberPerPage,
+    currentPage,
+    withDept,
+    withPublisher,
+    orderBy,
+    direction: orderDirection
+  });
 };
 
 /**
@@ -321,9 +344,9 @@ export const range = (start, end, step) => {
     throw TypeError('Step cannot be zero.');
   }
 
-  if (typeofStart == 'undefined' || typeofEnd == 'undefined') {
+  if (typeofStart === 'undefined' || typeofEnd === 'undefined') {
     throw TypeError('Must pass start and end arguments.');
-  } else if (typeofStart != typeofEnd) {
+  } else if (typeofStart !== typeofEnd) {
     throw TypeError('Start and end arguments must be of same type.');
   }
 
@@ -333,13 +356,13 @@ export const range = (start, end, step) => {
     step = -step;
   }
 
-  if (typeofStart == 'number') {
+  if (typeofStart === 'number') {
     while (step > 0 ? end >= start : end <= start) {
       range.push(start);
       start += step;
     }
-  } else if (typeofStart == 'string') {
-    if (start.length != 1 || end.length != 1) {
+  } else if (typeofStart === 'string') {
+    if (start.length !== 1 || end.length !== 1) {
       throw TypeError('Only strings with one character are supported.');
     }
 
@@ -356,37 +379,3 @@ export const range = (start, end, step) => {
 
   return range;
 };
-
-// export const treeDataWithRelation = (treeData, relations, treeDataDic) => {
-//   let result = [];
-//   for (let i = 0; i < treeData.length; i++) {
-//     const node = Object.assign({}, treeData[i]);
-//     const toNodeId = relations[node.id];
-//     if (toNodeId) {
-//       node.title = `${node.title} -> ${treeDataDic[toNodeId].name}`;
-//     }
-//     if (node.children)
-//       node.children = treeDataWithRelation(
-//         node.children,
-//         relations,
-//         treeDataDic
-//       );
-//     result.push(node);
-//   }
-//   return result;
-// };
-
-// /**
-//  *  全部展开或者折叠树
-//  * @param {Object[]} treeData tree的数据结构
-//  * @param {boolean} expand 是否展开
-//  */
-// export const toggleExpandTreeData = (treeData, expand) => {
-//   for (let i = 0; i < treeData.length; i++) {
-//     if (treeData[i].children) {
-//       treeData[i].expanded = expand;
-//       toggleExpandTreeData(treeData[i].children, expand);
-//     }
-//   }
-//   return [...treeData];
-// };

@@ -6,6 +6,7 @@ import { toRedirectPage } from '../../../services/utility';
 import EditWorkBasic from './EditWorkBasic';
 import EditWorkChannel from './EditWorkChannel';
 import ManageWorkArticles from './ManageWorkArticles';
+import ManageWorkTasks from './ManageWorkTasks';
 
 class WorkEdit extends React.PureComponent {
   constructor(props) {
@@ -44,6 +45,7 @@ class WorkEdit extends React.PureComponent {
             fullWidth
           >
             <Tab key="basic" label="基本信息" value="basic" />
+            <Tab key="task" label="任务管理" value="task" />
             <Tab key="channel" label="分类管理" value="channel" />
             <Tab key="article" label="文章管理" value="article" />
             <Tab key="discuss" label="讨论管理" value="discuss" />
@@ -51,6 +53,7 @@ class WorkEdit extends React.PureComponent {
         </Grid>
         <Grid item xs style={{ marginTop: '2rem' }}>
           {type === 'basic' && <EditWorkBasic id={id} />}
+          {type === 'task' && <ManageWorkTasks id={id} />}
           {type === 'channel' && <EditWorkChannel id={id} />}
           {type === 'article' && <ManageWorkArticles id={id} />}
           {type === 'discuss' && 'discuss'}

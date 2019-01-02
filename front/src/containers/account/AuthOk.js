@@ -1,8 +1,6 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import qs from 'qs';
-import { Grid, Typography, CircularProgress } from '@material-ui/core';
 import compose from 'recompose/compose';
 import history from '../../history';
 import { actions as accountActions } from '../../reducers/account';
@@ -33,7 +31,5 @@ class AuthOk extends PureComponent {
     return <Loading title="正在验证授权" />;
   }
 }
-
-AuthOk.propTypes = {};
 
 export default compose(connect())(AuthOk);

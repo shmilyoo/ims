@@ -63,6 +63,10 @@ class ColorPicker extends React.PureComponent {
     this.setState({ color });
   };
 
+  handleBackDropClick = () => {
+    this.setState({ showPicker: false });
+  };
+
   render() {
     const { showPicker, pickerTop, pickerLeft } = this.state;
     const { label, color } = this.props;
@@ -71,7 +75,8 @@ class ColorPicker extends React.PureComponent {
         <div id="aaa" ref={this.inputDiv}>
           <TextField
             fullWidth
-            style={{ color: '#FF0' }}
+            style={{ color: '#FF0', zIndex: 1999 }}
+            // style={{ color: '#FF0' }}
             InputProps={{
               style: { color: color },
               readOnly: true,
@@ -96,19 +101,34 @@ class ColorPicker extends React.PureComponent {
           />
         </div>
         {showPicker && (
-          <div
-            style={{
-              position: 'absolute',
-              top: `${pickerTop}px`,
-              left: `${pickerLeft}px`,
-              zIndex: '2000'
-            }}
-          >
-            <SketchPicker
-              color={color}
-              onChangeComplete={this.handlePickerChange}
+          <React.Fragment>
+            <div
+              id="colorPickerBackDrop"
+              onClick={this.handleBackDropClick}
+              style={{
+                backgroundColor: '#0000',
+                width: '100%',
+                height: '100%',
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                zIndex: 1998
+              }}
             />
-          </div>
+            <div
+              style={{
+                position: 'absolute',
+                top: `${pickerTop}px`,
+                left: `${pickerLeft}px`,
+                zIndex: 2000
+              }}
+            >
+              <SketchPicker
+                color={color}
+                onChangeComplete={this.handlePickerChange}
+              />
+            </div>
+          </React.Fragment>
         )}
       </div>
     );

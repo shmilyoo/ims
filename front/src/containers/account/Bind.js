@@ -2,7 +2,6 @@
 import React from 'react';
 import { Redirect, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import RegForm from '../../forms/account/RegForm';
 import { types as accountTypes } from '../../reducers/account';
 import { Card, withStyles, CardContent, Typography } from '@material-ui/core';
 import compose from 'recompose/compose';

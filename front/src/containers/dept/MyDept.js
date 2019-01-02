@@ -1,10 +1,7 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Grid, Typography, Divider } from '@material-ui/core';
 import compose from 'recompose/compose';
-import axios from 'axios';
-import Loading from '../../components/common/Loading';
 
 class MyDept extends PureComponent {
   render() {

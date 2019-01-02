@@ -6,8 +6,7 @@ import { types as accountTypes } from '../reducers/account';
 import { actions as accountActions } from '../reducers/account';
 import history from '../history';
 import { ssoLoginPage } from '../config';
-import { getAuth, getId } from '.';
-import Cookies from 'js-cookie';
+import { getAuth } from '.';
 
 /**
  * auth/ok 页面发出的验证请求

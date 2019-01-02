@@ -1,21 +1,15 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { SubmissionError } from 'redux-form';
 import { connect } from 'react-redux';
-import { Grid, Button, Divider, Typography } from '@material-ui/core';
+import { Grid, Divider, Typography } from '@material-ui/core';
 import Tree from '../../components/Tree';
 import {
   makeDeptTree,
   getLevel1ExpandsfromTreeArray,
   getNewExpands,
-  getDeptManagersAsync,
-  setDeptManagersAsync
+  getDeptManagersAsync
 } from '../../services/utility';
-import Axios from 'axios';
 import compose from 'recompose/compose';
-import { actions as systemActions } from '../../reducers/system';
 import DeptAdminForm from '../../forms/system/DeptAdminForm';
-import UserPicker from '../../components/common/UserPicker';
 import { actions as deptActions } from '../../reducers/dept';
 
 class DeptAdmin extends Component {

@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import compose from 'recompose/compose';
 import { SubmissionError } from 'redux-form';
-import { Grid, Divider, Typography, TextField } from '@material-ui/core';
+import { Grid, Divider, Typography } from '@material-ui/core';
 import WorkForm from '../../forms/work/WorkForm';
 import { actions as systemActions } from '../../reducers/system';
 import { actions as workActions } from '../../reducers/work';

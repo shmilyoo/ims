@@ -2,37 +2,18 @@ import React from 'react';
 import { Field, reduxForm } from 'redux-form';
 import { Button, Grid } from '@material-ui/core';
 import compose from 'recompose/compose';
-import { withStyles } from '@material-ui/core/styles';
-import grey from '@material-ui/core/colors/grey';
 import { required } from '../validate';
 import { trim } from '../normalize';
-import {
-  RenderTextField,
-  RenderInputSelect,
-  RenderSelectDeptField
-} from '../../forms/renderFields';
+import { RenderTextField, RenderInputSelect } from '../../forms/renderFields';
 import { userStatus } from '../../config';
 import RenderDeptPicker from '../renderFields/renderDeptPicker';
-
-const styles = () => ({
-  buttonLine: {
-    marginTop: '2rem',
-    display: 'flex',
-    justifyContent: 'space-around'
-  },
-  buttomText: {
-    color: grey[500]
-  }
-});
 
 const UserInfoForm = props => {
   const {
     handleSubmit,
     pristine,
     reset,
-    classes,
     submitting,
-    error,
     edit,
     deptArray,
     deptDic
@@ -106,10 +87,8 @@ UserInfoForm.defaultProps = {
 };
 
 const enchance = compose(
-  withStyles(styles),
   reduxForm({
     form: 'userInfoForm'
-    // validate: syncCheckRegForm,
   })
 );
 

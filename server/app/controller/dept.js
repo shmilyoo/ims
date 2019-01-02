@@ -87,7 +87,9 @@ class DeptController extends Controller {
       currentPage,
       withDept,
       withPublisher,
-    } = ctx.request.query;
+      orderBy,
+      direction,
+    } = ctx.request.body;
     const include = [];
     if (withDept) {
       include.push({
@@ -103,16 +105,15 @@ class DeptController extends Controller {
         attributes: [ 'id', 'name' ],
       });
     }
-    const perPge = Number.parseInt(numberPerPage);
-    const nowPage = Number.parseInt(currentPage);
     const { count, rows } = await ctx.model.Work.findAndCountAll({
       include,
       where: { deptId },
-      limit: perPge,
-      offset: (nowPage - 1) * perPge,
+      limit: numberPerPage,
+      offset: (currentPage - 1) * numberPerPage,
+      order: [[ orderBy, direction ]],
     });
     ctx.body = ctx.helper.getRespBody(true, {
-      workList: rows,
+      workList: rows || [],
       totalNumber: count,
     });
   }

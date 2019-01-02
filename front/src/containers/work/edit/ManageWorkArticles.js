@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import compose from 'recompose/compose';
 import {
@@ -10,16 +9,14 @@ import {
   ListItemText,
   withStyles,
   Paper,
-  Button,
   Typography
 } from '@material-ui/core';
 import Axios from 'axios';
-import ChannelForm from '../../../forms/work/ChannelForm';
 import ArticleList from '../../../components/common/ArticleList';
 import {
   getNumberPerPage,
-  getWorkChannelArticles,
-  setNumberPerPage
+  setNumberPerPage,
+  getArticles
 } from '../../../services/utility';
 
 const style = theme => ({
@@ -68,17 +65,18 @@ class ManageWorkArticles extends React.PureComponent {
       orderDirection,
       selectedChannel
     } = this.state;
-    getWorkChannelArticles(
-      workId,
-      selectedChannel.id,
+    getArticles({
+      from: 'work',
+      relativeId: workId,
+      channelId: selectedChannel.id,
       numberPerPage,
       currentPage,
-      true,
-      true,
-      false,
-      'createTime',
-      'desc'
-    ).then(res => {
+      orderBy,
+      orderDirection,
+      withChannel: true,
+      withPublisher: true,
+      withRelative: false
+    }).then(res => {
       if (res.success) {
         const { totalNumber, articleList } = res.data;
         this.setState({ articleList, totalNumber });

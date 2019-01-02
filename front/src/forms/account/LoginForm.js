@@ -1,15 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Field, reduxForm } from 'redux-form';
 import compose from 'recompose/compose';
 import { withStyles } from '@material-ui/core/styles';
 import { required } from '../validate';
 import { trim } from '../normalize';
-import { Button, Typography } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import { RenderTextField, RenderSwitch } from '../renderFields';
-import grey from '@material-ui/core/colors/grey';
 
-const styles = theme => ({
+const styles = () => ({
   buttonLine: {
     marginTop: '2rem',
     display: 'flex',

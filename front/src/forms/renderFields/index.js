@@ -7,6 +7,8 @@ import RenderSelectDeptField from './renderSelectDeptField';
 import RenderUserPicker from './renderUserPicker';
 import RenderWorkPhase from './renderWorkPhase';
 import RenderFileUpload from './renderFileUpload';
+import RenderAddMultiSchedules from './renderAddMultiSchedules';
+import RenderCheck from './renderCheck';
 // import RenderExps from './renderExps';
 // import RenderRandomCode from './renderRandomCode';
 
@@ -19,7 +21,9 @@ export {
   RenderSelectDeptField,
   RenderUserPicker,
   RenderWorkPhase,
-  RenderFileUpload
+  RenderFileUpload,
+  RenderAddMultiSchedules,
+  RenderCheck
   // RenderExps,
   // RenderRandomCode
 };

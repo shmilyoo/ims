@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Button, Divider } from '@material-ui/core';
+import { Grid, Button } from '@material-ui/core';
 import { connect } from 'react-redux';
 import { Field, reduxForm } from 'redux-form';
 import compose from 'recompose/compose';
@@ -14,7 +14,6 @@ import {
   checkMaxStringLength255
 } from '../validate';
 import { trim } from '../normalize';
-import FileUpload from '../../components/common/FileUpload';
 
 const ArticleForm = ({
   pristine,

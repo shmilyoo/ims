@@ -5,7 +5,6 @@ import compose from 'recompose/compose';
 import { SubmissionError } from 'redux-form';
 import { Grid } from '@material-ui/core';
 import WorkForm from '../../../forms/work/WorkForm';
-import { actions as workActions } from '../../../reducers/work';
 import { checkArrayDuplicated, checkFromToDate } from '../../../forms/validate';
 import { actions as systemActions } from '../../../reducers/system';
 import Axios from 'axios';
@@ -20,6 +19,7 @@ class EditWorkBasic extends React.PureComponent {
     }
     this.getWorkInfo();
   }
+  // todo 使用utility中的getworkinfo
   getWorkInfo = () => {
     // 获取work基本信息和phase信息
     Axios.get(`/work/basic?id=${this.props.id}`).then(res => {

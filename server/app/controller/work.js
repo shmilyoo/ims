@@ -77,22 +77,26 @@ class WorkController extends Controller {
     const {
       id,
       withDept,
+      withUsers,
       withUsersInCharge,
       withUsersAttend,
       withPublisher,
       withChannels,
       withTag,
       withPhases,
-    } = ctx.query;
+      withAttachments,
+    } = ctx.request.body;
     if (!id) ctx.throw('错误的请求参数-id');
     const include = ctx.service.work.getWorkIncludeModelSync({
       withDept,
+      withUsers,
       withUsersInCharge,
       withUsersAttend,
       withPublisher,
       withChannels,
       withTag,
       withPhases,
+      withAttachments,
     });
     const work = await ctx.model.Work.findOne({
       where: { id },
@@ -110,11 +114,18 @@ class WorkController extends Controller {
         {
           model: ctx.model.User,
           as: 'usersInCharge',
+          required: false,
+          through: {
+            attributes: [],
+          },
           attributes: [ 'id', 'name', 'deptId' ],
         },
         {
           model: ctx.model.User,
           as: 'usersAttend',
+          through: {
+            attributes: [],
+          },
           attributes: [ 'id', 'name', 'deptId' ],
         },
         {
@@ -129,6 +140,16 @@ class WorkController extends Controller {
       ],
       where: { id },
       order: [
+        // 使用col函数也可以，或者使用级联的model获取many to many through model的键值排序
+        // [ ctx.model.col('usersInCharge->userWork.order'), 'asc' ],
+        [
+          {
+            model: ctx.model.User,
+            as: 'usersInCharge',
+          },
+          ctx.model.UserWork,
+          'order',
+        ],
         [
           {
             model: ctx.model.Phase,
@@ -239,38 +260,103 @@ class WorkController extends Controller {
     ctx.body = ctx.helper.getRespBody(true, channels);
   }
 
-  async getWorkChannelArticles() {
+  async getWorkTasks() {
     const ctx = this.ctx;
     const {
-      where = 'work', // 获取work的还是channel的文章
       workId,
-      channelId,
-      numberPerPage,
-      currentPage,
-      orderBy = 'creatTime',
-      orderDirection = 'desc',
-      withChannel = true,
-      withWork = false,
-      withPublisher = true,
-    } = ctx.query;
-    const include = ctx.service.getArticleIncludeSync(
-      withPublisher,
-      withChannel,
-      withWork
-    );
-    const perPge = Number.parseInt(numberPerPage);
-    const nowPage = Number.parseInt(currentPage);
-    const { count, articles } = await ctx.model.Article.findAndCountAll({
-      include,
-      where: where === 'work' ? { workId } : { channelId },
-      limit: perPge,
-      offset: (nowPage - 1) * perPge,
-      order: [[ orderBy, orderDirection ]],
+      numberPerPage = 20,
+      currentPage = 1,
+      orderBy = 'createTime',
+      direction = 'desc',
+    } = ctx.request.body;
+    if (!workId) ctx.throw('错误的任务请求参数');
+    const { count, tasks } = await ctx.model.Task.findAndCountAll({
+      where: { workId },
+      limit: numberPerPage,
+      offset: (currentPage - 1) * numberPerPage,
+      order: [[ orderBy, direction ]],
     });
     ctx.body = ctx.helper.getRespBody(true, {
-      articleList: articles,
       totalNumber: count,
+      taskList: tasks || [],
     });
+  }
+
+  async addTask() {
+    const ctx = this.ctx;
+    const {
+      values: {
+        from,
+        to,
+        title,
+        content,
+        usersInCharge,
+        usersAttend,
+        attachments,
+        addSchedules,
+        schedules,
+      },
+      deptId,
+      workId,
+    } = ctx.request.body;
+    const transaction = await ctx.model.transaction();
+    try {
+      const now = ctx.helper.timeFunctions.getNowUnix();
+      const task = await ctx.model.Task.create({
+        publisherId: ctx.user.id,
+        title,
+        from,
+        to,
+        workId,
+        content,
+        createTime: now,
+        updateTime: now,
+      });
+      task.userWorks = await ctx.service.work.addUserWorkTaskWithInChargeAndAttendArray(
+        usersInCharge,
+        usersAttend,
+        task.id,
+        false
+      );
+      if (attachments && attachments.length > 0) {
+        ctx.service.work.dealAttachments(attachments, task.id);
+      }
+      if (addSchedules && schedules && schedules.length > 0) {
+        // schedules:[{title,date,from,to,content,toUsers:[{id,name}..]}]
+        // database:{userId,fromUserId,title,content,workId,taskId,from,to,createTime,accepted}
+        const fromUserId = ctx.user.id;
+        const saveSchedules = [];
+        const now = ctx.helper.timeFunctions.getNowUnix();
+        schedules.forEach(({ title, date, from, to, content, toUsers }) => {
+          const fromUnix = date + from;
+          const toUnix = date + to;
+          toUsers.forEach(({ id: userId }) => {
+            saveSchedules.push({
+              userId,
+              fromUserId,
+              title,
+              content,
+              workId,
+              taskId: task.id,
+              from: fromUnix,
+              to: toUnix,
+              createTime: now,
+              accepted: false,
+            });
+          });
+        });
+        await ctx.model.Schedule.bulkCreate(saveSchedules);
+      }
+      await transaction.commit();
+      ctx.body = ctx.helper.getRespBody(true, {
+        taskId: task.id,
+        workId,
+        deptId,
+      });
+    } catch (error) {
+      await transaction.rollback();
+      ctx.body = ctx.helper.getRespBody(false, error.message);
+    }
   }
 }
 

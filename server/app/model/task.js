@@ -2,7 +2,7 @@
 
 const db = require('../db');
 
-// 大项工作的具体子工作
+// 大项工作的具体子工作/任务
 module.exports = app => {
   const { STRING, INTEGER, DATE, TEXT, BOOLEAN, CHAR } = app.Sequelize;
 
@@ -12,7 +12,7 @@ module.exports = app => {
     title: { type: STRING(32) }, // 子工作名称
     from: { type: INTEGER }, // 子工作开始时间
     to: { type: INTEGER }, // 子工作结束时间 不允许不填
-    content: { type: TEXT, defaultValue: '' }, // 大项工作介绍
+    content: { type: TEXT, defaultValue: '' }, // 任务介绍
     createTime: { type: INTEGER }, // 添加时间
     updateTime: { type: INTEGER }, // 修改时间
   });

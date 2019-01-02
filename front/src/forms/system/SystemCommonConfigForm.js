@@ -1,9 +1,9 @@
 import React from 'react';
-import { Grid, Typography, Button, TextField } from '@material-ui/core';
+import { Grid, Typography, Button } from '@material-ui/core';
 import { Field, reduxForm } from 'redux-form';
 import compose from 'recompose/compose';
-import { required, syncCheckTimeScale, checkCommonConfig } from '../validate';
-import { RenderDatePicker, RenderTextField } from '../renderFields';
+import { checkCommonConfig } from '../validate';
+import { RenderTextField } from '../renderFields';
 import { trim } from '../normalize';
 
 const SystemCommonConfigForm = props => {

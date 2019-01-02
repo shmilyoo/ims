@@ -61,7 +61,7 @@ class DeptHeadChange extends React.PureComponent {
       showSelect,
       ...rest
     } = this.props;
-    const { nodeSelected, open, treeData, _id } = this.state;
+    const { open, treeData, _id } = this.state;
     const names = getDeptNamesArraySync(id, deptDic);
     return (
       <React.Fragment>

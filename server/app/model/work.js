@@ -39,10 +39,17 @@ module.exports = app => {
       foreignKey: 'workId',
       constraints: false,
     });
-    Work.hasMany(app.model.WorkChannel, {
+    Work.hasMany(app.model.Channel, {
       as: 'channels',
-      foreignKey: 'workId',
+      foreignKey: 'relativeId',
       constraints: false,
+    });
+    Work.belongsToMany(app.model.User, {
+      as: 'users',
+      constraints: false,
+      through: app.model.UserWork,
+      foreignKey: 'workId',
+      otherKey: 'userId',
     });
     Work.belongsToMany(app.model.User, {
       as: 'usersInCharge',

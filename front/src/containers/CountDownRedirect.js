@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import { withStyles, Grid, Typography } from '@material-ui/core';
 import history from '../history';
 import qs from 'qs';

@@ -1,5 +1,4 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import { Grid, Button, Divider } from '@material-ui/core';
 import { Field, FieldArray, reduxForm } from 'redux-form';
 import compose from 'recompose/compose';
@@ -99,7 +98,7 @@ class WorkForm extends React.PureComponent {
               />
             </Grid>
           </Grid>
-          <Grid item xs>
+          <Grid item>
             <Field
               name="usersInCharge"
               deptArray={deptArray}
@@ -108,7 +107,7 @@ class WorkForm extends React.PureComponent {
               validate={required}
             />
           </Grid>
-          <Grid item xs>
+          <Grid item>
             <Field
               name="usersAttend"
               deptArray={deptArray}
@@ -116,7 +115,7 @@ class WorkForm extends React.PureComponent {
               component={RenderUserPicker}
             />
           </Grid>
-          <Grid item xs>
+          <Grid item>
             {/* todo 更改为富文本编辑器 */}
             <Field
               name="content"

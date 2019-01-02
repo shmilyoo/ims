@@ -204,7 +204,7 @@ export const checkArrayDuplicated = (valueGetFuc, ...arrays) => {
  */
 export const checkFromToDate = (from, to, allowToEmpty = true) => {
   if (!to && !allowToEmpty) return '结束时间不能为空';
-  if (from && to && from >= to) return '结束时间应为空或者大于开始时间';
+  if (from && to && from >= to) return '结束应大于开始';
 };
 
 export const checkCommonConfig = values => {
@@ -229,3 +229,19 @@ export const checkCommonConfig = values => {
   }
   return error;
 };
+
+// export const checkTaskForm = ({ schedules }) => {
+//   const error = {};
+//   if (schedules && schedules.length > 0) {
+//     schedules.forEach(({ from, to }, index) => {
+//       const err = checkFromToDate(from, to, false);
+//       if (err) {
+//         error.schedules = [{ to: err }];
+//         // if (error.schedules) {
+//         //   Object.assign({},error.schedules,)
+//         // }
+//       }
+//     });
+//   }
+//   return error;
+// };

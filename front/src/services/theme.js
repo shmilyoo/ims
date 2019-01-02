@@ -1,6 +1,4 @@
-import React from 'react';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import { createMuiTheme } from '@material-ui/core/styles';
 
 // A theme with custom primary and secondary color.
 // It's optional.
@@ -93,6 +91,7 @@ const theme = createMuiTheme({
     grayLink: {
       cursor: 'pointer',
       color: secondaryTextColor,
+      textDecoration: 'none',
       '&:visited': { color: secondaryTextColor },
       '&:hover': { textDecoration: 'underline' }
     },

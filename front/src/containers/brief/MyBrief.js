@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import { Grid } from '@material-ui/core';
 
 class MyBrief extends PureComponent {
@@ -13,7 +12,5 @@ class MyBrief extends PureComponent {
     );
   }
 }
-
-MyBrief.propTypes = {};
 
 export default MyBrief;

@@ -37,8 +37,14 @@ export const pathTitle = {
   '/work/info': '查看工作',
   '/work/edit': '编辑大项工作',
   '/work/article/add': '添加工作文章',
-  '/dept': '我的部门',
+  '/work/article/edit': '编辑工作文章',
+  '/work/task/add': '添加工作的任务',
+  '/work/task/edit': '编辑工作的任务',
+  '/work/task/info': '查看任务',
+  '/work/task/add/success': '添加任务成功',
+  '/dept/mine': '我的部门',
   '/dept/work': '部门工作',
+  '/dept/info': '查看部门情况',
   '/dept-manage/announcement': '部门公告',
   '/dept-manage/work': '部门工作',
   '/dept-manage/work/add': '发布工作',
@@ -79,11 +85,11 @@ export const leftMenu = [
     ]
   },
   {
-    title: '我的部门',
+    title: '部门信息',
     state: 'dept', // 用于有子元素的菜单，在this.state中标记下拉是否展开
     icon: AccountBox,
     children: [
-      { title: pathTitle['/dept'], path: '/dept' },
+      { title: pathTitle['/dept/mine'], path: '/dept/mine' },
       { title: pathTitle['/dept/work'], path: '/dept/work' }
     ]
   },
