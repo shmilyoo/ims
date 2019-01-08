@@ -102,7 +102,7 @@ const RenderAddMultiSchedules = ({
               <Grid item xs={1}>
                 <Field
                   name={`${schedule}.from`}
-                  label="开始时间*"
+                  label="开始*"
                   dateFormat="HH:mm"
                   timeFormat="HH:mm"
                   showTimeSelect
@@ -118,7 +118,7 @@ const RenderAddMultiSchedules = ({
               <Grid item xs={1}>
                 <Field
                   name={`${schedule}.to`}
-                  label="结束时间*"
+                  label="结束*"
                   dateFormat="HH:mm"
                   timeFormat="HH:mm"
                   showTimeSelect

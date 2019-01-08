@@ -5,7 +5,7 @@ import DeptHeadChange from '../../components/common/DeptHeadChange';
 import compose from 'recompose/compose';
 import { Grid, Divider } from '@material-ui/core';
 import { actions as accountActions } from '../../reducers/account';
-import WorkList from '../../components/work/WorkList';
+// import WorkList from '../../components/work/WorkList';
 import { getDeptWorks, getNumberPerPage } from '../../services/utility';
 
 class DeptBulletin extends PureComponent {
@@ -54,14 +54,14 @@ class DeptBulletin extends PureComponent {
           <Divider />
         </Grid>
         <Grid item>
-          <WorkList
+          {/* <WorkList
             admin={true}
             totalNumber={totalNumber}
             currentPage={currentPage}
             numberPerPage={numberPerPage}
             workList={workList}
             hideColumns={['dept']}
-          />
+          /> */}
         </Grid>
       </Grid>
     );

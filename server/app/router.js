@@ -18,11 +18,13 @@ module.exports = app => {
   router.get('/account/info', checkUser, controller.account.accountInfo);
   router.post('/account/info', checkUser, controller.account.setUserInfo);
   router.post('/articles', checkUser, controller.article.getArticles);
+  router.post('/article/delete', checkUser, controller.article.deleteArticles);
   router.get('/dept/all', controller.dept.all);
   router.get('/dept/users', checkUser, controller.dept.deptUsers);
   router.get('/dept/managers', checkUser, controller.dept.deptManagers);
   router.post('/dept/managers', checkUser, controller.dept.setDeptManagers);
   router.post('/dept/works', checkUser, controller.dept.deptWorks);
+  router.post('/channel/delete', checkUser, controller.channel.deleteChannel);
   router.post('/work/add', checkUser, controller.work.addWork);
   router.post('/work/del', checkUser, controller.work.delWork);
   router.post('/work/info', checkUser, controller.work.workInfo);
@@ -35,12 +37,14 @@ module.exports = app => {
     checkUser,
     controller.work.updateWorkChannel
   );
-  router.post(
-    '/work/channel/delete',
-    checkUser,
-    controller.work.deleteWorkChannel
-  );
   router.post('/work/tasks', checkUser, controller.work.getWorkTasks);
+  router.post('/work/article/add', checkUser, controller.work.addWorkArticle);
+  router.post(
+    '/work/article/update',
+    checkUser,
+    controller.work.updateWorkArticle
+  );
+  router.post('/work/article', checkUser, controller.work.getWorkArticle);
   router.post('/task/add', checkUser, controller.work.addTask);
   router.post('/cache/updateAll', controller.cache.updateAll);
   router.get('/system/all', controller.system.allConfig);

@@ -12,7 +12,7 @@ const SystemCommonConfigForm = props => {
     <form onSubmit={handleSubmit}>
       <Grid item container direction="column">
         <Grid item container spacing={8} alignItems="center">
-          <Grid item xs={4}>
+          <Grid item xs>
             <Field
               name="allowExts"
               component={RenderTextField}

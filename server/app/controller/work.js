@@ -12,6 +12,7 @@ class WorkController extends Controller {
       tagId,
       deptId,
       content,
+      attachments,
       usersInCharge,
       usersAttend,
       phases,
@@ -37,7 +38,10 @@ class WorkController extends Controller {
         true
       );
       if (phases && phases.length > 0) {
-        work.phases = await ctx.service.work.addPhases(phases, work.id);
+        work.phases = await ctx.service.work.dealPhases(phases, work.id);
+      }
+      if (attachments && attachments.length > 0) {
+        await ctx.service.work.dealAttachments(attachments, work.id);
       }
       await transaction.commit();
       ctx.body = ctx.helper.getRespBody(true, work);
@@ -85,6 +89,7 @@ class WorkController extends Controller {
       withTag,
       withPhases,
       withAttachments,
+      order,
     } = ctx.request.body;
     if (!id) ctx.throw('错误的请求参数-id');
     const include = ctx.service.work.getWorkIncludeModelSync({
@@ -98,9 +103,11 @@ class WorkController extends Controller {
       withPhases,
       withAttachments,
     });
+    const _order = ctx.service.work.getWorkOrderSync(order);
     const work = await ctx.model.Work.findOne({
       where: { id },
       include,
+      order: _order,
     });
     ctx.body = ctx.helper.getRespBody(!!work, work || '找不到请求的工作记录');
   }
@@ -173,6 +180,7 @@ class WorkController extends Controller {
         tagId,
         deptId,
         content,
+        attachments,
         usersInCharge,
         usersAttend,
         phases,
@@ -193,8 +201,12 @@ class WorkController extends Controller {
         id,
         true
       );
-      await ctx.model.Phase.destroy({ where: { workId: id } });
-      await ctx.service.work.addPhases(phases, id);
+      if (attachments && attachments.length > 0) {
+        await ctx.service.work.dealAttachments(attachments, id);
+      }
+      if (phases && phases.length > 0) {
+        await ctx.service.work.dealPhases(phases, id);
+      }
       await transaction.commit();
       ctx.body = ctx.helper.getRespBody(true);
     } catch (error) {
@@ -206,7 +218,7 @@ class WorkController extends Controller {
     const ctx = this.ctx;
     const { workId } = ctx.query;
     if (!workId) ctx.throw('错误的请求参数！');
-    const channels = await ctx.service.work.getWorkChannel(workId);
+    const channels = await ctx.service.channel.getChannels('work', workId);
     ctx.body = ctx.helper.getRespBody(true, channels);
   }
 
@@ -217,8 +229,13 @@ class WorkController extends Controller {
       values: { name, content, order },
     } = ctx.request.body;
     if (!workId || !name) ctx.throw('错误的请求参数！');
-    await ctx.model.WorkChannel.create({ workId, name, content, order });
-    const channels = await ctx.service.work.getWorkChannel(workId);
+    await ctx.model.WorkChannel.create({
+      workId,
+      name,
+      content,
+      order,
+    });
+    const channels = await ctx.service.channel.getChannels('work', workId);
     ctx.body = ctx.helper.getRespBody(true, channels);
   }
 
@@ -233,30 +250,7 @@ class WorkController extends Controller {
       { name, content, order },
       { where: { id } }
     );
-    const channels = await ctx.service.work.getWorkChannel(workId);
-    ctx.body = ctx.helper.getRespBody(true, channels);
-  }
-
-  async deleteWorkChannel() {
-    // todo 待验证
-    const ctx = this.ctx;
-    const { id, workId } = ctx.request.body;
-    if (!id || !workId) ctx.throw('错误的请求参数！');
-    const count = await ctx.model.Article.count({
-      include: [
-        {
-          model: ctx.model.WorkChannel,
-          as: 'channel',
-          where: { workId },
-        },
-      ],
-    });
-    if (count) {
-      ctx.body = ctx.helper.getRespBody(false, '无法删除包含文章的频道');
-      return;
-    }
-    await ctx.model.WorkChannel.destroy({ where: { id } });
-    const channels = await ctx.service.work.getWorkChannel(workId);
+    const channels = await ctx.service.channel.getChannels('work', workId);
     ctx.body = ctx.helper.getRespBody(true, channels);
   }
 
@@ -264,21 +258,33 @@ class WorkController extends Controller {
     const ctx = this.ctx;
     const {
       workId,
-      numberPerPage = 20,
-      currentPage = 1,
-      orderBy = 'createTime',
-      direction = 'desc',
+      numberPerPage,
+      currentPage,
+      withPublisher,
+      withUsers,
+      withWork,
+      withDept,
+      order,
     } = ctx.request.body;
     if (!workId) ctx.throw('错误的任务请求参数');
-    const { count, tasks } = await ctx.model.Task.findAndCountAll({
+    const _order = ctx.service.work.getWorkTaskOrderSync(order);
+    const include = ctx.service.work.getWorkTasksIncludeSync({
+      withPublisher,
+      withUsers,
+      withWork,
+      withDept,
+    });
+    const { count, rows } = await ctx.model.Task.findAndCountAll({
       where: { workId },
+      include,
+      attributes: { exclude: [ 'content' ] },
       limit: numberPerPage,
       offset: (currentPage - 1) * numberPerPage,
-      order: [[ orderBy, direction ]],
+      order: _order,
     });
     ctx.body = ctx.helper.getRespBody(true, {
       totalNumber: count,
-      taskList: tasks || [],
+      taskList: rows || [],
     });
   }
 
@@ -319,7 +325,7 @@ class WorkController extends Controller {
         false
       );
       if (attachments && attachments.length > 0) {
-        ctx.service.work.dealAttachments(attachments, task.id);
+        await ctx.service.work.dealAttachments(attachments, task.id);
       }
       if (addSchedules && schedules && schedules.length > 0) {
         // schedules:[{title,date,from,to,content,toUsers:[{id,name}..]}]
@@ -357,6 +363,102 @@ class WorkController extends Controller {
       await transaction.rollback();
       ctx.body = ctx.helper.getRespBody(false, error.message);
     }
+  }
+
+  async addWorkArticle() {
+    const ctx = this.ctx;
+    const {
+      values: { title, channelId, content, attachments },
+    } = ctx.request.body;
+    const transaction = await ctx.model.transaction();
+    try {
+      const now = ctx.helper.timeFunctions.getNowUnix();
+      const article = await ctx.service.article.addArticle(
+        {
+          publisherId: ctx.user.id,
+          title,
+          content,
+          channelId,
+          createTime: now,
+          updateTime: now,
+        },
+        'work'
+      );
+      if (attachments && attachments.length > 0) {
+        await ctx.service.work.dealAttachments(attachments, article.id);
+      }
+      await transaction.commit();
+      ctx.body = ctx.helper.getRespBody(true, {
+        articleId: article.id,
+        channelId,
+      });
+    } catch (error) {
+      await transaction.rollback();
+      ctx.body = ctx.helper.getRespBody(false, error.message);
+    }
+  }
+
+  async updateWorkArticle() {
+    const ctx = this.ctx;
+    const { channelId, title, content, id, attachments } = ctx.query.body;
+    if (!id) ctx.throw('错误的请求参数');
+    const transaction = await ctx.model.transaction();
+    try {
+      const now = ctx.helper.timeFunctions.getNowUnix();
+      const nowFormat = ctx.helper.timeFunctions.formatFromUnix(
+        now,
+        'datetime'
+      );
+      const { name } = await ctx.model.User.findOne({
+        where: { id: ctx.user.id },
+      });
+      const [ count, rows ] = await ctx.model.WorkArticle.update(
+        {
+          channelId,
+          title,
+          content,
+          updateTime: now,
+          lastEdit: `文章在${nowFormat}由<a href='/user?id=${
+            ctx.user.id
+          }'>${name}</a>进行编辑`,
+        },
+        { where: { id } }
+      );
+      if (count !== 1) throw `错误的更新数量，更新了${count}个文章`;
+      if (attachments && attachments.length > 0) {
+        await ctx.service.work.dealAttachments(attachments, id);
+      }
+      await transaction.commit();
+      ctx.body = ctx.helper.getRespBody(true, rows[0]);
+    } catch (error) {
+      await transaction.rollback();
+      ctx.body = ctx.helper.getRespBody(false, error.message);
+    }
+  }
+
+  async getWorkArticle() {
+    const ctx = this.ctx;
+    const {
+      id,
+      withPublisher,
+      withChannel,
+      withWork,
+      withDept,
+      withAttachments,
+    } = ctx.request.body;
+    if (!id) ctx.throw('错误的请求参数');
+    const include = ctx.service.work.getWorkArticleIncludeSync({
+      withPublisher,
+      withChannel,
+      withWork,
+      withDept,
+      withAttachments,
+    });
+    const article = await ctx.model.WorkArticle.findOne({
+      where: { id },
+      include,
+    });
+    ctx.body = ctx.helper.getRespBody(true, article);
   }
 }
 

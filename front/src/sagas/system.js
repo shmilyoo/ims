@@ -1,4 +1,4 @@
-import { fork, take, put, call } from 'redux-saga/effects';
+import { fork, take, put, call, all } from 'redux-saga/effects';
 import { stopSubmit } from 'redux-form';
 import axios from 'axios';
 import { types as systemTypes } from '../reducers/system';
@@ -82,6 +82,7 @@ function* getSystemConfig() {
       configs.pmFrom = Number.parseInt(configs.pmFrom) || 0;
       configs.pmTo = Number.parseInt(configs.pmTo) || 0;
       yield put(systemActions.setCommonConfig(configs));
+      yield put(systemActions.prerequisiteSystem());
     }
   }
 }
@@ -119,7 +120,19 @@ function* getDepts() {
         deptDic[dept.id] = dept;
       });
       yield put(systemActions.setDepts(deptArray, deptDic));
+      yield put(systemActions.prerequisiteDept());
     }
+  }
+}
+
+function* prerequisite() {
+  while (true) {
+    yield all([
+      take(systemTypes.PREREQUISITE_ACCOUNT),
+      take(systemTypes.PREREQUISITE_DEPT),
+      take(systemTypes.PREREQUISITE_SYSTEM)
+    ]);
+    yield put(systemActions.setPrerequisite());
   }
 }
 
@@ -131,5 +144,6 @@ export default [
   fork(saveTimeScale),
   fork(getSystemConfig),
   fork(saveCommonConfig),
-  fork(getDepts)
+  fork(getDepts),
+  fork(prerequisite)
 ];

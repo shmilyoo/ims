@@ -9,18 +9,22 @@ import {
   ListItemText,
   withStyles,
   Paper,
-  Typography
+  Typography,
+  IconButton
 } from '@material-ui/core';
-import Axios from 'axios';
-import ArticleList from '../../../components/common/ArticleList';
+import Edit from '@material-ui/icons/Edit';
 import {
   getNumberPerPage,
   setNumberPerPage,
-  getArticles
+  getArticles,
+  getWorkChannels,
+  delArticles,
+  timeFunctions
 } from '../../../services/utility';
+import history from '../../../history';
+import TableList from '../../../components/common/TableList';
 
 const style = theme => ({
-  listItem: {},
   left: {
     width: '20rem'
   },
@@ -30,9 +34,17 @@ const style = theme => ({
 
 class ManageWorkArticles extends React.PureComponent {
   state = {
+    rows: null,
+    columns: [
+      ['title', '标题', false],
+      ['channel', '所属频道', false],
+      ['publisher', '发布人', false],
+      ['createTime', '创建时间', true],
+      ['updateTime', '更新时间', true],
+      ['edit', '', false]
+    ],
     channels: null,
-    selectedChannel: {},
-    articleList: null,
+    selectedChannel: null,
     numberPerPage: getNumberPerPage(),
     currentPage: 1,
     totalNumber: 0,
@@ -41,94 +53,161 @@ class ManageWorkArticles extends React.PureComponent {
     orderDirection: 'desc'
   };
   componentDidMount() {
-    this.getWorkChannels();
+    const { id } = this.props;
+    const { numberPerPage, currentPage } = this.state;
+    Promise.all([
+      getWorkChannels(id),
+      getArticles({
+        from: 'work',
+        channelParentId: id,
+        channelId: 'all',
+        numberPerPage,
+        currentPage,
+        withPublisher: true,
+        withChannel: true,
+        order: { updateTime: 'desc' }
+      })
+    ]).then(([resChannels, resArticles]) => {
+      if (resChannels.success && resArticles.success) {
+        const { totalNumber, articleList } = resArticles.data;
+        this.setState({
+          channels: resChannels.data,
+          totalNumber,
+          rows: this.formatArticles(articleList)
+        });
+      }
+    });
   }
   channelItemClick = channel => {
-    if (channel.id === this.state.selectedChannel.id) {
-      // 取消选择channel
-      this.setState({ selectedChannel: {}, currentPage: 1 }, () => {
-        this.showChannelArticles();
+    if (
+      !this.state.selectedChannel ||
+      channel.id !== this.state.selectedChannel.id
+    ) {
+      // 获取对应channel的文章
+      this.setState({ selectedChannel: channel }, () => {
+        this.showChannelArticles(1);
       });
     } else {
-      // 获取对应channel的文章
-      this.setState({ selectedChannel: channel, currentPage: 1 }, () => {
-        this.showChannelArticles();
+      // 取消选择channel
+      this.setState({ selectedChannel: null }, () => {
+        this.showChannelArticles(1);
       });
     }
   };
-  showChannelArticles = () => {
+  showChannelArticles = (page = 1) => {
     const { id: workId } = this.props;
     const {
       numberPerPage,
-      currentPage,
+      selectedChannel,
       orderBy,
-      orderDirection,
-      selectedChannel
+      orderDirection
     } = this.state;
     getArticles({
       from: 'work',
-      relativeId: workId,
-      channelId: selectedChannel.id,
+      channelParentId: workId,
+      channelId: selectedChannel ? selectedChannel.id : 'all',
       numberPerPage,
-      currentPage,
-      orderBy,
-      orderDirection,
-      withChannel: true,
+      currentPage: page,
       withPublisher: true,
-      withRelative: false
+      withChannel: true,
+      order: { [orderBy]: orderDirection }
     }).then(res => {
       if (res.success) {
         const { totalNumber, articleList } = res.data;
-        this.setState({ articleList, totalNumber });
+        this.setState({
+          rows: this.formatArticles(articleList),
+          totalNumber,
+          currentPage: page
+        });
       }
     });
   };
-  getWorkChannels = () => {
-    // 获取work基本信息和phase信息
-    Axios.get(`/work/channels?workId=${this.props.id}`).then(res => {
-      if (res.success) {
-        this.setState({ channels: res.data });
-      }
-    });
+
+  formatArticles = articleList => {
+    return articleList.map(
+      ({ id, title, channel, publisher, createTime, updateTime }) => ({
+        id,
+        title: (
+          <Link
+            className={this.props.classes.link}
+            to={`/work/article?id=${id}`}
+          >
+            {title}
+          </Link>
+        ),
+        channel: <Typography>{channel.name}</Typography>,
+        publisher: (
+          <Link
+            className={this.props.classes.link}
+            to={`/user/info?id=${publisher.id}`}
+          >
+            {publisher.name}
+          </Link>
+        ),
+        createTime: (
+          <Typography>{timeFunctions.formatFromUnix(createTime)}</Typography>
+        ),
+        updateTime: (
+          <Typography>{timeFunctions.formatFromUnix(updateTime)}</Typography>
+        ),
+        edit: (
+          <IconButton
+            className={this.props.classes.padding5}
+            onClick={() => {
+              history.push(`/work/article/edit?id=${id}`);
+            }}
+          >
+            <Edit />
+          </IconButton>
+        )
+      })
+    );
   };
+
   handleSelectedChange = ids => {
     this.setState({ selectedIds: ids });
   };
+
   handleChangeRowsPerPage = rowsPerPage => {
     this.setState(
       {
         numberPerPage: setNumberPerPage(rowsPerPage),
-        articleList: null,
-        currentPage: 1
+        articleList: null
       },
       () => {
-        this.showChannelArticles();
+        this.showChannelArticles(1);
       }
     );
   };
   handlePageChagne = page => {
-    this.setState({ workList: null });
-    this.getWorkList(page);
+    this.setState({ rows: null });
+    this.showChannelArticles(page);
   };
   handleChangeOrder = (name, direction) => {
     this.setState(
       {
         orderBy: name,
-        orderDirection: direction || 'asc'
+        orderDirection: direction || 'desc'
       },
-      () => this.getWorkList(1)
+      () => this.showChannelArticles(1)
     );
   };
-  handleMultiDelWorks = () => {
+  handleMultiDelArticles = () => {
     if (!this.state.selectedIds.length) return;
-    this.setState({ alertOpen: true });
+    delArticles(this.state.selectedIds, 'work').then(res => {
+      if (res.success) {
+        this.showChannelArticles(1);
+        this.setState({ selectedIds: [] });
+      }
+    });
   };
   render() {
     const { classes, id: workId } = this.props;
     const {
+      rows,
+      columns,
       channels,
       selectedChannel,
-      articleList,
       numberPerPage,
       currentPage,
       totalNumber,
@@ -171,36 +250,47 @@ class ManageWorkArticles extends React.PureComponent {
             <Grid item>
               <Link
                 className={classes.link}
-                to={`/work/article/add?workId=${workId}&channelId=${selectedChannel.id ||
-                  ''}`}
+                to={`/work/article/add?workId=${workId}&channelId=${
+                  selectedChannel ? selectedChannel.id : ''
+                }`}
               >
                 添加工作文章
               </Link>
             </Grid>
             <Grid item>
-              <Typography className={classes.link}>删除</Typography>
+              <Typography
+                className={
+                  selectedIds && selectedIds.length > 0
+                    ? classes.link
+                    : classes.disableLink
+                }
+                onClick={
+                  selectedIds && selectedIds.length > 0
+                    ? this.handleMultiDelArticles
+                    : () => {}
+                }
+              >
+                删除
+              </Typography>
             </Grid>
             <Grid item>
               <Typography className={classes.disableLink}>移动</Typography>
             </Grid>
           </Grid>
-          <Grid item>
-            <ArticleList
-              admin={true}
+          <Grid item xs>
+            <TableList
+              rows={rows}
+              columns={columns}
               selectedIds={selectedIds}
               totalNumber={totalNumber}
               currentPage={currentPage}
               numberPerPage={numberPerPage}
-              articleList={articleList}
-              // hideColumns={['dept']}
-              canChangeOrder={true}
               orderBy={orderBy}
               orderDirection={orderDirection}
               onPageChange={this.handlePageChagne}
               onSelectedChange={this.handleSelectedChange}
               onChangeRowsPerPage={this.handleChangeRowsPerPage}
               onChangeOrder={this.handleChangeOrder}
-              onDelRows={this.handleMultiDelWorks}
             />
           </Grid>
         </Grid>

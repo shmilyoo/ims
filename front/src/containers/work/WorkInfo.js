@@ -9,10 +9,14 @@ import {
   getWorkInfo,
   getDeptArraySync,
   timeFunctions,
-  checkInUsers
+  checkInUsers,
+  checkCanManageWork,
+  checkCanAddTaskArticle
 } from '../../services/utility';
 import compose from 'recompose/compose';
-import TaskListWrapper from './TaskListWrapper';
+import FileList from '../../components/common/FileList';
+import TableList from '../../components/common/TableList';
+import WorkTaskList from './WorkTaskList';
 
 const style = theme => ({
   link: theme.sharedClass.link,
@@ -36,24 +40,25 @@ class WorkInfo extends PureComponent {
     }
     getWorkInfo({
       id: id,
-      withDept: 1,
+      // withDept: 1,
       withChannels: 1,
       withUsers: 1,
       withPublisher: 1,
       withTag: 1,
       withPhases: 1,
-      withAttachments: 1
+      withAttachments: 1,
+      order: { phase: 'asc', user: 'asc' }
     }).then(res => {
       if (res.success) {
-        // todotodo
         const work = { ...res.data, usersInCharge: [], usersAttend: [] };
         res.data.users.forEach(
-          ({ id, name, deptId, userWork: { isInCharge, order } }) => {
-            if (user.userWork.isInCharge) work.usersInCharge.push({});
+          ({ id, name, deptId, userWork: { isInCharge } }) => {
+            if (isInCharge) work.usersInCharge.push({ id, name, deptId });
+            else work.usersAttend.push({ id, name, deptId });
           }
         );
         this.setState({
-          work: res.data,
+          work,
           id
         });
         this.checkAuthority();
@@ -72,14 +77,15 @@ class WorkInfo extends PureComponent {
     const { work } = this.state;
     let canManage = false; // 是否可以编辑work的主要信息
     let canAddTaskArticle = false; // 是否可以添加文章，任务，除了管理者外，参与者也可以
-    if (manageDepts.includes(work.dept.id)) {
-      canManage = true;
-    } else {
-      canManage = checkInUsers(work.usersInCharge, accountId);
-      if (!canManage) {
-        // 没有管理work的权限，才有必要验证是否有权限添加task article
-        canAddTaskArticle = checkInUsers(work.usersAttend, accountId);
-      }
+    canManage = checkCanManageWork(
+      manageDepts,
+      accountId,
+      work.deptId,
+      work.usersInCharge
+    );
+    if (!canManage) {
+      // 没有管理work的权限，才有必要验证是否有权限添加task article
+      canAddTaskArticle = checkCanAddTaskArticle(accountId, work.usersAttend);
     }
     this.setState({ canManage, canAddTaskArticle });
   };
@@ -139,8 +145,8 @@ class WorkInfo extends PureComponent {
           <Grid item xs={12} lg={6}>
             <Typography variant="h6">
               部门:{' '}
-              {work.dept &&
-                getDeptArraySync(work.dept.id, deptDic).map(
+              {work.deptId &&
+                getDeptArraySync(work.deptId, deptDic).map(
                   ({ id, name }, index) => (
                     <span key={id}>
                       {index > 0 && ' - '}
@@ -207,11 +213,15 @@ class WorkInfo extends PureComponent {
           </Typography>
         </Grid>
         <Grid item>
-          <Divider />
+          <Typography variant="h6">工作介绍:</Typography>
         </Grid>
+        <Grid item>{work.content}</Grid>
         {work.phases &&
           work.phases.length > 0 && (
             <Grid item container direction="column" wrap="nowrap">
+              <Grid item>
+                <Divider />
+              </Grid>
               <Grid item>
                 <Typography variant="h6">阶段:</Typography>
               </Grid>
@@ -249,20 +259,25 @@ class WorkInfo extends PureComponent {
                   </Grid>
                 </Grid>
               ))}
+            </Grid>
+          )}
+        {work.attachments &&
+          work.attachments.length > 0 && (
+            <Grid item container direction="column" wrap="nowrap">
               <Grid item>
                 <Divider />
               </Grid>
+              <Grid item>
+                <Typography variant="h6">附件:</Typography>
+              </Grid>
+              <FileList files={work.attachments} />
             </Grid>
           )}
-        <Grid item>
-          <Typography variant="h6">工作介绍:</Typography>
-        </Grid>
-        <Grid item>{work.content}</Grid>
-        <Grid item>
-          <Divider />
-        </Grid>
 
         <Grid item container direction="column" wrap="nowrap">
+          <Grid item>
+            <Divider />
+          </Grid>
           <Grid item container justify="space-between">
             <Grid item>
               <Grid container spacing={16} alignItems="center">
@@ -279,6 +294,16 @@ class WorkInfo extends PureComponent {
                     </Link>
                   </Grid>
                 )}
+                {canManage && (
+                  <Grid item>
+                    <Link
+                      className={classes.grayLink}
+                      to={`/work/edit?type=task&id=${work.id}`}
+                    >
+                      管理
+                    </Link>
+                  </Grid>
+                )}
               </Grid>
             </Grid>
             <Grid item>
@@ -286,12 +311,46 @@ class WorkInfo extends PureComponent {
             </Grid>
           </Grid>
           <Grid item>
-            <TaskListWrapper
-              workId={work.id}
-              canChangeOrder={false}
-              admin={false}
-            />
+            <WorkTaskList workId={work.id} />
           </Grid>
+        </Grid>
+
+        <Grid item>
+          <Divider />
+        </Grid>
+        <Grid item container direction="column" wrap="nowrap">
+          <Grid container spacing={16} alignItems="center">
+            <Grid item>
+              <Typography variant="h6">频道文章:</Typography>
+            </Grid>
+            {(canManage || canAddTaskArticle) && (
+              <Grid item>
+                <Link
+                  className={classes.grayLink}
+                  to={`/work/article/add?workId=${work.id}`}
+                >
+                  添加
+                </Link>
+              </Grid>
+            )}
+          </Grid>
+          <Grid container spacing={16}>
+            <Grid item xs={12} md={6}>
+              频道1
+            </Grid>
+            <Grid item xs={12} md={6}>
+              频道2
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item>
+          <Divider />
+        </Grid>
+        <Grid item container direction="column" wrap="nowrap">
+          <Grid item>
+            <Typography variant="h6">讨论:</Typography>
+          </Grid>
+          {/* <FileList files={work.attachments} /> */}
         </Grid>
       </Grid>
     );

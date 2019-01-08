@@ -39,9 +39,9 @@ module.exports = app => {
       foreignKey: 'workId',
       constraints: false,
     });
-    Work.hasMany(app.model.Channel, {
+    Work.hasMany(app.model.WorkChannel, {
       as: 'channels',
-      foreignKey: 'relativeId',
+      foreignKey: 'workId',
       constraints: false,
     });
     Work.belongsToMany(app.model.User, {
@@ -74,6 +74,11 @@ module.exports = app => {
       },
       foreignKey: 'workId',
       otherKey: 'userId',
+    });
+    Work.hasMany(app.model.Attachment, {
+      as: 'attachments',
+      foreignKey: 'relativeId',
+      constraints: false,
     });
   };
 

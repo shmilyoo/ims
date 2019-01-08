@@ -62,15 +62,17 @@ class Home extends React.Component {
     leftOpen: true
   };
   componentDidMount() {
-    this.props.dispatch(accountActions.sagaGetAccountInfo());
-    this.props.dispatch(systemActions.sagaGetDepts());
-    this.props.dispatch(systemActions.sagaGetSystemConfig());
+    if (!this.props.prerequisite) {
+      this.props.dispatch(accountActions.sagaGetAccountInfo());
+      this.props.dispatch(systemActions.sagaGetDepts());
+      this.props.dispatch(systemActions.sagaGetSystemConfig());
+    }
   }
   handleMenuClick = () => {
     this.setState({ leftOpen: !this.state.leftOpen });
   };
   render() {
-    const { classes, deptArray } = this.props;
+    const { classes, prerequisite } = this.props;
     return (
       <div className={classes.homeRoot}>
         <LeftNav menu={leftMenu} open={this.state.leftOpen} header={sysName} />
@@ -87,7 +89,7 @@ class Home extends React.Component {
             <AppHead type="user" onMenuClick={this.handleMenuClick} />
           </Grid>
           <Grid item xs className={classes.main}>
-            {deptArray ? (
+            {prerequisite ? (
               <Switch>
                 <Route path="/brief" component={Brief} />
                 <Route path="/work" component={Work} />
@@ -112,8 +114,7 @@ class Home extends React.Component {
 }
 function mapStateToProps(state) {
   return {
-    // id: state.account.id
-    deptArray: state.system.deptArray
+    prerequisite: state.system.prerequisite
   };
 }
 

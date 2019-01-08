@@ -1,6 +1,7 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Grid, Button, Divider } from '@material-ui/core';
-import { Field, FieldArray, reduxForm } from 'redux-form';
+import { Field, FieldArray, reduxForm, focus } from 'redux-form';
 import compose from 'recompose/compose';
 import setMinutes from 'date-fns/setMinutes';
 import setHours from 'date-fns/setHours';
@@ -9,7 +10,8 @@ import {
   RenderTextField,
   RenderDatePicker,
   RenderWorkPhase,
-  RenderInputSelect
+  RenderInputSelect,
+  RenderFileUpload
 } from '../renderFields';
 import { formatUnixTimeToDate, parseDateToUnixTime } from '../formatParse';
 import {
@@ -19,8 +21,15 @@ import {
 } from '../validate';
 import { trim } from '../normalize';
 import RenderDeptPicker from '../renderFields/renderDeptPicker';
+import { attachmentUploadUrl } from '../../config';
 
 class WorkForm extends React.PureComponent {
+  handleDeletePhase = _index => {
+    this.props.change(`phases[${_index}].type`, 'delete');
+    // 手动focus 对应行才隐藏，已经提了issue
+    this.props.dispatch(focus(this.props.form, `phases[${_index}].type`));
+  };
+
   render() {
     const {
       pristine,
@@ -31,6 +40,7 @@ class WorkForm extends React.PureComponent {
       canSelectIdList,
       deptArray,
       deptDic,
+      allowExts,
       tags,
       edit = false
     } = this.props;
@@ -126,11 +136,26 @@ class WorkForm extends React.PureComponent {
               normalize={trim}
             />
           </Grid>
+          <Grid item>
+            <Divider />
+          </Grid>
+          <Grid item>
+            <Field
+              name="attachments"
+              component={RenderFileUpload}
+              allowExts={allowExts ? allowExts.split(';') : undefined}
+              apiUrl={attachmentUploadUrl}
+            />
+          </Grid>
           <Grid item xs>
             <Divider />
           </Grid>
           <Grid item>
-            <FieldArray name="phases" component={RenderWorkPhase} />
+            <FieldArray
+              name="phases"
+              onDeletePhase={this.handleDeletePhase}
+              component={RenderWorkPhase}
+            />
           </Grid>
           <Grid item>
             <Button
@@ -156,4 +181,11 @@ class WorkForm extends React.PureComponent {
   }
 }
 
-export default compose(reduxForm())(WorkForm);
+function mapStateToProps(state, ownProps) {
+  return {};
+}
+
+export default compose(
+  reduxForm(),
+  connect(mapStateToProps)
+)(WorkForm);

@@ -42,20 +42,29 @@ class WorkService extends Service {
     ).bulkCreate(usersArrayInWorkTask);
   }
 
-  async addPhases(phases, workId) {
+  async dealPhases(phases, workId) {
     if (phases && phases.length > 0) {
-      return this.ctx.model.Phase.bulkCreate(
-        phases.map(phase => Object.assign(phase, { workId }))
-      );
+      const addList = [];
+      const deleteList = [];
+      phases.forEach(phase => {
+        if (phase.type === 'add') addList.push(phase);
+        if (phase.type === 'delete' && phase.id) deleteList.push(phase.id);
+      });
+      if (addList.length > 0) {
+        await this.ctx.model.Phase.bulkCreate(
+          addList.map(phase => Object.assign(phase, { workId }))
+        );
+      }
+      if (deleteList.length > 0) {
+        await this.ctx.model.Phase.destroy({
+          where: {
+            id: {
+              [this.ctx.model.Op.in]: deleteList,
+            },
+          },
+        });
+      }
     }
-    return null;
-  }
-  async getWorkChannel(workId) {
-    const channels = await this.ctx.model.WorkChannel.findAll({
-      where: { workId },
-      order: [ 'order' ],
-    });
-    return channels;
   }
 
   getWorkIncludeModelSync({
@@ -120,7 +129,7 @@ class WorkService extends Service {
     }
     if (withChannels) {
       include.push({
-        model: ctx.model.Channel,
+        model: ctx.model.WorkChannel,
         as: 'channels',
         attributes: [ 'id', 'name' ],
       });
@@ -144,6 +153,183 @@ class WorkService extends Service {
       });
     }
     return include;
+  }
+
+  getWorkArticleIncludeSync({
+    withPublisher,
+    withChannel,
+    withWork,
+    withDept,
+    withAttachments,
+  }) {
+    const ctx = this.ctx;
+    const include = [];
+    if (withPublisher) {
+      include.push({
+        model: ctx.model.User,
+        as: 'publisher',
+        attributes: [ 'id', 'name' ],
+      });
+    }
+    if (withAttachments) {
+      include.push({
+        model: ctx.model.Attachment,
+        as: 'attachments',
+      });
+    }
+    if (withChannel) {
+      include.push({
+        model: ctx.model.WorkChannel,
+        as: 'channel',
+        attributes: [ 'id' ],
+        include: withWork
+          ? [
+            {
+              model: ctx.model.Work,
+              as: 'work',
+              attributes: [ 'id', 'title' ],
+              include: withDept
+                ? [
+                  {
+                    model: ctx.model.Dept,
+                    as: 'dept',
+                    attributes: [ 'id', 'name' ],
+                  },
+                ]
+                : [],
+            },
+          ]
+          : [],
+      });
+    }
+    return include;
+  }
+
+  getWorkTasksIncludeSync({ withPublisher, withUsers, withWork, withDept }) {
+    const ctx = this.ctx;
+    const include = [];
+    if (withPublisher) {
+      include.push({
+        model: ctx.model.User,
+        as: 'publisher',
+        attributes: [ 'id', 'name' ],
+      });
+    }
+    if (withUsers) {
+      include.push({
+        model: ctx.model.User,
+        as: 'users',
+        through: {
+          attributes: [ 'isInCharge' ],
+        },
+        attributes: [ 'id', 'name', 'deptId' ],
+      });
+    }
+    if (withWork) {
+      include.push({
+        model: ctx.model.Work,
+        as: 'work',
+        attributes: [ 'id', 'title' ],
+        include: withDept
+          ? [
+            {
+              model: ctx.model.Dept,
+              as: 'dept',
+              attributes: [ 'id', 'name' ],
+            },
+          ]
+          : [],
+      });
+    }
+    return include;
+  }
+
+  getWorkTaskOrderSync(order) {
+    let _order;
+    if (order) {
+      _order = [];
+      if (order.createTime) {
+        _order.push([ 'createTime', order.createTime ]);
+      }
+      if (order.updateTime) {
+        _order.push([ 'updateTime', order.updateTime ]);
+      }
+      if (order.from) {
+        _order.push([ 'from', order.from ]);
+      }
+      if (order.to) {
+        _order.push([ 'to', order.to ]);
+      }
+    }
+    return _order;
+  }
+
+  getWorkOrderSync(order) {
+    const ctx = this.ctx;
+    let _order;
+    if (order) {
+      _order = [];
+      if (order.phase) {
+        _order.push([
+          {
+            model: ctx.model.Phase,
+            as: 'phases',
+          },
+          'from',
+          order.phase,
+        ]);
+      }
+      if (order.user) {
+        _order.push([
+          {
+            model: ctx.model.User,
+            as: 'users',
+          },
+          ctx.model.UserWork,
+          'order',
+          order.user,
+        ]);
+      } else {
+        if (order.usersInCharge) {
+          _order.push([
+            {
+              model: ctx.model.User,
+              as: 'usersInCharge',
+            },
+            ctx.model.UserWork,
+            'order',
+            order.usersInCharge,
+          ]);
+        }
+        if (order.usersAttend) {
+          _order.push([
+            {
+              model: ctx.model.User,
+              as: 'usersAttend',
+            },
+            ctx.model.UserWork,
+            'order',
+            order.usersAttend,
+          ]);
+        }
+      }
+    }
+    return _order;
+  }
+
+  getWorkArticleOrderSync(order) {
+    // const ctx = this.ctx;
+    let _order;
+    if (order) {
+      _order = [];
+      if (order.createTime) {
+        _order.push([ 'createTime', order.createTime ]);
+      }
+      if (order.updateTime) {
+        _order.push([ 'updateTime', order.updateTime ]);
+      }
+    }
+    return _order;
   }
 
   /**

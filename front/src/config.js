@@ -12,6 +12,9 @@ export const ssoAuthLoginPage = 'http://localhost:3000/auth/login';
 export const ssoLoginPage = 'http://localhost:3000/login';
 export const ssoCheckPage = 'http://localhost:3000/auth/check';
 export const ssoAuthOk = 'http://localhost:4000/auth/ok'; // sso认证成功后，重定向到本地此页面进行cookie和缓存的操作
+
+export const attachmentUploadUrl = '/upload/attachment'; // 附件默认的上传地址
+
 export const userStatusDic = {
   ONDUTY: 'onDuty',
   ONHOLIDAY: 'onHoliday',
@@ -36,7 +39,9 @@ export const pathTitle = {
   '/work/schedule/manage': '日程管理',
   '/work/info': '查看工作',
   '/work/edit': '编辑大项工作',
+  '/work/article': '查看工作文章',
   '/work/article/add': '添加工作文章',
+  '/work/article/add/success': '添加工作文章成功',
   '/work/article/edit': '编辑工作文章',
   '/work/task/add': '添加工作的任务',
   '/work/task/edit': '编辑工作的任务',

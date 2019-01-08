@@ -11,7 +11,11 @@ export const types = {
   SET_DEPTS: 'SYSTEM/SET_DEPTS',
   SET_DEPT_RELATION: 'SYSTEM/SET_DEPT_RELATION',
   SET_TIME_SCALE: 'SYSTEM/SET_TIME_SCALE',
-  SET_TAGS: 'SYSTEM/SET_TAGS'
+  SET_TAGS: 'SYSTEM/SET_TAGS',
+  SET_PREREQUISITE: 'SYSTEM/SET_PREREQUISITE',
+  PREREQUISITE_ACCOUNT: 'SYSTEM/PREREQUISITE_ACCOUNT',
+  PREREQUISITE_DEPT: 'SYSTEM/PREREQUISITE_DEPT',
+  PREREQUISITE_SYSTEM: 'SYSTEM/PREREQUISITE_SYSTEM'
 };
 export const actions = {
   sagaGetTags: () => ({
@@ -66,6 +70,18 @@ export const actions = {
   setCommonConfig: values => ({
     type: types.SET_COMMON_CONFIG,
     values
+  }),
+  setPrerequisite: () => ({
+    type: types.SET_PREREQUISITE
+  }),
+  prerequisiteAccount: () => ({
+    type: types.PREREQUISITE_ACCOUNT
+  }),
+  prerequisiteSystem: () => ({
+    type: types.PREREQUISITE_SYSTEM
+  }),
+  prerequisiteDept: () => ({
+    type: types.PREREQUISITE_DEPT
   })
 };
 
@@ -74,7 +90,8 @@ const initState = {
   // 默认上午8点到11:30，下午14:30到17:30。数字是从0点经过的秒数
   // { amFrom: 28800, amTo: 41400, pmFrom: 52200, pmTo: 63000 }
   deptArray: null,
-  deptDic: null
+  deptDic: null,
+  prerequisite: false
 };
 
 export default (state = initState, action) => {
@@ -99,6 +116,11 @@ export default (state = initState, action) => {
       return {
         ...state,
         ...action.values
+      };
+    case types.SET_PREREQUISITE:
+      return {
+        ...state,
+        prerequisite: true
       };
     default:
       return state;

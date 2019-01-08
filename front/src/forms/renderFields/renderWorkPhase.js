@@ -11,7 +11,7 @@ import { formatUnixTimeToDate, parseDateToUnixTime } from '../formatParse';
 import { required } from '../validate';
 import { trim } from '../normalize';
 
-const renderEduExps = ({ fields }) => {
+const RenderWorkPhases = ({ fields, onDeletePhase }) => {
   return (
     <Grid container direction="column" wrap="nowrap">
       <Grid
@@ -30,7 +30,7 @@ const renderEduExps = ({ fields }) => {
             mini
             color="secondary"
             onClick={() => {
-              fields.push({});
+              fields.push({ type: 'add' });
             }}
           >
             <Add />
@@ -38,7 +38,16 @@ const renderEduExps = ({ fields }) => {
         </Grid>
       </Grid>
       {fields.map((phase, index) => (
-        <Grid key={index} item container spacing={8} alignItems="center">
+        <Grid
+          key={index}
+          style={{
+            display: fields.get(index).type === 'delete' ? 'none' : 'flex'
+          }}
+          item
+          container
+          spacing={8}
+          alignItems="center"
+        >
           <Grid item xs={7}>
             <Field
               name={`${phase}.title`}
@@ -48,7 +57,6 @@ const renderEduExps = ({ fields }) => {
               validate={required}
             />
           </Grid>
-
           <Grid item xs={2}>
             <Field
               name={`${phase}.from`}
@@ -82,7 +90,7 @@ const renderEduExps = ({ fields }) => {
           <Grid item xs={1}>
             <IconButton
               onClick={() => {
-                fields.remove(index);
+                onDeletePhase(index);
               }}
             >
               <Delete color="error" />
@@ -96,10 +104,10 @@ const renderEduExps = ({ fields }) => {
   );
 };
 
-renderEduExps.propTypes = {
+RenderWorkPhases.propTypes = {
   label: PropTypes.string, // 不设置trueLabel和falseLabel时显示的文本
   trueLabel: PropTypes.string, // switch为true的时候显示的文本
   falseLabel: PropTypes.string
 };
 
-export default renderEduExps;
+export default RenderWorkPhases;

@@ -4,6 +4,7 @@ import { md5Passwd, checkCookieLocal } from '../services/utility';
 import axios from 'axios';
 import { types as accountTypes } from '../reducers/account';
 import { actions as accountActions } from '../reducers/account';
+import { actions as systemActions } from '../reducers/system';
 import history from '../history';
 import { ssoLoginPage } from '../config';
 import { getAuth } from '.';
@@ -171,6 +172,7 @@ function* getUserInfoFlow() {
       // data/相当于state的account:
       //  {dept:{id,name,names},info:{status,position},...}
       yield put(accountActions.setAccountInfo(dept, info, manageDepts));
+      yield put(systemActions.prerequisiteAccount());
     }
   }
 }

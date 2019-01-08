@@ -18,7 +18,7 @@ const style = theme => ({
   link: theme.sharedClass.link
 });
 
-class AddWorkArticle extends PureComponent {
+class AddWorkTask extends PureComponent {
   constructor(props) {
     super(props);
     const { workId } = qs.parse(props.location.search, {
@@ -55,7 +55,7 @@ class AddWorkArticle extends PureComponent {
       }
     }
     const { dept, work } = this.state;
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       this.props.dispatch(
         workActions.sagaAddTask(resolve, values, dept.id, work.id)
       );
@@ -132,7 +132,7 @@ class AddWorkArticle extends PureComponent {
   }
 }
 
-AddWorkArticle.propTypes = {};
+AddWorkTask.propTypes = {};
 
 function mapStateToProps(state) {
   return {
@@ -149,4 +149,4 @@ function mapStateToProps(state) {
 export default compose(
   withStyles(style),
   connect(mapStateToProps)
-)(AddWorkArticle);
+)(AddWorkTask);

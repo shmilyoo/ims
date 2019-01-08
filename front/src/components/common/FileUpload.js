@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import path from 'path';
 import axios from 'axios';
 import compose from 'recompose/compose';
+import FileList from './FileList';
 
 const style = theme => ({
   progress: {
@@ -140,7 +141,14 @@ class FileUpload extends PureComponent {
     const { file, fileName, percent, showProgress, error } = this.state;
     return (
       <Grid container direction="column" wrap="nowrap">
-        <Grid item container spacing={8} direction="column" wrap="nowrap">
+        {files &&
+          files.length > 0 && (
+            <Grid item>
+              <Typography variant="body2">附件:</Typography>
+            </Grid>
+          )}
+        <FileList onDelFile={this.delFile} edit={true} files={files} />
+        {/* <Grid item container spacing={8} direction="column" wrap="nowrap">
           {files &&
             files.length > 0 && (
               <Grid item>
@@ -174,7 +182,7 @@ class FileUpload extends PureComponent {
                   </Grid>
                 )
             )}
-        </Grid>
+        </Grid> */}
         <Grid item container spacing={8} alignItems="center">
           <Grid item xs={4}>
             <input
@@ -246,12 +254,18 @@ class FileUpload extends PureComponent {
 }
 
 FileUpload.propTypes = {
+  edit: PropTypes.bool,
   allowTypes: PropTypes.array, // 允许的上传扩展名，不设置为允许所有，扩展名不带.
-  maxSize: PropTypes.number, // 允许上传最大字节数，不设置为不限制
+  maxSize: PropTypes.number, // 允许上传最大字节数，0为不限制
   apiUrl: PropTypes.string, // 服务端接口
-  onChange: PropTypes.func.isRequired, // 受控组件回调
+  onChange: PropTypes.func, // 受控组件回调
   // [{name,path,ext,type?}..],type: add||delete||undefined, 用来后端区别
   files: PropTypes.array
+};
+
+FileUpload.defaultProps = {
+  maxSize: 50 * 1024 * 1024,
+  edit: false
 };
 
 export default compose(withStyles(style))(FileUpload);

@@ -91,10 +91,6 @@ class UserPicker extends PureComponent {
   handleCloseBtn = () => {
     this.setState({ open: false, users: null });
   };
-  // todotodo
-  // 把三个部分的用户建立一个统一的用户id:user dic
-  // 同时建立三个 分别的dic
-  // 循环
 
   handleCheck = type => {
     const { selectedUsers, onUserPickerChange } = this.props;

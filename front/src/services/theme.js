@@ -43,7 +43,7 @@ const theme = createMuiTheme({
     text: {
       primary: primaryTextColor,
       secondary: secondaryTextColor,
-      third: thirdTextColor
+      third: thirdTextColor // 用来表格间隔行的backgroundColor
     }
   },
   typography: {
@@ -77,6 +77,7 @@ const theme = createMuiTheme({
   },
   sharedClass: {
     link: {
+      fontSize: '1.4rem',
       cursor: 'pointer',
       color: primaryTextColor,
       textDecoration: 'none',
@@ -84,11 +85,13 @@ const theme = createMuiTheme({
       '&:hover': { textDecoration: 'underline' }
     },
     disableLink: {
+      fontSize: '1.4rem',
       cursor: 'default',
-      color: secondaryTextColor,
-      '&:hover': { textDecoration: 'line-through' }
+      color: secondaryTextColor
+      // '&:hover': { textDecoration: 'line-through' }
     },
     grayLink: {
+      fontSize: '1.4rem',
       cursor: 'pointer',
       color: secondaryTextColor,
       textDecoration: 'none',
@@ -96,6 +99,7 @@ const theme = createMuiTheme({
       '&:hover': { textDecoration: 'underline' }
     },
     onlyLink: {
+      fontSize: '1.4rem',
       cursor: 'pointer',
       '&:hover': { textDecoration: 'underline' }
     },

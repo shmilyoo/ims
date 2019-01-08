@@ -53,8 +53,26 @@ function* addTaskFlow() {
 //   }
 // }
 
+function* addWorkArticleFlow() {
+  while (true) {
+    const { resolve, values, workId } = yield take(workTypes.SAGA_ADD_ARTICLE);
+    const res = yield axios.post(`/work/article/add`, { values });
+    if (res.success) {
+      const { articleId, channelId } = res.data;
+      yield call(resolve);
+      yield call(
+        history.push,
+        `/work/article/add/success?articleId=${articleId}&&channelId=${channelId}&&workId=${workId}`
+      ); // 跳转到成功页，提示 是继续添加 or 查看文章
+    } else {
+      yield put(stopSubmit('taskForm', { _error: res.error }));
+    }
+  }
+}
+
 export default [
   fork(addWorkFlow),
-  fork(addTaskFlow)
+  fork(addTaskFlow),
+  fork(addWorkArticleFlow)
   // , fork(updateWorkBasicFlow)
 ];

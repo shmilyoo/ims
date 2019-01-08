@@ -1,3 +1,5 @@
+// obsolete because it alreadly have tableList
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -13,6 +15,7 @@ import {
   withStyles,
   TableFooter
 } from '@material-ui/core';
+import { Link } from 'react-router-dom';
 import Edit from '@material-ui/icons/Edit';
 import compose from 'recompose/compose';
 import classnames from 'classnames';
@@ -22,12 +25,15 @@ import CustomTablePaginationActions from '../CustomTablePaginationActions';
 import Loading from '../common/Loading';
 
 const style = theme => ({
-  onlyLink: { ...theme.sharedClass.onlyLink },
+  link: { ...theme.sharedClass.link },
   orderHead: {
     cursor: 'pointer'
   },
   alterRow: {
     backgroundColor: theme.palette.text.third
+  },
+  padding0: {
+    padding: '0px'
   }
 });
 
@@ -50,11 +56,11 @@ class ArticleList extends React.PureComponent {
   };
 
   handleAllCheck = () => {
-    const { onSelectedChange, selectedIds, workList } = this.props;
+    const { onSelectedChange, selectedIds, articleList } = this.props;
     onSelectedChange(
-      selectedIds.length === workList.length
+      selectedIds.length === articleList.length
         ? []
-        : workList.map(work => work.id)
+        : articleList.map(article => article.id)
     );
   };
   handleChangePage = (e, page) => {
@@ -78,6 +84,7 @@ class ArticleList extends React.PureComponent {
   render() {
     const {
       articleList,
+      from,
       numberPerPage,
       currentPage,
       totalNumber,
@@ -97,7 +104,7 @@ class ArticleList extends React.PureComponent {
         <TableHead>
           <TableRow>
             {admin && (
-              <TableCell padding="checkbox">
+              <TableCell className={classes.padding0}>
                 <Checkbox
                   checked={selectedIds.length === articleList.length}
                   onClick={this.handleAllCheck}
@@ -160,7 +167,11 @@ class ArticleList extends React.PureComponent {
                 )}
               </TableCell>
             )}
-            {admin && <TableCell style={{ width: '15rem', padding: '0' }} />}
+            {admin && (
+              <TableCell
+              //  style={{ width: 'auto', padding: '0' }}
+              />
+            )}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -170,7 +181,7 @@ class ArticleList extends React.PureComponent {
               className={classnames({ [classes.alterRow]: index % 2 === 0 })}
             >
               {admin && (
-                <TableCell padding="checkbox">
+                <TableCell className={classes.padding0}>
                   <Checkbox
                     checked={selectedIds.includes(article.id)}
                     onClick={e => this.handleRowClick(e, article.id)}
@@ -179,58 +190,54 @@ class ArticleList extends React.PureComponent {
               )}
               {!hideColumns.includes('sNumber') && (
                 <TableCell scope="row">
-                  {numberPerPage * (currentPage - 1) + index + 1}
+                  <Typography>
+                    {numberPerPage * (currentPage - 1) + index + 1}
+                  </Typography>
                 </TableCell>
               )}
-              <TableCell title={article.content}>
-                <Typography
-                  className={classes.onlyLink}
-                  onClick={() => {
-                    history.push(`/work/info?id=${article.id}`);
-                  }}
+              <TableCell>
+                <Link
+                  className={classes.link}
+                  to={`/${from}/article?id=${article.id}`}
                 >
                   {article.title}
-                </Typography>
+                </Link>
               </TableCell>
               {!hideColumns.includes('channel') && (
                 <TableCell>
-                  <Typography
-                    className={classes.onlyLink}
-                    onClick={() => {
-                      history.push(`/work/channel?id=${article.channel.id}`);
-                    }}
-                  >
-                    {article.dept.name}
-                  </Typography>
+                  <Typography>{article.channel.name}</Typography>
                 </TableCell>
               )}
               {!hideColumns.includes('publisher') && (
                 <TableCell>
-                  <Typography
-                    className={classes.onlyLink}
-                    onClick={() => {
-                      history.push(`/user/info?id=${article.publisher.id}`);
-                    }}
+                  <Link
+                    className={classes.link}
+                    to={`/user/info?id=${article.publisher.id}`}
                   >
                     {article.publisher.name}
-                  </Typography>
+                  </Link>
                 </TableCell>
               )}
               {!hideColumns.includes('createTime') && (
                 <TableCell>
-                  {timeFunctions.formatFromUnix(article.createTime)}
+                  <Typography>
+                    {timeFunctions.formatFromUnix(article.createTime)}
+                  </Typography>
                 </TableCell>
               )}
               {!hideColumns.includes('updateTime') && (
                 <TableCell>
-                  {timeFunctions.formatFromUnix(article.updateTime)}
+                  <Typography>
+                    {timeFunctions.formatFromUnix(article.updateTime)}
+                  </Typography>
                 </TableCell>
               )}
               {admin && (
-                <TableCell style={{ padding: '0' }}>
+                <TableCell className={classes.padding0}>
                   <IconButton
+                    className={classes.padding0}
                     onClick={() => {
-                      history.push(`/work/edit?id=${article.id}`);
+                      history.push(`/${from}/article/edit?id=${article.id}`);
                     }}
                   >
                     <Edit />

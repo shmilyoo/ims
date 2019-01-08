@@ -67,5 +67,24 @@ module.exports = {
 
   timeFunctions: {
     getNowUnix: () => Math.floor(new Date().getTime() / 1000),
+    /**
+     * 从unix时间戳返回日期字符串
+     * @param {number} unix unix 时间戳
+     * @param {string} type 返回的格式，date,datetime,time
+     * @return {string}  返回的时间格式化字符串
+     */
+    formatFromUnix: (unix, type = 'date') => {
+      const date = new Date(unix * 1000);
+      switch (type) {
+        case 'datetime':
+          return `${date.getFullYear()}-${date.getMonth() +
+            1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
+        case 'time':
+          return `${date.getHours()}:${date.getMinutes()}`;
+        default:
+          return `${date.getFullYear()}-${date.getMonth() +
+            1}-${date.getDate()}`;
+      }
+    },
   },
 };

@@ -15,6 +15,7 @@ class AddWork extends PureComponent {
     }
   }
   handleSubmit = values => {
+    // 后台需要重新处理phases逻辑，根据type是add还是delete等判断
     const { usersInCharge, usersAttend } = values;
     let error;
     if (
@@ -38,7 +39,7 @@ class AddWork extends PureComponent {
     });
   };
   render() {
-    const { manageDepts, deptDic, deptArray, tags } = this.props;
+    const { manageDepts, deptDic, deptArray, allowExts, tags } = this.props;
     return (
       <Grid container direction="column" spacing={8} wrap="nowrap">
         <Grid item>
@@ -58,6 +59,7 @@ class AddWork extends PureComponent {
             onSubmit={this.handleSubmit}
             deptArray={deptArray}
             deptDic={deptDic}
+            allowExts={allowExts}
             tags={
               tags
                 ? tags.map(tag => ({
@@ -80,7 +82,8 @@ function mapStateToProps(state) {
     manageDepts: state.account.manageDepts,
     deptDic: state.system.deptDic,
     deptArray: state.system.deptArray,
-    tags: state.system.tags
+    tags: state.system.tags,
+    allowExts: state.system.allowExts
   };
 }
 

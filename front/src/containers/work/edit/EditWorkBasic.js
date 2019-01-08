@@ -8,6 +8,11 @@ import WorkForm from '../../../forms/work/WorkForm';
 import { checkArrayDuplicated, checkFromToDate } from '../../../forms/validate';
 import { actions as systemActions } from '../../../reducers/system';
 import Axios from 'axios';
+import {
+  getWorkInfo,
+  checkCanManageWork,
+  toRedirectPage
+} from '../../../services/utility';
 
 class EditWorkBasic extends React.PureComponent {
   state = {
@@ -17,17 +22,41 @@ class EditWorkBasic extends React.PureComponent {
     if (!this.props.tags) {
       this.props.dispatch(systemActions.sagaGetTags());
     }
-    this.getWorkInfo();
-  }
-  // todo 使用utility中的getworkinfo
-  getWorkInfo = () => {
-    // 获取work基本信息和phase信息
-    Axios.get(`/work/basic?id=${this.props.id}`).then(res => {
+    const { id, accountId, manageDepts } = this.props;
+    getWorkInfo({
+      id: id,
+      withUsers: 1,
+      withPublisher: 1,
+      withPhases: 1,
+      withAttachments: 1,
+      order: { phase: 'asc', user: 'asc' }
+    }).then(res => {
       if (res.success) {
-        this.setState({ work: res.data });
+        const work = { ...res.data, usersInCharge: [], usersAttend: [] };
+        res.data.users.forEach(
+          ({ id, name, deptId, userWork: { isInCharge } }) => {
+            if (isInCharge) work.usersInCharge.push({ id, name, deptId });
+            else work.usersAttend.push({ id, name, deptId });
+          }
+        );
+        this.setState({
+          work
+        });
+        const canManageWork = checkCanManageWork(
+          manageDepts,
+          accountId,
+          work.deptId,
+          work.usersInCharge
+        );
+        if (!canManageWork)
+          toRedirectPage(
+            '没有编辑本工作的权限，重定向到工作信息页',
+            `/work/info?id=${work.id}`
+          );
       }
     });
-  };
+  }
+
   handleSubmit = values => {
     const { usersInCharge, usersAttend } = values;
     let error;
@@ -102,6 +131,7 @@ EditWorkBasic.propTypes = {
 
 function mapStateToProps(state) {
   return {
+    accountId: state.account.id,
     manageDepts: state.account.manageDepts,
     deptDic: state.system.deptDic,
     deptArray: state.system.deptArray,

@@ -33,6 +33,39 @@ export const checkInUsers = (users, id) => {
   return result;
 };
 
+/**
+ * 检查用户是否具有管理work权限
+ * @param {array} manageDepts 用户具有管理权限的dept id 列表
+ * @param {string} userId 用户id
+ * @param {string} workDeptId work所属的dept id
+ * @param {array} usersInCharge work的负责人，[{id,name}...]
+ */
+export const checkCanManageWork = (
+  manageDepts,
+  userId,
+  workDeptId,
+  usersInCharge
+) => {
+  let canManage = false; // 是否可以编辑work的主要信息
+  if (manageDepts.includes(workDeptId)) {
+    canManage = true;
+  } else {
+    canManage = checkInUsers(usersInCharge, userId);
+  }
+  return canManage;
+};
+
+/**
+ * 检查用户是否可以在work中发布task和article，如果用户可以管理work，就不需要调用本函数
+ * @param {string} userId 用户id
+ * @param {array} usersAttend work的參加人，[{id,name}...]
+ */
+export const checkCanAddTaskArticle = (userId, usersAttend) => {
+  let canAddTaskArticle = false; // 是否可以添加文章，任务，除了管理者外，参与者也可以
+  canAddTaskArticle = checkInUsers(usersAttend, userId);
+  return canAddTaskArticle;
+};
+
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
@@ -212,7 +245,8 @@ export const getWorkInfo = ({
   withChannels,
   withTag,
   withPhases,
-  withAttachments
+  withAttachments,
+  order
 }) => {
   return axios.post('/work/info', {
     id,
@@ -224,65 +258,106 @@ export const getWorkInfo = ({
     withChannels,
     withTag,
     withPhases,
-    withAttachments
+    withAttachments,
+    order
   });
 };
 
-/**
- * 获取工作下属任务，用在taskList中
- * @param {Object} param0 task参数
- */
 export const getWorkTasks = ({
   workId,
-  numberPerPage,
-  currentPage,
-  orderBy = 'createTime',
-  orderDirection = 'desc'
+  numberPerPage = 10,
+  currentPage = 1,
+  withPublisher,
+  withUsers,
+  withWork,
+  withDept,
+  order = { updateTime: 'desc' }
 }) => {
   return axios.post('/work/tasks', {
     workId,
     numberPerPage,
     currentPage,
-    orderBy,
-    orderDirection
+    withPublisher,
+    withUsers,
+    withWork,
+    withDept,
+    order
   });
+};
+
+/**
+ * 获取work频道列表
+ * @param {string} workId work的id
+ */
+export const getWorkChannels = workId => {
+  return axios.get(`/work/channels?workId=${workId}`);
+};
+/**
+ * 获取dept频道列表
+ * @param {string} workId work的id
+ */
+export const getDeptChannels = deptId => {
+  return axios.get(`/dept/channels?deptId=${deptId}`);
 };
 
 export const getArticles = ({
   from = 'work', // work or dept
-  relativeId, //  work id or dept id
-  channelId, // 是否限定只获取指定channel 的文章
+  channelParentId, //  work id or dept id
+  channelId, // 是否限定只获取指定channel 的文章,all代表获取整个work或dept的articles
   numberPerPage,
   currentPage,
   withChannel = true,
   withPublisher = true,
-  withRelative = false,
-  orderBy = 'createTime',
-  orderDirection = 'desc'
+  withChannelParent = false,
+  order = { updateTime: 'desc' }
 }) => {
   return axios.post(`/articles`, {
     from,
-    relativeId,
+    channelParentId,
     channelId,
     numberPerPage,
     currentPage,
-    orderBy,
-    direction: orderDirection,
     withChannel,
-    withRelative,
-    withPublisher
+    withPublisher,
+    withChannelParent,
+    order
   });
 };
 
-export const getDeptWorks = (
+export const getWorkArticle = ({
+  id,
+  withPublisher,
+  withChannel,
+  withWork,
+  withDept,
+  withAttachments
+}) => {
+  return axios.post('/work/article', {
+    id,
+    withPublisher,
+    withChannel,
+    withWork,
+    withDept,
+    withAttachments
+  });
+};
+
+/**
+ * @param {string[]} ids 删除的workarticle id列表
+ */
+export const deleteWorkArticle = ids => {
+  return axios.post('/work/article/delete', { ids });
+};
+
+export const getDeptWorks = ({
   deptId,
   numberPerPage,
   currentPage,
-  orderBy = 'createTime',
-  orderDirection = 'desc',
   withDept = true,
-  withPublisher = true
-) => {
+  withPublisher = true,
+  orderBy = 'createTime',
+  orderDirection = 'desc'
+}) => {
   return axios.post(`/dept/works`, {
     deptId,
     numberPerPage,
@@ -310,8 +385,16 @@ export const setNumberPerPage = number => {
  * 批量删除大项工作
  * @param {array} ids work id 列表
  */
-export const delMultiWorks = ids => {
+export const delWorks = ids => {
   return axios.post('/work/del', { ids });
+};
+
+export const delArticles = (ids, from = 'work') => {
+  return axios.post('/article/delete', { ids, from });
+};
+
+export const delChannel = (from = 'work', id, channelParentId) => {
+  return axios.post('/channel/delete', { id, from, channelParentId });
 };
 
 export const timeFunctions = {

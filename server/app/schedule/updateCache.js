@@ -10,3 +10,5 @@ module.exports = {
     await ctx.service.cache.updateDeptArray();
   },
 };
+
+// todo 每十分钟执行一次，把超过一天的未接受日程置为接受

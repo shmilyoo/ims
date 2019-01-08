@@ -36,7 +36,7 @@ class WorkEdit extends React.PureComponent {
         wrap="nowrap"
         style={{ height: '100%' }}
       >
-        <Grid item>
+        <Grid>
           <Tabs
             value={type}
             onChange={this.tabChange}
@@ -46,7 +46,7 @@ class WorkEdit extends React.PureComponent {
           >
             <Tab key="basic" label="基本信息" value="basic" />
             <Tab key="task" label="任务管理" value="task" />
-            <Tab key="channel" label="分类管理" value="channel" />
+            <Tab key="channel" label="频道管理" value="channel" />
             <Tab key="article" label="文章管理" value="article" />
             <Tab key="discuss" label="讨论管理" value="discuss" />
           </Tabs>

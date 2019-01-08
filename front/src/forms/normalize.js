@@ -11,3 +11,7 @@ export const toLowerCase = value => {
 export const toUpperCase = value => {
   return value && value.toUpperCase();
 };
+
+// export const normalizeAllowExts = value => {
+//   return value && value.trim()
+// }

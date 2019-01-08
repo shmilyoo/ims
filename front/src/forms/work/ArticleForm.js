@@ -69,12 +69,6 @@ const ArticleForm = ({
             maxSize={1 * 1024 * 1024 * 1024}
             apiUrl="/upload/attachment "
           />
-          {/* <FileUpload
-            dispatch={dispatch}
-            allowExts={allowExts ? allowExts.split(';') : undefined}
-            maxSize={50 * 1024 * 1024 * 1024}
-            apiUrl="/upload/attachment "
-          /> */}
         </Grid>
         <Grid item container justify="center" spacing={32}>
           <Grid item>

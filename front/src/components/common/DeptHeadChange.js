@@ -54,6 +54,7 @@ class DeptHeadChange extends React.PureComponent {
   render() {
     const {
       id,
+      tipBtnText,
       canSelectIdList,
       cantSelectIdList,
       deptDic,
@@ -129,6 +130,7 @@ class DeptHeadChange extends React.PureComponent {
 DeptHeadChange.propTypes = {
   id: PropTypes.string.isRequired, // 现显示的部门id
   showSelect: PropTypes.bool, // 是否显示右边的选择部门按钮
+  tipBtnText: PropTypes.string, // 右边显示的提示消息按钮文字
   deptArray: PropTypes.array.isRequired,
   deptDic: PropTypes.object.isRequired, // dept dic from state.system
   onSelect: PropTypes.func.isRequired, // 选择后执行的回调函数
@@ -136,7 +138,8 @@ DeptHeadChange.propTypes = {
   cantSelectIdList: PropTypes.array
 };
 DeptHeadChange.defaultProps = {
-  showSelect: false
+  showSelect: false,
+  tipBtnText: '切换部门'
 };
 
 export default compose(withStyles(style))(DeptHeadChange);

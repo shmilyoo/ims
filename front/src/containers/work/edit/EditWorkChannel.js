@@ -12,6 +12,7 @@ import {
 } from '@material-ui/core';
 import Axios from 'axios';
 import ChannelForm from '../../../forms/work/ChannelForm';
+import { getWorkChannels, delChannel } from '../../../services/utility';
 
 const style = {
   listItem: {},
@@ -26,7 +27,11 @@ class EditWorkChannel extends React.PureComponent {
     selectedChannel: {}
   };
   componentDidMount() {
-    this.getWorkChannels();
+    getWorkChannels(this.props.id).then(res => {
+      if (res.success) {
+        this.setState({ channels: res.data });
+      }
+    });
   }
   channelItemClick = channel => {
     this.setState({
@@ -37,24 +42,16 @@ class EditWorkChannel extends React.PureComponent {
   handleSwitchClick = () => {
     this.setState({ selectedChannel: {} });
   };
-  getWorkChannels = () => {
-    // 获取work基本信息和phase信息
-    Axios.get(`/work/channels?workId=${this.props.id}`).then(res => {
-      if (res.success) {
-        this.setState({ channels: res.data });
-      }
-    });
-  };
+
   handleDelChannel = () => {
     if (!this.state.selectedChannel.id) return;
-    Axios.post('/work/channel/delete', {
-      id: this.state.selectedChannel.id,
-      workId: this.props.id
-    }).then(res => {
-      if (res.success) {
-        this.setState({ selectedChannel: {}, channels: res.data });
+    delChannel('work', this.state.selectedChannel.id, this.props.id).then(
+      res => {
+        if (res.success) {
+          this.setState({ selectedChannel: {}, channels: res.data });
+        }
       }
-    });
+    );
   };
   handleSubmit = values => {
     const init = { name: '', content: '', order: NaN };
@@ -118,7 +115,7 @@ class EditWorkChannel extends React.PureComponent {
                 ))
               ) : (
                 <ListItem>
-                  <ListItemText primary="分类为空" />
+                  <ListItemText primary="频道为空" />
                 </ListItem>
               )}
             </List>

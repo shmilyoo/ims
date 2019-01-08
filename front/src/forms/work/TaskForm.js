@@ -27,6 +27,7 @@ import { trim } from '../normalize';
 import { formatUnixTimeToDate, parseDateToUnixTime } from '../formatParse';
 import setHours from 'date-fns/esm/setHours';
 import setMinutes from 'date-fns/esm/setMinutes';
+import { attachmentUploadUrl } from '../../config';
 
 class ArticleForm extends React.PureComponent {
   handleChangeAmPm = (index, ampm) => {
@@ -125,8 +126,7 @@ class ArticleForm extends React.PureComponent {
               name="attachments"
               component={RenderFileUpload}
               allowExts={allowExts ? allowExts.split(';') : undefined}
-              maxSize={1 * 1024 * 1024 * 1024}
-              apiUrl="/upload/attachment "
+              apiUrl={attachmentUploadUrl}
             />
           </Grid>
           <Grid item>

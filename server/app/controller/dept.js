@@ -15,7 +15,6 @@ class DeptController extends Controller {
    * query: id 必须，部门id
    */
   async deptUsers() {
-    // todo relation 废弃后，使用关联deptId level order 来查找user
     const ctx = this.ctx;
     const { offspring, id } = ctx.query;
     if (!id) throw '错误的请求参数';
@@ -24,6 +23,10 @@ class DeptController extends Controller {
         ? await ctx.service.dept.getDeptWithOffspring(id)
         : [ id ];
     const ids = depts.map(dept => dept.id);
+    const order =
+      offspring === '1'
+        ? [[ ctx.model.Dept, 'level' ], [ ctx.model.Dept, 'order' ], [ 'name' ]]
+        : [[ 'name' ]];
     const users = await ctx.model.User.findAll({
       include: [
         {
@@ -34,7 +37,7 @@ class DeptController extends Controller {
       ],
       attributes: [ 'id', 'name' ],
       where: { deptId: { [ctx.model.Op.in]: ids } },
-      order: [[ ctx.model.Dept, 'level' ], [ ctx.model.Dept, 'order' ]],
+      order,
     });
     ctx.body = ctx.helper.getRespBody(true, users);
   }
@@ -107,6 +110,7 @@ class DeptController extends Controller {
     }
     const { count, rows } = await ctx.model.Work.findAndCountAll({
       include,
+      attributes: { exclude: [ 'content' ] },
       where: { deptId },
       limit: numberPerPage,
       offset: (currentPage - 1) * numberPerPage,

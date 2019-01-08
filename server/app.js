@@ -76,50 +76,85 @@ module.exports = app => {
       });
       const works = new Array(16).fill(0).map((n, i) => ({
         deptId: 'c360d5f0ceef11e8b013f53754442dd4',
+        id: `c360d5f0cfff11e8b013f53754442d${i + 10}`,
         tagId: defaultTag.id,
         title: new Array(i + 1).fill('a').join(),
-        from: '1545267600',
-        to: '1545267700',
-        createTime: '1545267600',
-        updateTime: '1545267600',
+        from: 1745267600 + i * 1000000,
+        to: 1845267600 + i * 1000000,
+        createTime: 1545267600 + i * 1000000,
+        updateTime: 1555267600 + i * 1000000,
         publisherId: 'c360d5f0ceef11e8b013f53754442777',
       }));
 
       // console.log(works);
       const worksModel = await app.model.Work.bulkCreate(works);
+      const workId = worksModel[2].id;
+      const channel1 = await app.model.WorkChannel.create({
+        workId,
+        name: 'channel1',
+      });
+      const channel2 = await app.model.WorkChannel.create({
+        workId,
+        name: 'channel2',
+        order: 2,
+      });
+      const title =
+        '一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二';
+      const articles = new Array(21).fill(0).map((n, i) => ({
+        channelId: channel1.id,
+        title: title.substring(0, i + 12),
+        createTime: 1545267600 + i * 1000000,
+        updateTime: 1545267600 + i * 1000000,
+        publisherId: 'c360d5f0ceef11e8b013f53754442777',
+      }));
+      const articles2 = new Array(21).fill(0).map((n, i) => ({
+        channelId: channel2.id,
+        title: title.substring(0, 21 - i),
+        createTime: 1545267600 + i * 1000000,
+        updateTime: 1545267600 + i * 1000000,
+        publisherId: 'f3762080cb9911e884eec9a890da2222',
+      }));
+      await app.model.WorkArticle.bulkCreate(articles);
+      await app.model.WorkArticle.bulkCreate(articles2);
       await app.model.Phase.bulkCreate([
         {
           title: 'phase 1',
-          workId: worksModel[2].id,
+          workId,
           from: '1545267600',
         },
         {
           title: 'phase 4',
-          workId: worksModel[2].id,
+          workId,
           from: '1655267602',
         },
         {
           title: 'phase 3',
-          workId: worksModel[2].id,
+          workId,
           from: '1565267602',
         },
         {
           title: 'phase 2',
-          workId: worksModel[2].id,
+          workId,
           from: '1555267602',
         },
       ]);
-      // await app.model.Work.bulkCreate([
-      //   {
-      //     deptId: 'c360d5f0ceef11e8b013f53754442dd4',
-      //     title: 'aaa',
-      //     from: '1545267600',
-      //     to: '1545267600',
-      //     createTime: '1545267600',
-      //     updateTime: '1545267600',
-      //     publisherId: 'c360d5f0ceef11e8b013f53754442777',
-      //   },
-      // ]);
+      const tasks = new Array(16).fill(0).map((n, i) => ({
+        workId,
+        id: `c360d5f0cef211e8b013f53754442d${i + 10}`,
+        title: new Array(i + 1).fill('a').join(),
+        from: 1535267600 + i * 10000,
+        to: 1555467600 + i * 10000,
+        content:
+          '测试task内容，测试task内容，测试task内容，测试task内容，测试task内容，',
+        createTime: 1545267600 + i * 10000,
+        updateTime: 1545367600 + i * 10000,
+        publisherId: 'c360d5f0ceef11e8b013f53754442777',
+      }));
+      await app.model.Task.bulkCreate(tasks);
+      await app.model.System.create({
+        name: 'allowExts',
+        value: '.rar;.zip;.7zip;.tar;.doc;.docx;.jpg;.png;.bmp;.gif',
+      });
       await app.runSchedule('updateCache');
       app.logger.info('同步数据库表完毕');
     });
