@@ -3,20 +3,19 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import qs from 'qs';
 import { Grid, Divider, Typography, withStyles } from '@material-ui/core';
-import history from '../../history';
 import Loading from '../../components/common/Loading';
 import {
   getWorkInfo,
   getDeptArraySync,
   timeFunctions,
-  checkInUsers,
   checkCanManageWork,
-  checkCanAddTaskArticle
+  checkCanAddTaskArticle,
+  toRedirectPage
 } from '../../services/utility';
 import compose from 'recompose/compose';
 import FileList from '../../components/common/FileList';
-import TableList from '../../components/common/TableList';
 import WorkTaskList from './WorkTaskList';
+import ChannelsArticles from '../../components/common/ChannelsArticles';
 
 const style = theme => ({
   link: theme.sharedClass.link,
@@ -35,19 +34,19 @@ class WorkInfo extends PureComponent {
       ignoreQueryPrefix: true
     });
     if (!id) {
-      history.push('/work/mine');
+      toRedirectPage('错误的请求url参数', '/work/mine');
       return;
     }
     getWorkInfo({
       id: id,
-      // withDept: 1,
-      withChannels: 1,
+      // withChannels: 1,
+      // withChannelsArticles: this.state.articleNumber,
       withUsers: 1,
       withPublisher: 1,
       withTag: 1,
       withPhases: 1,
       withAttachments: 1,
-      order: { phase: 'asc', user: 'asc' }
+      order: { phase: 'asc', user: 'asc', channel: 'asc', article: 'desc' }
     }).then(res => {
       if (res.success) {
         const work = { ...res.data, usersInCharge: [], usersAttend: [] };
@@ -57,11 +56,11 @@ class WorkInfo extends PureComponent {
             else work.usersAttend.push({ id, name, deptId });
           }
         );
+        this.checkAuthority(work);
         this.setState({
           work,
           id
         });
-        this.checkAuthority();
       }
     });
   }
@@ -72,9 +71,9 @@ class WorkInfo extends PureComponent {
    * 另外work的参加者可以发article和task
    * 所有注册用户均可以发讨论
    */
-  checkAuthority = () => {
+  checkAuthority = work => {
     const { manageDepts, accountId } = this.props;
-    const { work } = this.state;
+    // const { work } = this.state;
     let canManage = false; // 是否可以编辑work的主要信息
     let canAddTaskArticle = false; // 是否可以添加文章，任务，除了管理者外，参与者也可以
     canManage = checkCanManageWork(
@@ -92,8 +91,10 @@ class WorkInfo extends PureComponent {
 
   render() {
     const { work, canManage, canAddTaskArticle } = this.state;
-    const { deptDic, classes } = this.props;
+    const { deptDic, classes, articleNumber } = this.props;
+    const now = timeFunctions.getNowUnix();
     if (!work) return <Loading />;
+    console.log('render work info');
     return (
       <Grid container direction="column" wrap="nowrap" spacing={8}>
         <Grid item container justify="center">
@@ -215,7 +216,9 @@ class WorkInfo extends PureComponent {
         <Grid item>
           <Typography variant="h6">工作介绍:</Typography>
         </Grid>
-        <Grid item>{work.content}</Grid>
+        <Grid item>
+          <div dangerouslySetInnerHTML={{ __html: work.content }} />
+        </Grid>
         {work.phases &&
           work.phases.length > 0 && (
             <Grid item container direction="column" wrap="nowrap">
@@ -242,23 +245,37 @@ class WorkInfo extends PureComponent {
                   </Typography>
                 </Grid>
               </Grid>
-              {work.phases.map(({ id, title, from, to }) => (
-                <Grid item container key={id}>
-                  <Grid item xs={2}>
-                    <Typography variant="body1">
-                      {timeFunctions.formatFromUnix(from)}
-                    </Typography>
+              {work.phases.map(({ id, title, from, to }) => {
+                const nowInPhase = now > from && (!to || now < to);
+                return (
+                  <Grid item container key={id}>
+                    <Grid item xs={2}>
+                      <Typography
+                        variant="body1"
+                        style={{ fontWeight: nowInPhase ? 'bold' : 'normal' }}
+                      >
+                        {timeFunctions.formatFromUnix(from)}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={2}>
+                      <Typography
+                        variant="body1"
+                        style={{ fontWeight: nowInPhase ? 'bold' : 'normal' }}
+                      >
+                        {to ? timeFunctions.formatFromUnix(to) : '未定/至今'}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs>
+                      <Typography
+                        variant="body1"
+                        style={{ fontWeight: nowInPhase ? 'bold' : 'normal' }}
+                      >
+                        {title}
+                      </Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={2}>
-                    <Typography variant="body1">
-                      {to ? timeFunctions.formatFromUnix(to) : '未定/至今'}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs>
-                    <Typography variant="body1">{title}</Typography>
-                  </Grid>
-                </Grid>
-              ))}
+                );
+              })}
             </Grid>
           )}
         {work.attachments &&
@@ -333,15 +350,24 @@ class WorkInfo extends PureComponent {
                 </Link>
               </Grid>
             )}
+            {canManage && (
+              <Grid item>
+                <Link
+                  className={classes.grayLink}
+                  to={`/work/edit?type=article&id=${work.id}`}
+                >
+                  管理
+                </Link>
+              </Grid>
+            )}
           </Grid>
-          <Grid container spacing={16}>
-            <Grid item xs={12} md={6}>
-              频道1
-            </Grid>
-            <Grid item xs={12} md={6}>
-              频道2
-            </Grid>
-          </Grid>
+          <ChannelsArticles
+            articleNumber={articleNumber}
+            from="work"
+            fromId={work.id}
+            columns={2}
+            channels={work.channels}
+          />
         </Grid>
         <Grid item>
           <Divider />
@@ -361,7 +387,8 @@ function mapStateToProps(state) {
   return {
     deptDic: state.system.deptDic,
     manageDepts: state.account.manageDepts,
-    accountId: state.account.id
+    accountId: state.account.id,
+    articleNumber: state.system.articleNumber
   };
 }
 

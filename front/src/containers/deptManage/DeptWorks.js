@@ -6,14 +6,12 @@ import compose from 'recompose/compose';
 import {
   Grid,
   Divider,
-  Typography,
   IconButton,
   Button,
   withStyles
 } from '@material-ui/core';
 import Edit from '@material-ui/icons/Edit';
 import { actions as accountActions } from '../../reducers/account';
-import WorkList from '../../components/work/WorkList';
 import {
   getDeptWorks,
   getNumberPerPage,
@@ -37,12 +35,12 @@ class DeptWorks extends PureComponent {
     // 大项工作名称	起始日期	结束日期	添加人	添加时间 ⬇	修改时间
     columns: [
       ['title', '大项工作名称', false],
-      ['from', '开始时间', true],
-      ['to', '结束时间', true],
-      ['publisher', '发布人', false],
-      ['createTime', '创建时间', true],
-      ['updateTime', '更新时间', true],
-      ['edit', '', false]
+      ['from', '开始时间', true, { width: '10rem' }],
+      ['to', '结束时间', true, { width: '10rem' }],
+      ['publisher', '发布人', false, { width: '10rem' }],
+      ['createTime', '创建时间', true, { width: '10rem' }],
+      ['updateTime', '更新时间', true, { width: '10rem' }],
+      ['edit', '', false, { width: '10rem' }]
     ],
     numberPerPage: getNumberPerPage(),
     currentPage: 1,
@@ -92,8 +90,8 @@ class DeptWorks extends PureComponent {
             {title}
           </Link>
         ),
-        from: <Typography>{timeFunctions.formatFromUnix(from)}</Typography>,
-        to: <Typography>{timeFunctions.formatFromUnix(to)}</Typography>,
+        from: timeFunctions.formatFromUnix(from),
+        to: timeFunctions.formatFromUnix(to),
         publisher: (
           <Link
             className={this.props.classes.link}
@@ -102,12 +100,8 @@ class DeptWorks extends PureComponent {
             {publisher.name}
           </Link>
         ),
-        createTime: (
-          <Typography>{timeFunctions.formatFromUnix(createTime)}</Typography>
-        ),
-        updateTime: (
-          <Typography>{timeFunctions.formatFromUnix(updateTime)}</Typography>
-        ),
+        createTime: timeFunctions.formatFromUnix(createTime),
+        updateTime: timeFunctions.formatFromUnix(updateTime),
         edit: (
           <IconButton
             className={this.props.classes.padding5}

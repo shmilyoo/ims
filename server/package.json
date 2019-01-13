@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "axios": "^0.18.0",
+    "date-fns": "^2.0.0-alpha.27",
     "egg": "^2.2.1",
     "egg-multipart": "^2.4.0",
     "egg-redis": "^2.0.0",

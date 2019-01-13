@@ -8,7 +8,6 @@ import {
   ListItem,
   ListItemText,
   withStyles,
-  Paper,
   Typography,
   IconButton
 } from '@material-ui/core';
@@ -29,7 +28,8 @@ const style = theme => ({
     width: '20rem'
   },
   link: theme.sharedClass.link,
-  disableLink: theme.sharedClass.disableLink
+  disableLink: theme.sharedClass.disableLink,
+  padding5: { padding: '0.5rem' }
 });
 
 class ManageWorkArticles extends React.PureComponent {
@@ -37,11 +37,11 @@ class ManageWorkArticles extends React.PureComponent {
     rows: null,
     columns: [
       ['title', '标题', false],
-      ['channel', '所属频道', false],
-      ['publisher', '发布人', false],
-      ['createTime', '创建时间', true],
-      ['updateTime', '更新时间', true],
-      ['edit', '', false]
+      ['channel', '所属频道', false, { width: '12rem' }],
+      ['publisher', '发布人', false, { width: '10rem' }],
+      ['createTime', '创建时间', true, { width: '10rem' }],
+      ['updateTime', '更新时间', true, { width: '10rem' }],
+      ['edit', '', false, { width: '6rem' }]
     ],
     channels: null,
     selectedChannel: null,
@@ -135,7 +135,7 @@ class ManageWorkArticles extends React.PureComponent {
             {title}
           </Link>
         ),
-        channel: <Typography>{channel.name}</Typography>,
+        channel: channel.name,
         publisher: (
           <Link
             className={this.props.classes.link}
@@ -144,12 +144,8 @@ class ManageWorkArticles extends React.PureComponent {
             {publisher.name}
           </Link>
         ),
-        createTime: (
-          <Typography>{timeFunctions.formatFromUnix(createTime)}</Typography>
-        ),
-        updateTime: (
-          <Typography>{timeFunctions.formatFromUnix(updateTime)}</Typography>
-        ),
+        createTime: timeFunctions.formatFromUnix(createTime),
+        updateTime: timeFunctions.formatFromUnix(updateTime),
         edit: (
           <IconButton
             className={this.props.classes.padding5}
@@ -216,83 +212,91 @@ class ManageWorkArticles extends React.PureComponent {
       orderDirection
     } = this.state;
     return (
-      <Grid container spacing={16} wrap="nowrap" style={{ height: '100%' }}>
-        <Grid item className={classes.left}>
-          <Paper style={{ height: '100%' }}>
-            <List>
-              {channels && channels.length > 0 ? (
-                channels.map(channel => (
-                  <ListItem
-                    className={classes.listItem}
-                    button
-                    divider
-                    key={channel.id}
-                    selected={
-                      selectedChannel && selectedChannel.id === channel.id
-                    }
-                    onClick={() => {
-                      this.channelItemClick(channel);
-                    }}
-                  >
-                    <ListItemText primary={`${channel.name}`} />
-                  </ListItem>
-                ))
-              ) : (
-                <ListItem>
-                  <ListItemText primary="分类为空" />
+      <Grid
+        container
+        spacing={16}
+        direction="column"
+        wrap="nowrap"
+        style={{ height: '100%' }}
+      >
+        <Grid item>
+          <List
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              padding: 0
+            }}
+          >
+            {channels && channels.length > 0 ? (
+              channels.map(channel => (
+                <ListItem
+                  className={classes.listItem}
+                  button
+                  divider
+                  key={channel.id}
+                  selected={
+                    selectedChannel && selectedChannel.id === channel.id
+                  }
+                  onClick={() => {
+                    this.channelItemClick(channel);
+                  }}
+                >
+                  <ListItemText primary={`${channel.name}`} />
                 </ListItem>
-              )}
-            </List>
-          </Paper>
+              ))
+            ) : (
+              <ListItem>
+                <ListItemText primary="频道分类为空" />
+              </ListItem>
+            )}
+          </List>
         </Grid>
-        <Grid item xs container spacing={16} direction="column" wrap="nowrap">
-          <Grid item container spacing={8} justify="flex-start">
-            <Grid item>
-              <Link
-                className={classes.link}
-                to={`/work/article/add?workId=${workId}&channelId=${
-                  selectedChannel ? selectedChannel.id : ''
-                }`}
-              >
-                添加工作文章
-              </Link>
-            </Grid>
-            <Grid item>
-              <Typography
-                className={
-                  selectedIds && selectedIds.length > 0
-                    ? classes.link
-                    : classes.disableLink
-                }
-                onClick={
-                  selectedIds && selectedIds.length > 0
-                    ? this.handleMultiDelArticles
-                    : () => {}
-                }
-              >
-                删除
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography className={classes.disableLink}>移动</Typography>
-            </Grid>
+        <Grid item container spacing={8} justify="flex-start">
+          <Grid item>
+            <Link
+              className={classes.link}
+              to={`/work/article/add?workId=${workId}&channelId=${
+                selectedChannel ? selectedChannel.id : ''
+              }`}
+            >
+              添加工作文章
+            </Link>
           </Grid>
-          <Grid item xs>
-            <TableList
-              rows={rows}
-              columns={columns}
-              selectedIds={selectedIds}
-              totalNumber={totalNumber}
-              currentPage={currentPage}
-              numberPerPage={numberPerPage}
-              orderBy={orderBy}
-              orderDirection={orderDirection}
-              onPageChange={this.handlePageChagne}
-              onSelectedChange={this.handleSelectedChange}
-              onChangeRowsPerPage={this.handleChangeRowsPerPage}
-              onChangeOrder={this.handleChangeOrder}
-            />
+          <Grid item>
+            <Typography
+              className={
+                selectedIds && selectedIds.length > 0
+                  ? classes.link
+                  : classes.disableLink
+              }
+              onClick={
+                selectedIds && selectedIds.length > 0
+                  ? this.handleMultiDelArticles
+                  : () => {}
+              }
+            >
+              删除
+            </Typography>
           </Grid>
+          <Grid item>
+            <Typography className={classes.disableLink}>移动</Typography>
+          </Grid>
+        </Grid>
+        <Grid item xs>
+          <TableList
+            rows={rows}
+            columns={columns}
+            selectedIds={selectedIds}
+            totalNumber={totalNumber}
+            currentPage={currentPage}
+            numberPerPage={numberPerPage}
+            orderBy={orderBy}
+            orderDirection={orderDirection}
+            onPageChange={this.handlePageChagne}
+            onSelectedChange={this.handleSelectedChange}
+            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+            onChangeOrder={this.handleChangeOrder}
+          />
         </Grid>
       </Grid>
     );

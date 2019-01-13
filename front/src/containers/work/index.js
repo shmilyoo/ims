@@ -8,6 +8,7 @@ import AddWorkTask from './AddWorkTask';
 import AddTaskSuccess from './AddTaskSuccess';
 import AddWorkArticleSuccess from './AddWorkArticleSuccess';
 import EditWorkArticle from './EditWorkArticle';
+import WorkTaskInfo from './WorkTaskInfo';
 
 const Work = ({ match }) => {
   return (
@@ -35,7 +36,7 @@ const Work = ({ match }) => {
       />
       <Route exact path={`${match.path}/task/add`} component={AddWorkTask} />
       <Route exact path={`${match.path}/task/edit`} component={null} />
-      <Route exact path={`${match.path}/task/info`} component={null} />
+      <Route exact path={`${match.path}/task/info`} component={WorkTaskInfo} />
       <Route
         exact
         path={`${match.path}/task/add/success`}

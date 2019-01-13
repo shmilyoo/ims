@@ -11,7 +11,6 @@ import {
   IconButton
 } from '@material-ui/core';
 import Cancel from '@material-ui/icons/Cancel';
-import { Link } from 'react-router-dom';
 import path from 'path';
 import axios from 'axios';
 import compose from 'recompose/compose';
@@ -148,41 +147,6 @@ class FileUpload extends PureComponent {
             </Grid>
           )}
         <FileList onDelFile={this.delFile} edit={true} files={files} />
-        {/* <Grid item container spacing={8} direction="column" wrap="nowrap">
-          {files &&
-            files.length > 0 && (
-              <Grid item>
-                <Typography variant="body2">附件:</Typography>
-              </Grid>
-            )}
-          {files &&
-            files.map(
-              file =>
-                file.type !== 'delete' && (
-                  <Grid
-                    item
-                    key={file.path}
-                    container
-                    spacing={8}
-                    alignItems="center"
-                  >
-                    <Grid item>
-                      <Link to={file.type ? '#' : file.path}>{`${file.name}${
-                        file.ext
-                      }`}</Link>
-                    </Grid>
-                    <Grid item>
-                      <IconButton
-                        className={classes.cancelBtn}
-                        onClick={() => this.delFile(file)}
-                      >
-                        <Cancel />
-                      </IconButton>
-                    </Grid>
-                  </Grid>
-                )
-            )}
-        </Grid> */}
         <Grid item container spacing={8} alignItems="center">
           <Grid item xs={4}>
             <input

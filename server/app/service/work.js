@@ -3,6 +3,7 @@
 const Service = require('egg').Service;
 const shell = require('shelljs');
 const path = require('path');
+const format = require('date-fns/format');
 const filenamify = require('filenamify');
 
 class WorkService extends Service {
@@ -144,6 +145,72 @@ class WorkService extends Service {
       include.push({
         model: ctx.model.Phase,
         as: 'phases',
+      });
+    }
+    if (withAttachments) {
+      include.push({
+        model: ctx.model.Attachment,
+        as: 'attachments',
+      });
+    }
+    return include;
+  }
+
+  getTaskIncludeModelSync({
+    withWork = false,
+    // withUsers 和 withUsersInCharge withUsersAttend 没必要重复
+    // withUsers 包括了 withUsersInCharge withUsersAttend
+    withUsers = false,
+    withUsersInCharge = false,
+    withUsersAttend = false,
+    withPublisher = false,
+    withAttachments,
+  }) {
+    const ctx = this.ctx;
+    const include = [];
+    if (withWork) {
+      include.push({
+        model: ctx.model.Work,
+        as: 'work',
+        attributes: [ 'id', 'title', 'deptId' ],
+      });
+    }
+    if (withUsers) {
+      include.push({
+        model: ctx.model.User,
+        as: 'users',
+        through: {
+          attributes: [ 'isInCharge' ],
+        },
+        attributes: [ 'id', 'name', 'deptId' ],
+      });
+    } else {
+      if (withUsersInCharge) {
+        include.push({
+          model: ctx.model.User,
+          as: 'usersInCharge',
+          through: {
+            attributes: [],
+          },
+          attributes: [ 'id', 'name', 'deptId' ],
+        });
+      }
+      if (withUsersAttend) {
+        include.push({
+          model: ctx.model.User,
+          as: 'usersAttend',
+          through: {
+            attributes: [],
+          },
+          attributes: [ 'id', 'name', 'deptId' ],
+        });
+      }
+    }
+    if (withPublisher) {
+      include.push({
+        model: ctx.model.User,
+        as: 'publisher',
+        attributes: [ 'id', 'name', 'deptId' ],
       });
     }
     if (withAttachments) {
@@ -317,6 +384,49 @@ class WorkService extends Service {
     return _order;
   }
 
+  getTaskOrderSync(order) {
+    const ctx = this.ctx;
+    let _order;
+    if (order) {
+      _order = [];
+      if (order.user) {
+        _order.push([
+          {
+            model: ctx.model.User,
+            as: 'users',
+          },
+          ctx.model.UserTask,
+          'order',
+          order.user,
+        ]);
+      } else {
+        if (order.usersInCharge) {
+          _order.push([
+            {
+              model: ctx.model.User,
+              as: 'usersInCharge',
+            },
+            ctx.model.UserTask,
+            'order',
+            order.usersInCharge,
+          ]);
+        }
+        if (order.usersAttend) {
+          _order.push([
+            {
+              model: ctx.model.User,
+              as: 'usersAttend',
+            },
+            ctx.model.UserTask,
+            'order',
+            order.usersAttend,
+          ]);
+        }
+      }
+    }
+    return _order;
+  }
+
   getWorkArticleOrderSync(order) {
     // const ctx = this.ctx;
     let _order;
@@ -355,10 +465,13 @@ class WorkService extends Service {
     });
     if (toDeal.add.length > 0) {
       const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth() + 1;
-      const day = now.getDate();
-      const relativeDirectory = path.join(`${year}`, `${month}`, `${day}`);
+      const [ year, month, day ] = format(now, 'yyyy-MM-dd').split('-');
+      const relativeDirectory = path.join(
+        'attachment',
+        `${year}`,
+        `${month}`,
+        `${day}`
+      );
       const dir = path.join(uploadRoot, relativeDirectory);
       if (!shell.test('-e', dir)) shell.mkdir('-p', dir);
       toDeal.add.forEach(file => {

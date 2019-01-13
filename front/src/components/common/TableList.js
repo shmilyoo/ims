@@ -90,11 +90,11 @@ class TableList extends React.PureComponent {
       return <Loading />;
     }
     return rows.length > 0 ? (
-      <Table padding="checkbox">
+      <Table padding="checkbox" style={{ tableLayout: 'fixed' }}>
         <TableHead>
           <TableRow>
             {showCheckbox && (
-              <TableCell className={classes.padding0}>
+              <TableCell style={{ width: '4rem' }} className={classes.padding0}>
                 <Checkbox
                   checked={selectedIds.length === rows.length}
                   onClick={this.handleAllCheck}
@@ -104,15 +104,16 @@ class TableList extends React.PureComponent {
             {showNumber && (
               <TableCell
                 className={classes.padding0}
-                style={{ textAlign: 'center' }}
+                style={{ textAlign: 'center', width: '4rem' }}
               >
                 序号
               </TableCell>
             )}
-            {columns.map(([name, title, canOrder]) => (
+            {columns.map(([name, title, canOrder, style]) => (
               <TableCell
                 key={name}
                 className={classnames({ [classes.orderHead]: canOrder })}
+                style={style}
                 onClick={
                   canOrder
                     ? () => {
@@ -155,7 +156,9 @@ class TableList extends React.PureComponent {
                 </TableCell>
               )}
               {columns.map(([name]) => (
-                <TableCell key={name}>{row[name]}</TableCell>
+                <TableCell key={name}>
+                  <Typography noWrap>{row[name]}</Typography>
+                </TableCell>
               ))}
             </TableRow>
           ))}

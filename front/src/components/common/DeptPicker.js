@@ -88,7 +88,8 @@ class DeptPicker extends PureComponent {
           disabled={disabled}
           fullWidth
           label={label}
-          onClick={this.handleTextFieldClick}
+          InputProps={{ onClick: this.handleTextFieldClick }}
+          // onClick={this.handleTextFieldClick}
           value={id ? getDeptNamesArraySync(id, deptDic).join('-') : ''}
           error={error}
           helperText={helperText}

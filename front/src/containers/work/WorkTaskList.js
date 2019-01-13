@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import TableList from '../../components/common/TableList';
 import {
@@ -8,9 +9,7 @@ import {
   setNumberPerPage,
   timeFunctions
 } from '../../services/utility';
-import { Typography, IconButton, withStyles } from '@material-ui/core';
-import createTypography from '@material-ui/core/styles/createTypography';
-import history from '../../history';
+import { withStyles } from '@material-ui/core';
 
 const style = theme => ({
   left: {
@@ -24,7 +23,8 @@ const style = theme => ({
   },
   padding5: {
     padding: '.5rem'
-  }
+  },
+  lineCut: theme.sharedClass.lineCut
 });
 
 class WorkTaskList extends PureComponent {
@@ -32,11 +32,11 @@ class WorkTaskList extends PureComponent {
     rows: null,
     columns: [
       ['title', '标题', false],
-      ['from', '开始时间', true],
-      ['to', '结束时间', true],
-      ['createTime', '创建时间', true],
-      ['updateTime', '更新时间', true],
-      ['publisher', '发布人', false]
+      ['from', '开始时间', true, { width: '10rem' }],
+      ['to', '结束时间', true, { width: '10rem' }],
+      ['createTime', '创建时间', true, { width: '10rem' }],
+      ['updateTime', '更新时间', true, { width: '10rem' }],
+      ['publisher', '发布人', false, { width: '10rem' }]
     ],
     numberPerPage: getNumberPerPage(),
     currentPage: 1,
@@ -90,28 +90,26 @@ class WorkTaskList extends PureComponent {
         id,
         title: (
           <Link
-            className={this.props.classes.link}
+            className={classnames(
+              this.props.classes.link,
+              this.props.classes.lineCut
+            )}
             to={`/work/task/info?id=${id}`}
           >
             {title}
           </Link>
         ),
-        from: <Typography>{timeFunctions.formatFromUnix(from)}</Typography>,
-        to: <Typography>{timeFunctions.formatFromUnix(to)}</Typography>,
-        createTime: (
-          <Typography>{timeFunctions.formatFromUnix(createTime)}</Typography>
-        ),
-        updateTime: (
-          <Typography>{timeFunctions.formatFromUnix(updateTime)}</Typography>
-        ),
+        from: timeFunctions.formatFromUnix(from),
+        to: timeFunctions.formatFromUnix(to),
+        createTime: timeFunctions.formatFromUnix(createTime),
+        updateTime: timeFunctions.formatFromUnix(updateTime),
         publisher: (
-          <Typography
-            onClick={() => {
-              history.push(`/user/info?id=${publisher.id}`);
-            }}
+          <Link
+            className={this.props.classes.link}
+            to={`/user/info?id=${publisher.id}`}
           >
             {publisher.name}
-          </Typography>
+          </Link>
         )
       })
     );
@@ -142,7 +140,6 @@ class WorkTaskList extends PureComponent {
     );
   };
   render() {
-    const { workId, classes } = this.props;
     const {
       numberPerPage,
       currentPage,

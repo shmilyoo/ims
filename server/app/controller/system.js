@@ -28,10 +28,33 @@ class SystemController extends Controller {
   async deleteTag() {
     const ctx = this.ctx;
     const { id } = ctx.request.body;
-    await ctx.model.Tag.destroy({ where: { id } });
-    // todo 把关联到这个tag的work全部转移到其他上
-    const tags = await ctx.model.Tag.findAll({ order: [ 'order' ] });
-    ctx.body = ctx.helper.getRespBody(true, tags);
+    const transaction = await ctx.model.transaction();
+    try {
+      const works = await ctx.model.Work.findAll({ where: { tagId: id } });
+      if (works && works.length > 0) {
+        const [ defaultTag ] = await ctx.model.Tag.findOrCreate({
+          where: { name: '其他' },
+          defaults: { name: '其他', color: '#666', order: 1000 },
+        });
+        await ctx.model.Work.update(
+          { tagId: defaultTag.id },
+          {
+            where: {
+              id: {
+                [ctx.model.Op.in]: works.map(work => work.id),
+              },
+            },
+          }
+        );
+      }
+      await ctx.model.Tag.destroy({ where: { id } });
+      const tags = await ctx.model.Tag.findAll({ order: [ 'order' ] });
+      await transaction.commit();
+      ctx.body = ctx.helper.getRespBody(true, tags);
+    } catch (error) {
+      await transaction.rollback();
+      ctx.body = ctx.helper.getRespBody(false, error.message);
+    }
   }
 
   async updateTag() {

@@ -8,6 +8,7 @@ import { Router, Switch, Route } from 'react-router-dom';
 import configureStore from './store';
 import 'typeface-roboto';
 import './index.css';
+// import './assets/css/quillFont.css';
 import 'nprogress/nprogress.css';
 import configureAxios from './axios';
 import * as serviceWorker from './serviceWorker';

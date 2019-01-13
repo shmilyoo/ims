@@ -91,6 +91,7 @@ const initState = {
   // { amFrom: 28800, amTo: 41400, pmFrom: 52200, pmTo: 63000 }
   deptArray: null,
   deptDic: null,
+  articleNumber: 5,
   prerequisite: false
 };
 

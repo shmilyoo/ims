@@ -1,13 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
-  Grid,
-  Button,
-  Divider,
-  FormControlLabel,
-  Typography,
-  Checkbox
-} from '@material-ui/core';
+import { Grid, Button, Divider, Typography } from '@material-ui/core';
 import { Field, FieldArray, reduxForm } from 'redux-form';
 import compose from 'recompose/compose';
 import {
@@ -16,17 +9,15 @@ import {
   RenderDatePicker,
   RenderUserPicker,
   RenderAddMultiSchedules,
-  RenderCheck
+  RenderCheck,
+  RenderRichEditor
 } from '../renderFields';
-import {
-  required,
-  checkMaxStringLength32,
-  checkMaxStringLength255
-} from '../validate';
+import { required, checkMaxStringLength32 } from '../validate';
 import { trim } from '../normalize';
 import { formatUnixTimeToDate, parseDateToUnixTime } from '../formatParse';
-import setHours from 'date-fns/esm/setHours';
-import setMinutes from 'date-fns/esm/setMinutes';
+// import { setHours, setMinutes } from 'date-fns';
+import setHours from 'date-fns/setHours';
+import setMinutes from 'date-fns/setMinutes';
 import { attachmentUploadUrl } from '../../config';
 
 class ArticleForm extends React.PureComponent {
@@ -108,14 +99,10 @@ class ArticleForm extends React.PureComponent {
             />
           </Grid>
           <Grid item>
-            {/* todo 更改为富文本编辑器 */}
             <Field
               name="content"
-              label="任务的介绍(最长255个字符)"
-              multiline
-              component={RenderTextField}
-              validate={checkMaxStringLength255}
-              normalize={trim}
+              component={RenderRichEditor}
+              label="任务内容"
             />
           </Grid>
           <Grid item>

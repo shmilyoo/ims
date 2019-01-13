@@ -186,7 +186,7 @@ class UserPicker extends PureComponent {
           disabled={disabled}
           fullWidth
           label={label}
-          onClick={this.handleClick}
+          InputProps={{ onClick: this.handleClick }}
           value={
             selectedUsers ? selectedUsers.map(user => user.name).join(', ') : ''
           }

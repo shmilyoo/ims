@@ -7,7 +7,7 @@ module.exports = app => {
 
   const Tag = db.defineModel(app, 'tag', {
     name: { type: STRING(16), unique: true },
-    color: { type: STRING(16) },
+    color: { type: STRING(16) }, // 包含#  ， like #666
     order: { type: INTEGER, defaultValue: 9999 },
   });
 

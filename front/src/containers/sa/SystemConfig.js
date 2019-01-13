@@ -24,7 +24,7 @@ class SystemConfig extends PureComponent {
     });
   };
   render() {
-    const { timeScale, allowExts } = this.props;
+    const { timeScale, allowExts, articleNumber } = this.props;
     return (
       <Grid container direction="column" spacing={16} wrap="nowrap">
         <Grid item>
@@ -58,7 +58,7 @@ class SystemConfig extends PureComponent {
           <SystemCommonConfigForm
             enableReinitialize
             onSubmit={this.handleCommonConfigSubmit}
-            initialValues={{ allowExts }}
+            initialValues={{ allowExts, articleNumber }}
           />
         </Grid>
       </Grid>
@@ -74,7 +74,8 @@ function mapStateToProps(state) {
       pmFrom: state.system.pmFrom,
       pmTo: state.system.pmTo
     },
-    allowExts: state.system.allowExts
+    allowExts: state.system.allowExts,
+    articleNumber: state.system.articleNumber
   };
 }
 

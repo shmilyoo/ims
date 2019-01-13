@@ -14,6 +14,8 @@ export const ssoCheckPage = 'http://localhost:3000/auth/check';
 export const ssoAuthOk = 'http://localhost:4000/auth/ok'; // sso认证成功后，重定向到本地此页面进行cookie和缓存的操作
 
 export const attachmentUploadUrl = '/upload/attachment'; // 附件默认的上传地址
+export const imageUploadUrl = '/upload/image'; // 附件默认的上传地址
+export const imageUrlPrefix = '/upload';
 
 export const userStatusDic = {
   ONDUTY: 'onDuty',
@@ -60,6 +62,8 @@ export const pathTitle = {
   '/dept-manage/news/edit': '编辑文章',
   '/user/info': '我的资料',
   '/user/changePasswd': '修改密码',
+  '/user/message': '消息中心',
+  '/user/message/send': '发送消息',
   '/about': '关于',
   '/sa/system': '系统设置',
   '/sa/admin': '权限管理',
@@ -130,6 +134,8 @@ export const leftMenu = [
     icon: AccountBox,
     children: [
       { title: pathTitle['/user/info'], path: '/user/info' },
+      { title: pathTitle['/user/message'], path: '/user/message' },
+      { title: pathTitle['/user/message/send'], path: '/user/message/send' },
       {
         title: pathTitle['/user/changePasswd'],
         path: '/user/changePasswd'

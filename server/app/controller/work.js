@@ -85,7 +85,8 @@ class WorkController extends Controller {
       withUsersInCharge,
       withUsersAttend,
       withPublisher,
-      withChannels,
+      withChannels, // 如果同时获取频道尤其是文章的时候，orm会另开一个sql查询，比较麻烦，
+      // withChannelsArticles, // 实现中还是单独获取文章频道列表为好
       withTag,
       withPhases,
       withAttachments,
@@ -187,11 +188,14 @@ class WorkController extends Controller {
       },
     } = ctx.request.body;
     if (!id) ctx.throw('错误的请求参数！');
-    await ctx.service.common.sleep(2);
+    // await ctx.service.common.sleep(2);
     const transaction = await ctx.model.transaction();
     try {
+      const _content = content.startsWith('<div>')
+        ? content
+        : `<div>${content}</div>`;
       await ctx.model.Work.update(
-        { title, from, to, tagId, deptId, content },
+        { title, from, to, tagId, deptId, content: _content },
         { where: { id } }
       );
       await ctx.model.UserWork.destroy({ where: { workId: id } });
@@ -286,6 +290,38 @@ class WorkController extends Controller {
       totalNumber: count,
       taskList: rows || [],
     });
+  }
+
+  async getTaskInfo() {
+    const ctx = this.ctx;
+    const {
+      id,
+      withWork,
+      withDept,
+      withUsers,
+      withUsersInCharge,
+      withUsersAttend,
+      withPublisher,
+      withAttachments,
+      order,
+    } = ctx.request.body;
+    if (!id) ctx.throw('错误的请求参数-id');
+    const include = ctx.service.work.getTaskIncludeModelSync({
+      withWork,
+      withDept,
+      withUsers,
+      withUsersInCharge,
+      withUsersAttend,
+      withPublisher,
+      withAttachments,
+    });
+    const _order = ctx.service.work.getTaskOrderSync(order);
+    const task = await ctx.model.Task.findOne({
+      where: { id },
+      include,
+      order: _order,
+    });
+    ctx.body = ctx.helper.getRespBody(!!task, task || '找不到请求的任务记录');
   }
 
   async addTask() {

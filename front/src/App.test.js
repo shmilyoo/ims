@@ -6,6 +6,7 @@ import {
   checkArrayDuplicated,
   checkFromToDate
 } from './forms/validate';
+// import { timeFunctions } from './services/utility';
 
 // it('renders without crashing', () => {
 //   const div = document.createElement('div');
@@ -59,3 +60,7 @@ it('to should be empty or greater than from', () => {
     checkFromToDate(new Date(), new Date(new Date().getTime() - 2000), true)
   ).toEqual('结束时间应为空或者大于开始时间');
 });
+
+// it('检查相对时间格式化输出', () => {
+//   // expect(timeFunctions.formatRelative(1, 1 + 3600 + 1)).toEqual('1小时前');
+// });

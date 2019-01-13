@@ -3,12 +3,7 @@ import PropTypes from 'prop-types';
 import { Field } from 'redux-form';
 import {
   Grid,
-  Button,
   IconButton,
-  Select,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   withStyles,
   Typography,
   Divider
@@ -24,7 +19,7 @@ import {
   parseDateToSeconds,
   formatSecondsToDate
 } from '../formatParse';
-import { required, checkMaxStringLength32 } from '../validate';
+import { required } from '../validate';
 import { trim } from '../normalize';
 import compose from 'recompose/compose';
 
@@ -47,7 +42,7 @@ const RenderAddMultiSchedules = ({
   fields,
   deptArray,
   onChangeAmPm,
-  meta: { touched, error },
+  meta: { error },
   classes
 }) => {
   return (

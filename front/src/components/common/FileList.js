@@ -1,15 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
-import {
-  Grid,
-  Typography,
-  Button,
-  TextField,
-  withStyles,
-  LinearProgress,
-  IconButton
-} from '@material-ui/core';
+import { Grid, withStyles, IconButton } from '@material-ui/core';
 import Cancel from '@material-ui/icons/Cancel';
 import { Link } from 'react-router-dom';
 import compose from 'recompose/compose';

@@ -106,6 +106,11 @@ const theme = createMuiTheme({
     alertBtn: {
       // color: error.light,
       '&:hover': { color: error.light }
+    },
+    lineCut: {
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap'
     }
   }
 });

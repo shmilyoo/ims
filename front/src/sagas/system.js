@@ -81,6 +81,7 @@ function* getSystemConfig() {
       configs.amTo = Number.parseInt(configs.amTo) || 0;
       configs.pmFrom = Number.parseInt(configs.pmFrom) || 0;
       configs.pmTo = Number.parseInt(configs.pmTo) || 0;
+      configs.articleNumber = Number.parseInt(configs.articleNumber) || 5;
       yield put(systemActions.setCommonConfig(configs));
       yield put(systemActions.prerequisiteSystem());
     }

@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Grid, Typography, Chip, Button, TextField } from '@material-ui/core';
 import { withTheme } from '@material-ui/core/styles';
-import ColorPicker from '../../components/common/ColorPicker';
+import ColorPickerTextField from '../../components/common/ColorPickerTextField';
 import { compose } from 'recompose';
 import { actions as systemActions } from '../../reducers/system';
 import { actions as commonAction } from '../../reducers/common';
@@ -77,8 +77,17 @@ class SystemConfigTag extends React.PureComponent {
     const { tags, theme } = this.props;
     return (
       <Grid container direction="column" spacing={8}>
-        <Grid item>
-          <Typography variant="h6">标签管理:</Typography>
+        <Grid item container alignItems="center" spacing={16}>
+          <Grid item>
+            <Typography variant="h6" noWrap>
+              标签管理:
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Typography variant="body2" color="textSecondary">
+              用以分类大项工作类型
+            </Typography>
+          </Grid>
         </Grid>
         <Grid item>
           {tags &&
@@ -115,7 +124,7 @@ class SystemConfigTag extends React.PureComponent {
             />
           </Grid>
           <Grid item>
-            <ColorPicker
+            <ColorPickerTextField
               label="标签颜色"
               color={tagColor}
               onChange={this.colorPickerChange}

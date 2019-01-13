@@ -6,18 +6,14 @@ import qs from 'qs';
 import { SubmissionError } from 'redux-form';
 import {
   toRedirectPage,
-  getWorkInfo,
   getDeptArraySync,
   getWorkArticle,
-  getWorkChannels,
-  deleteWorkArticle
+  getWorkChannels
 } from '../../services/utility';
 import compose from 'recompose/compose';
 import ArticleForm from '../../forms/work/ArticleForm';
-import { actions as workActions } from '../../reducers/work';
 import Loading from '../../components/common/Loading';
 import Axios from 'axios';
-import history from '../../history';
 
 const style = theme => ({
   link: theme.sharedClass.link,

@@ -98,6 +98,11 @@ module.exports = app => {
         name: 'channel2',
         order: 2,
       });
+      const channel3 = await app.model.WorkChannel.create({
+        workId,
+        name: 'channel3',
+        order: 3,
+      });
       const title =
         '一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二';
       const articles = new Array(21).fill(0).map((n, i) => ({
@@ -114,8 +119,16 @@ module.exports = app => {
         updateTime: 1545267600 + i * 1000000,
         publisherId: 'f3762080cb9911e884eec9a890da2222',
       }));
+      const articles3 = new Array(3).fill(0).map((n, i) => ({
+        channelId: channel3.id,
+        title: title.substring(0, i + 1),
+        createTime: 1545267600 + i * 1000000,
+        updateTime: 1545267600 + i * 1000000,
+        publisherId: 'f3762080cb9911e884eec9a890da2222',
+      }));
       await app.model.WorkArticle.bulkCreate(articles);
       await app.model.WorkArticle.bulkCreate(articles2);
+      await app.model.WorkArticle.bulkCreate(articles3);
       await app.model.Phase.bulkCreate([
         {
           title: 'phase 1',

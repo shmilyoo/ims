@@ -1,6 +1,7 @@
 // 一些辅助函数
 import { actions as accountActions } from '../reducers/account';
 import md5 from 'md5';
+import format from 'date-fns/format';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import history from '../history';
@@ -39,20 +40,42 @@ export const checkInUsers = (users, id) => {
  * @param {string} userId 用户id
  * @param {string} workDeptId work所属的dept id
  * @param {array} usersInCharge work的负责人，[{id,name}...]
+ * @param {object} workPublisher work的发布人，{id,name}
  */
 export const checkCanManageWork = (
   manageDepts,
   userId,
   workDeptId,
-  usersInCharge
+  usersInCharge,
+  workPublisher
 ) => {
-  let canManage = false; // 是否可以编辑work的主要信息
-  if (manageDepts.includes(workDeptId)) {
-    canManage = true;
-  } else {
-    canManage = checkInUsers(usersInCharge, userId);
-  }
-  return canManage;
+  // 是否可以编辑work的主要信息
+  if (manageDepts.includes(workDeptId)) return true;
+  if (checkInUsers(usersInCharge, userId)) return true;
+  if (userId === workPublisher.id) return true;
+  return false;
+};
+
+/**
+ * 检查用户是否具有管理task权限
+ * @param {array} manageDepts 用户具有管理权限的dept id 列表
+ * @param {string} userId 用户id
+ * @param {string} workDeptId task的work所属的dept id
+ * @param {array} usersInCharge task的负责人，[{id,name}...]
+ * @param {object} taskPublisher task的发布人，{id,name}
+ */
+export const checkCanManageTask = (
+  manageDepts,
+  userId,
+  workDeptId,
+  usersInCharge,
+  taskPublisher
+) => {
+  // 是否可以编辑work的主要信息
+  if (manageDepts.includes(workDeptId)) return true;
+  if (checkInUsers(usersInCharge, userId)) return true;
+  if (userId === taskPublisher.id) return true;
+  return false;
 };
 
 /**
@@ -242,7 +265,8 @@ export const getWorkInfo = ({
   withUsersInCharge,
   withUsersAttend,
   withPublisher,
-  withChannels,
+  withChannels, // 单独实现，orm会另外开一个sql查询，不太好
+  // withChannelsArticles = 5, // 频道下是否获取最新的文章，设置为几篇
   withTag,
   withPhases,
   withAttachments,
@@ -256,11 +280,45 @@ export const getWorkInfo = ({
     withUsersAttend,
     withPublisher,
     withChannels,
+    // withChannelsArticles,
     withTag,
     withPhases,
     withAttachments,
     order
   });
+};
+export const getTaskInfo = ({
+  id,
+  withWork,
+  withUsers,
+  withUsersInCharge,
+  withUsersAttend,
+  withPublisher,
+  withAttachments,
+  order
+}) => {
+  return axios.post('/task/info', {
+    id,
+    withWork,
+    withUsers,
+    withUsersInCharge,
+    withUsersAttend,
+    withPublisher,
+    withAttachments,
+    order
+  });
+};
+
+/**
+ * 用在work/dept下面的各个频道文章列表
+ * @param {string} fromId work的id
+ * @param {'work'|'dept'} from 从work还是dept获取
+ * @param {number} limit 每个频道获取多少文章
+ */
+export const getArticlesChannels = (fromId, from = 'work', limit = 5) => {
+  return axios.get(
+    `/articles/channels?from=${from}&&fromId=${fromId}&&limit=${limit}`
+  );
 };
 
 export const getWorkTasks = ({
@@ -398,6 +456,10 @@ export const delChannel = (from = 'work', id, channelParentId) => {
 };
 
 export const timeFunctions = {
+  // getUnixFromDate: d => {
+  //   if (d instanceof Date) return Math.floor(d.getTime() / 1000);
+  //   throw Error('错误的参数，必须为Date类型');
+  // },
   getNowUnix: () => Math.floor(new Date().getTime() / 1000),
   /**
    * 从unix时间戳返回日期字符串
@@ -405,16 +467,40 @@ export const timeFunctions = {
    * @param {string} type 返回的格式，date,datetime,time
    */
   formatFromUnix: (unix, type = 'date') => {
-    const date = new Date(unix * 1000);
+    if (!Number.isInteger || unix < 0) return '';
     switch (type) {
       case 'datetime':
-        return `${date.getFullYear()}-${date.getMonth() +
-          1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
+        return format(unix * 1000, 'yyyy-MM-dd HH:mm');
       case 'time':
-        return `${date.getHours()}:${date.getMinutes()}`;
+        return format(unix * 1000, 'HH:mm');
       default:
-        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+        return format(unix * 1000, 'yyyy-MM-dd');
     }
+  },
+  formatRelative: (compareFrom, compareTo = new Date(), type = 'date') => {
+    let from;
+    let to;
+    if (compareFrom instanceof Date)
+      from = timeFunctions.getUnixFromDate(compareFrom);
+    else if (Number.isInteger(compareFrom) && compareFrom >= 0)
+      from = compareFrom;
+    else throw Error('参数必须是Date类型或者正整数');
+    if (compareTo instanceof Date)
+      to = timeFunctions.getUnixFromDate(compareTo);
+    else if (Number.isInteger(compareTo) && compareTo >= 0) to = compareTo;
+    else throw Error('参数必须是Date类型或者正整数');
+    const diff = from - to;
+    const absDiff = Math.abs(diff);
+    const direction = diff > 0 ? '后' : '前';
+    if (absDiff >= 3600 * 24 * 3)
+      return timeFunctions.formatFromUnix(from, type);
+    else if (absDiff >= 3600 * 24)
+      return `${Math.floor(absDiff / (3600 * 24))}天${direction}`;
+    else if (absDiff >= 3600)
+      return `${Math.floor(absDiff / 3600)}小时${direction}`;
+    else if (absDiff >= 60)
+      return `${Math.floor(absDiff / 60)}分钟${direction}`;
+    else if (absDiff >= 0) return '刚刚';
   }
 };
 

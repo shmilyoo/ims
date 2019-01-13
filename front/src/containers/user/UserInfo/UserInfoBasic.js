@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import compose from 'recompose/compose';
-import { actions as accountActions } from '../../reducers/account';
+import { actions as accountActions } from '../../../reducers/account';
 import {
   Grid,
   Divider,
@@ -9,9 +9,9 @@ import {
   Switch,
   Typography
 } from '@material-ui/core';
-import UserInfoForm from '../../forms/user/UserInfoForm';
+import UserInfoForm from '../../../forms/user/UserInfoForm';
 
-class ChangeDept extends PureComponent {
+class UserInfoBasic extends PureComponent {
   state = {
     edit: false
   };
@@ -87,4 +87,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default compose(connect(mapStateToProps))(ChangeDept);
+export default compose(connect(mapStateToProps))(UserInfoBasic);

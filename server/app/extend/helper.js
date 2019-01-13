@@ -1,6 +1,8 @@
 'use strict';
 // 项目中在helper中定义一些不需要app/ctx等上下文的帮助函数,但会在app/ctx中调用
 
+const format = require('date-fns/format');
+
 module.exports = {
   /**
    *
@@ -74,16 +76,14 @@ module.exports = {
      * @return {string}  返回的时间格式化字符串
      */
     formatFromUnix: (unix, type = 'date') => {
-      const date = new Date(unix * 1000);
+      if (!Number.isInteger || unix < 0) return '';
       switch (type) {
         case 'datetime':
-          return `${date.getFullYear()}-${date.getMonth() +
-            1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
+          return format(unix * 1000, 'yyyy-MM-dd HH:mm');
         case 'time':
-          return `${date.getHours()}:${date.getMinutes()}`;
+          return format(unix * 1000, 'HH:mm');
         default:
-          return `${date.getFullYear()}-${date.getMonth() +
-            1}-${date.getDate()}`;
+          return format(unix * 1000, 'yyyy-MM-dd');
       }
     },
   },

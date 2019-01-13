@@ -11,14 +11,11 @@ import {
   RenderDatePicker,
   RenderWorkPhase,
   RenderInputSelect,
-  RenderFileUpload
+  RenderFileUpload,
+  RenderRichEditor
 } from '../renderFields';
 import { formatUnixTimeToDate, parseDateToUnixTime } from '../formatParse';
-import {
-  required,
-  checkMaxStringLength32,
-  checkMaxStringLength255
-} from '../validate';
+import { required, checkMaxStringLength32 } from '../validate';
 import { trim } from '../normalize';
 import RenderDeptPicker from '../renderFields/renderDeptPicker';
 import { attachmentUploadUrl } from '../../config';
@@ -127,17 +124,19 @@ class WorkForm extends React.PureComponent {
           </Grid>
           <Grid item>
             {/* todo 更改为富文本编辑器 */}
-            <Field
+            {/* <Field
               name="content"
               label="大项工作的介绍(最长255个字符)"
               multiline
               component={RenderTextField}
               validate={checkMaxStringLength255}
               normalize={trim}
+            /> */}
+            <Field
+              name="content"
+              label="工作介紹"
+              component={RenderRichEditor}
             />
-          </Grid>
-          <Grid item>
-            <Divider />
           </Grid>
           <Grid item>
             <Field
@@ -181,7 +180,7 @@ class WorkForm extends React.PureComponent {
   }
 }
 
-function mapStateToProps(state, ownProps) {
+function mapStateToProps() {
   return {};
 }
 

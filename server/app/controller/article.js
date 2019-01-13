@@ -67,6 +67,34 @@ class ArticleController extends Controller {
       ctx.body = ctx.helper.getRespBody(false);
     }
   }
+
+  async getArticlesChannels() {
+    const ctx = this.ctx;
+    const { from, fromId, limit = 5 } = ctx.query;
+    if (!fromId) ctx.throw('错误的请求参数');
+    const ChannelModel =
+      from === 'work'
+        ? ctx.model.WorkChannel
+        : from === 'dept'
+          ? ctx.model.DeptChannel
+          : ctx.throw('错误的请求参数');
+    const ArticleModel =
+      from === 'work' ? ctx.model.WorkArticle : ctx.model.DeptArticle;
+    const res = await ChannelModel.findAll({
+      where: { [from === 'work' ? 'workId' : 'deptId']: fromId },
+      include: [
+        {
+          model: ArticleModel,
+          as: 'articles',
+          attributes: [ 'id', 'title', 'createTime', 'channelId' ],
+          limit: Number(limit),
+          order: [[ 'createTime', 'desc' ]],
+        },
+      ],
+      order: [[ 'order', 'asc' ]],
+    });
+    ctx.body = ctx.helper.getRespBody(true, res);
+  }
 }
 
 module.exports = ArticleController;

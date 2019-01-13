@@ -71,5 +71,6 @@ export const parseStringToNumber = s => {
   return Number(s);
 };
 export const formatNumberToString = n => {
+  if (!Number.isInteger(n)) return '';
   return `${n}`;
 };

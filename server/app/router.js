@@ -19,6 +19,11 @@ module.exports = app => {
   router.post('/account/info', checkUser, controller.account.setUserInfo);
   router.post('/articles', checkUser, controller.article.getArticles);
   router.post('/article/delete', checkUser, controller.article.deleteArticles);
+  router.get(
+    '/articles/channels',
+    checkUser,
+    controller.article.getArticlesChannels
+  );
   router.get('/dept/all', controller.dept.all);
   router.get('/dept/users', checkUser, controller.dept.deptUsers);
   router.get('/dept/managers', checkUser, controller.dept.deptManagers);
@@ -46,6 +51,7 @@ module.exports = app => {
   );
   router.post('/work/article', checkUser, controller.work.getWorkArticle);
   router.post('/task/add', checkUser, controller.work.addTask);
+  router.post('/task/info', checkUser, controller.work.getTaskInfo);
   router.post('/cache/updateAll', controller.cache.updateAll);
   router.get('/system/all', controller.system.allConfig);
   router.post('/system/config', controller.system.setConfig);
@@ -55,4 +61,5 @@ module.exports = app => {
   router.post('/system/tag/delete', controller.system.deleteTag);
   router.post('/system/time-scale', controller.system.timeScale);
   router.post('/upload/attachment', controller.common.uploadAttachment);
+  router.post('/upload/image', controller.common.uploadImage);
 };
