@@ -38,6 +38,7 @@ class CustomInput extends React.PureComponent {
                 endAdornment: (
                   <InputAdornment position="end">
                     <Cancel
+                      color="action"
                       style={{ cursor: 'pointer' }}
                       onClick={this.handleClearClick}
                     />

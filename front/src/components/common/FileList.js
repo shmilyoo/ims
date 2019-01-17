@@ -34,7 +34,9 @@ class FileList extends PureComponent {
                   <Grid item>
                     <Link
                       className={classes.link}
-                      to={file.type ? '#' : file.path}
+                      download={`${file.name}${file.ext}`}
+                      // type为add或者delete表示新增还没上传或者已经删除的，不需要链接
+                      to={file.type ? '#' : `/upload/${file.path}`}
                     >{`${file.name}${file.ext}`}</Link>
                   </Grid>
                   {edit && (

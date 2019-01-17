@@ -140,12 +140,12 @@ class FileUpload extends PureComponent {
     const { file, fileName, percent, showProgress, error } = this.state;
     return (
       <Grid container direction="column" wrap="nowrap">
-        {files &&
-          files.length > 0 && (
-            <Grid item>
-              <Typography variant="body2">附件:</Typography>
-            </Grid>
-          )}
+        {/* {files &&
+          files.length > 0 && ( */}
+        <Grid item>
+          <Typography variant="body2">附件:</Typography>
+        </Grid>
+        {/* )} */}
         <FileList onDelFile={this.delFile} edit={true} files={files} />
         <Grid item container spacing={8} alignItems="center">
           <Grid item xs={4}>

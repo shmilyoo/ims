@@ -78,6 +78,7 @@ module.exports = app => {
         deptId: 'c360d5f0ceef11e8b013f53754442dd4',
         id: `c360d5f0cfff11e8b013f53754442d${i + 10}`,
         tagId: defaultTag.id,
+        content: '<div><p>测试工作内容数据</p></div>',
         title: new Array(i + 1).fill('a').join(),
         from: 1745267600 + i * 1000000,
         to: 1845267600 + i * 1000000,
@@ -103,9 +104,25 @@ module.exports = app => {
         name: 'channel3',
         order: 3,
       });
+      const deptId4s = 'c360d5f0ceef11e8b013f53754442dd4';
+      const channel11 = await app.model.DeptChannel.create({
+        deptId: deptId4s,
+        name: 'channel1',
+      });
+      const channel12 = await app.model.DeptChannel.create({
+        deptId: deptId4s,
+        name: 'channel2',
+        order: 2,
+      });
+      const channel13 = await app.model.DeptChannel.create({
+        deptId: deptId4s,
+        name: 'channel3',
+        order: 3,
+      });
       const title =
         '一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二';
       const articles = new Array(21).fill(0).map((n, i) => ({
+        id: `c360d5f0c12311e8b013f53754442d${i + 10}`,
         channelId: channel1.id,
         title: title.substring(0, i + 12),
         createTime: 1545267600 + i * 1000000,
@@ -113,6 +130,7 @@ module.exports = app => {
         publisherId: 'c360d5f0ceef11e8b013f53754442777',
       }));
       const articles2 = new Array(21).fill(0).map((n, i) => ({
+        id: `c360d5f0c17311e8b013f53754442d${i + 10}`,
         channelId: channel2.id,
         title: title.substring(0, 21 - i),
         createTime: 1545267600 + i * 1000000,
@@ -120,6 +138,7 @@ module.exports = app => {
         publisherId: 'f3762080cb9911e884eec9a890da2222',
       }));
       const articles3 = new Array(3).fill(0).map((n, i) => ({
+        id: `c360d5f0c19311e8b013f53754442d${i + 10}`,
         channelId: channel3.id,
         title: title.substring(0, i + 1),
         createTime: 1545267600 + i * 1000000,
@@ -157,8 +176,7 @@ module.exports = app => {
         title: new Array(i + 1).fill('a').join(),
         from: 1535267600 + i * 10000,
         to: 1555467600 + i * 10000,
-        content:
-          '测试task内容，测试task内容，测试task内容，测试task内容，测试task内容，',
+        content: '<div><p>测试工作任务内容数据</p></div>',
         createTime: 1545267600 + i * 10000,
         updateTime: 1545367600 + i * 10000,
         publisherId: 'c360d5f0ceef11e8b013f53754442777',

@@ -4,7 +4,7 @@ import { withStyles, Grid, Typography } from '@material-ui/core';
 import history from '../history';
 import qs from 'qs';
 import compose from 'recompose/compose';
-import { sysName } from '../config';
+import { sysName, systemDomain } from '../config';
 
 const style = theme => ({
   root: {
@@ -41,7 +41,8 @@ class CountDownRedirect extends PureComponent {
   };
   redirect = () => {
     const to = this.state.to;
-    if (to.startsWith('http://') || to.startsWith('https://')) {
+    alert(to);
+    if (to.startsWith('http') && !to.startsWith(systemDomain)) {
       global.location = to;
     } else history.push(to);
   };

@@ -81,7 +81,7 @@ class ChannelsArticles extends PureComponent {
                         <Grid className={classes.articleTitle}>
                           <Link
                             className={classes.link}
-                            to={`/${from}/article?id=${articles[i].id}`}
+                            to={`/${from}/article/info?id=${articles[i].id}`}
                           >
                             {articles[i].title}
                           </Link>

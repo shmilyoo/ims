@@ -7,6 +7,8 @@ import compose from 'recompose/compose';
 import Loading from '../../components/common/Loading';
 import AddWorkSuccess from './AddWorkSuccess';
 import DeptWorks from './DeptWorks';
+import EditDeptChannel from './EditDeptChannel';
+import DeptBulletin from './DeptBulletin';
 
 const DeptManage = ({ match, manageDept }) => {
   return (
@@ -14,6 +16,16 @@ const DeptManage = ({ match, manageDept }) => {
       {manageDept ? (
         <Switch>
           <Route exact path={`${match.path}`} component={null} />
+          <Route
+            exact
+            path={`${match.path}/bulletin`}
+            component={DeptBulletin}
+          />
+          <Route
+            exact
+            path={`${match.path}/channels`}
+            component={EditDeptChannel}
+          />
           <Route exact path={`${match.path}/work/add`} component={AddWork} />
           <Route exact path={`${match.path}/work/edit`} component={null} />
           <Route exact path={`${match.path}/work`} component={DeptWorks} />

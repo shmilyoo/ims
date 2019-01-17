@@ -130,7 +130,7 @@ class ManageWorkArticles extends React.PureComponent {
         title: (
           <Link
             className={this.props.classes.link}
-            to={`/work/article?id=${id}`}
+            to={`/work/article/info?id=${id}`}
           >
             {title}
           </Link>
@@ -150,7 +150,9 @@ class ManageWorkArticles extends React.PureComponent {
           <IconButton
             className={this.props.classes.padding5}
             onClick={() => {
-              history.push(`/work/article/edit?id=${id}`);
+              history.push(
+                `/work/article/edit?articleId=${id}&&workId=${this.props.id}`
+              );
             }}
           >
             <Edit />
@@ -241,7 +243,10 @@ class ManageWorkArticles extends React.PureComponent {
                     this.channelItemClick(channel);
                   }}
                 >
-                  <ListItemText primary={`${channel.name}`} />
+                  <ListItemText
+                    primary={`${channel.name}`}
+                    primaryTypographyProps={{ align: 'center' }}
+                  />
                 </ListItem>
               ))
             ) : (

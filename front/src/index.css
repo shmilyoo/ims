@@ -1,10 +1,18 @@
 html {
   font-size: 62.5%;
   height: 100%;
+  /* 防止滚动条导致弹出窗口和页面抖动 */
+  /* overflow-x: hidden;
+  overflow-y: auto; */
 }
 body {
   font-size: 1.4rem;
   height: 100%;
+  /* 防止滚动条导致弹出窗口和页面抖动 */
+  /* width: 100vw;
+  overflow: hidden; */
+  /* padding-left: calc(100vw - 100%); */
+  /* margin-left: calc(100vw - 100%); */
 }
 #root {
   height: 100%;
@@ -12,4 +20,7 @@ body {
 * {
   margin: 0;
   padding: 0;
+}
+.wrap-outer {
+  margin-left: calc(100vw - 100%);
 }

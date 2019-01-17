@@ -72,7 +72,8 @@ class WorkTaskInfo extends PureComponent {
       manageDepts,
       accountId,
       task.work.deptId,
-      task.usersInCharge
+      task.usersInCharge,
+      task.publisher.id
     );
     this.setState({ canManage });
   };
@@ -101,20 +102,20 @@ class WorkTaskInfo extends PureComponent {
             </Grid>
           )}
         </Grid>
+        <Grid item>
+          <Typography variant="h6">
+            所属工作:{' '}
+            {task.work && (
+              <Link
+                className={classes.link}
+                to={`/work/info?id=${task.work.id}`}
+              >
+                {task.work.title}
+              </Link>
+            )}
+          </Typography>
+        </Grid>
         <Grid item container>
-          <Grid item xs={12}>
-            <Typography variant="h6">
-              所属工作:{' '}
-              {task.work && (
-                <Link
-                  className={classes.link}
-                  to={`/work/info?id=${task.work.id}`}
-                >
-                  {task.work.title}
-                </Link>
-              )}
-            </Typography>
-          </Grid>
           <Grid item xs={6} lg={3}>
             <Typography variant="h6">
               发布人:{' '}
@@ -198,7 +199,9 @@ class WorkTaskInfo extends PureComponent {
         <Grid item>
           <Typography variant="h6">工作介绍:</Typography>
         </Grid>
-        <Grid item>{task.content}</Grid>
+        <Grid item>
+          <div dangerouslySetInnerHTML={{ __html: task.content }} />
+        </Grid>
 
         {task.attachments &&
           task.attachments.length > 0 && (

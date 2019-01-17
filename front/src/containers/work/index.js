@@ -9,6 +9,8 @@ import AddTaskSuccess from './AddTaskSuccess';
 import AddWorkArticleSuccess from './AddWorkArticleSuccess';
 import EditWorkArticle from './EditWorkArticle';
 import WorkTaskInfo from './WorkTaskInfo';
+import EditWorkTask from './EditWorkTask';
+import WorkArticleInfo from './WorkArticleInfo';
 
 const Work = ({ match }) => {
   return (
@@ -18,7 +20,11 @@ const Work = ({ match }) => {
       <Route exact path={`${match.path}/schedule/manage`} component={null} />
       <Route exact path={`${match.path}/info`} component={WorkInfo} />
       <Route exact path={`${match.path}/edit`} component={WorkEdit} />
-      <Route exact path={`${match.path}/article`} component={null} />
+      <Route
+        exact
+        path={`${match.path}/article/info`}
+        component={WorkArticleInfo}
+      />
       <Route
         exact
         path={`${match.path}/article/add`}
@@ -35,7 +41,7 @@ const Work = ({ match }) => {
         component={AddWorkArticleSuccess}
       />
       <Route exact path={`${match.path}/task/add`} component={AddWorkTask} />
-      <Route exact path={`${match.path}/task/edit`} component={null} />
+      <Route exact path={`${match.path}/task/edit`} component={EditWorkTask} />
       <Route exact path={`${match.path}/task/info`} component={WorkTaskInfo} />
       <Route
         exact

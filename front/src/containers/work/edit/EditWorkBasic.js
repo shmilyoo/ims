@@ -60,15 +60,9 @@ class EditWorkBasic extends React.PureComponent {
   handleSubmit = values => {
     const { usersInCharge, usersAttend } = values;
     let error;
-    if (
-      (error = checkArrayDuplicated(
-        user => user.id,
-        usersInCharge,
-        usersAttend
-      ))
-    ) {
+    if (checkArrayDuplicated(user => user.id, usersInCharge, usersAttend)) {
       throw new SubmissionError({
-        usersInCharge: error
+        usersInCharge: '负责人和参加人不可重复'
       });
     }
     if ((error = checkFromToDate(values.from, values.to, true))) {

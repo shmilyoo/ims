@@ -39,6 +39,11 @@ module.exports = app => {
       foreignKey: 'workId',
       constraints: false,
     });
+    Work.hasMany(app.model.Task, {
+      as: 'tasks',
+      foreignKey: 'workId',
+      constraints: false,
+    });
     Work.hasMany(app.model.WorkChannel, {
       as: 'channels',
       foreignKey: 'workId',

@@ -10,24 +10,41 @@ import {
   timeFunctions,
   checkCanManageWork,
   checkCanAddTaskArticle,
-  toRedirectPage
+  toRedirectPage,
+  delWorks
 } from '../../services/utility';
 import compose from 'recompose/compose';
 import FileList from '../../components/common/FileList';
 import WorkTaskList from './WorkTaskList';
 import ChannelsArticles from '../../components/common/ChannelsArticles';
+import TwoValueSwitch from '../../components/common/TwoValueSwitch';
+import SearchTextFieldWithType from '../../components/common/SearchTextFieldWithType';
+import SimpleAlertDialog from '../../components/common/SimpleAlertDialog';
+import history from '../../history';
 
 const style = theme => ({
   link: theme.sharedClass.link,
   grayLink: theme.sharedClass.grayLink,
   main: { width: '80%', maxWidth: '100rem' },
-  workEdit: {}
+  workEdit: {},
+  adminContainer: {
+    position: 'absolute',
+    top: '7rem',
+    left: '4rem'
+  },
+  adminItem: {
+    ...theme.sharedClass.grayLink,
+    marginLeft: '1rem',
+    display: 'inline'
+  }
 });
 
 class WorkInfo extends PureComponent {
   state = {
     id: '',
-    work: null
+    work: null,
+    taskShowStyle: 'list', // 子任务的显示模式，默认列表，可切换到timeline
+    alertOpen: false
   };
   componentDidMount() {
     const { id } = qs.parse(this.props.location.search, {
@@ -89,31 +106,72 @@ class WorkInfo extends PureComponent {
     this.setState({ canManage, canAddTaskArticle });
   };
 
+  handleChangeTaskShowStyle = value => {
+    this.setState({ taskShowStyle: value });
+  };
+  handleDeleteConfirm = () => {
+    delWorks([this.state.id]).then(res => {
+      if (res.success) {
+        if (res.data === 1) {
+          history.push(`/dept-manage/work`);
+        }
+      }
+    });
+    this.handleAlertCancel();
+  };
+
+  handleAlertOpen = () => {
+    this.setState({ alertOpen: true });
+  };
+
+  handleAlertCancel = () => {
+    this.setState({ alertOpen: false });
+  };
+
   render() {
-    const { work, canManage, canAddTaskArticle } = this.state;
+    const {
+      work,
+      canManage,
+      canAddTaskArticle,
+      taskShowStyle,
+      alertOpen
+    } = this.state;
     const { deptDic, classes, articleNumber } = this.props;
     const now = timeFunctions.getNowUnix();
     if (!work) return <Loading />;
     console.log('render work info');
     return (
       <Grid container direction="column" wrap="nowrap" spacing={8}>
+        {canManage && (
+          <div className={classes.adminContainer}>
+            <Link className={classes.adminItem} to={`/dept-manage/work/add`}>
+              添加
+            </Link>
+            <Link className={classes.adminItem} to={`/work/edit?id=${work.id}`}>
+              编辑
+            </Link>
+            <Typography
+              component="span"
+              className={classes.adminItem}
+              onClick={this.handleAlertOpen}
+            >
+              删除
+            </Typography>
+            <SimpleAlertDialog
+              title="确认操作"
+              content="是否确认删除工作，操作将同时删除工作包含的所有附件、阶段、任务、文章"
+              open={alertOpen}
+              onConfirm={this.handleDeleteConfirm}
+              onCancel={this.handleAlertCancel}
+            />
+          </div>
+        )}
         <Grid item container justify="center">
           <Grid item>
             <Typography variant="h3" align="center" paragraph>
               {work.title}
             </Typography>
           </Grid>
-          {canManage && (
-            <Grid item>
-              {/* // todo 验证下canManage 是否正确 */}
-              <Link
-                className={classes.grayLink}
-                to={`/work/edit?id=${work.id}`}
-              >
-                编辑
-              </Link>
-            </Grid>
-          )}
         </Grid>
         <Grid item container>
           <Grid item xs={6} lg={3}>
@@ -290,12 +348,11 @@ class WorkInfo extends PureComponent {
               <FileList files={work.attachments} />
             </Grid>
           )}
-
         <Grid item container direction="column" wrap="nowrap">
           <Grid item>
             <Divider />
           </Grid>
-          <Grid item container justify="space-between">
+          <Grid item container justify="space-between" alignItems="center">
             <Grid item>
               <Grid container spacing={16} alignItems="center">
                 <Grid item>
@@ -324,14 +381,21 @@ class WorkInfo extends PureComponent {
               </Grid>
             </Grid>
             <Grid item>
-              <Typography variant="h6">列表/时间线</Typography>
+              <TwoValueSwitch
+                value={taskShowStyle}
+                onChange={this.handleChangeTaskShowStyle}
+                primaryValue="list"
+                sencondaryValue="timeline"
+                primaryLabel="列表"
+                sencondaryLabel="时间线"
+              />
             </Grid>
           </Grid>
           <Grid item>
-            <WorkTaskList workId={work.id} />
+            {taskShowStyle === 'list' && <WorkTaskList workId={work.id} />}
+            {taskShowStyle === 'timeline' && null}
           </Grid>
         </Grid>
-
         <Grid item>
           <Divider />
         </Grid>

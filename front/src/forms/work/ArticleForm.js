@@ -6,7 +6,8 @@ import compose from 'recompose/compose';
 import {
   RenderTextField,
   RenderInputSelect,
-  RenderFileUpload
+  RenderFileUpload,
+  RenderRichEditor
 } from '../renderFields';
 import {
   required,
@@ -51,14 +52,15 @@ const ArticleForm = ({
         </Grid>
         <Grid item xs>
           {/* todo 更改为富文本编辑器 */}
-          <Field
+          <Field name="content" component={RenderRichEditor} label="任务内容" />
+          {/* <Field
             name="content"
             label="正文"
             multiline
             component={RenderTextField}
             validate={checkMaxStringLength255}
             normalize={trim}
-          />
+          /> */}
         </Grid>
         <Grid item>
           <Field

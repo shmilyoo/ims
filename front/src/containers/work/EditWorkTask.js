@@ -6,60 +6,63 @@ import { Grid, Typography, withStyles, Divider } from '@material-ui/core';
 import qs from 'qs';
 import {
   toRedirectPage,
-  getWorkInfo,
-  getDeptArraySync
+  getDeptArraySync,
+  getTaskInfo
 } from '../../services/utility';
 import compose from 'recompose/compose';
 import TaskForm from '../../forms/work/TaskForm';
-import { actions as workActions } from '../../reducers/work';
 import Loading from '../../components/common/Loading';
-import { checkArrayDuplicated, checkFromToDate } from '../../forms/validate';
+import Axios from 'axios';
+import { checkFromToDate, checkArrayDuplicated } from '../../forms/validate';
+import history from '../../history';
 
 const style = theme => ({
   link: theme.sharedClass.link
 });
 
-class AddWorkTask extends PureComponent {
-  constructor(props) {
-    super(props);
-    const { workId } = qs.parse(props.location.search, {
+class EditWorkTask extends PureComponent {
+  state = {
+    id: '',
+    task: null
+  };
+  componentDidMount() {
+    const { id } = qs.parse(this.props.location.search, {
       ignoreQueryPrefix: true
     });
-    if (!workId) toRedirectPage('错误的请求url参数', document.referrer || '/');
-    this.state = { workId, dept: null, work: null };
-  }
-
-  componentDidMount() {
-    getWorkInfo({ id: this.state.workId, withDept: 1 }).then(res => {
+    if (!id) {
+      toRedirectPage('错误的请求url参数', '/');
+      return;
+    }
+    getTaskInfo({
+      id,
+      withUsers: true,
+      withWork: true,
+      withPublisher: true,
+      withAttachments: true,
+      order: { user: 'asc' }
+    }).then(res => {
       if (res.success) {
-        const work = res.data;
+        const task = { ...res.data, usersInCharge: [], usersAttend: [] };
+        res.data.users.forEach(
+          ({ id, name, deptId, userTask: { isInCharge } }) => {
+            if (isInCharge) task.usersInCharge.push({ id, name, deptId });
+            else task.usersAttend.push({ id, name, deptId });
+          }
+        );
         this.setState({
-          work,
-          dept: work.dept
+          task,
+          id
         });
-      } else {
-        toRedirectPage('找不到对应的大项工作记录', '/dept/mine');
       }
     });
   }
 
   handleSubmit = values => {
-    if (values.schedules && values.schedules.length > 0) {
-      const error = { schedules: [] };
-      values.schedules.forEach(({ from, to }, index) => {
-        if (to <= from) {
-          error.schedules[index] = { to: '应大于开始' };
-        }
-      });
-      if (error.schedules.length > 0) {
-        throw new SubmissionError(error);
-      }
-    }
     const { usersInCharge, usersAttend } = values;
     let error;
     if (checkArrayDuplicated(user => user.id, usersInCharge, usersAttend)) {
       throw new SubmissionError({
-        usersInCharge: '负责人和参加人不可重复'
+        usersInCharge: '负责人和参加人不能重复'
       });
     }
     if ((error = checkFromToDate(values.from, values.to, true))) {
@@ -67,33 +70,34 @@ class AddWorkTask extends PureComponent {
         from: error
       });
     }
-    const { dept, work } = this.state;
-    return new Promise(resolve => {
-      this.props.dispatch(
-        workActions.sagaAddTask(resolve, values, dept.id, work.id)
-      );
+    return new Promise((resolve, reject) => {
+      Axios.post('/task/edit', values).then(res => {
+        if (res.success) {
+          resolve();
+          history.push(`/work/task/info?id=${values.id}`);
+        } else {
+          reject(
+            new SubmissionError({
+              _error: res.error
+            })
+          );
+        }
+      });
     });
   };
 
   render() {
-    const { dept, work } = this.state;
-    const {
-      deptDic,
-      deptArray,
-      allowExts,
-      amFrom,
-      amTo,
-      pmFrom,
-      pmTo,
-      classes
-    } = this.props;
-    if (!dept || !work) return <Loading />;
+    const { task } = this.state;
+    const { deptDic, deptArray, allowExts, classes } = this.props;
+    if (!task) return <Loading />;
+    const work = task.work;
+    const dept = deptDic[work.deptId];
     return (
       <Grid container justify="center">
         <Grid item container direction="column" wrap="nowrap" spacing={8}>
           <Grid item>
             <Typography variant="h4" align="center">
-              添加大项工作的子工作/任务
+              编辑大项工作的子工作/任务
             </Typography>
           </Grid>
           <Grid item>
@@ -128,15 +132,12 @@ class AddWorkTask extends PureComponent {
           </Grid>
           <Grid item>
             <TaskForm
-              edit={false}
+              edit={true}
               enableReinitialize
+              initialValues={task}
               onSubmit={this.handleSubmit}
               deptArray={deptArray}
               allowExts={allowExts}
-              amFrom={amFrom}
-              amTo={amTo}
-              pmFrom={pmFrom}
-              pmTo={pmTo}
             />
           </Grid>
         </Grid>
@@ -145,21 +146,17 @@ class AddWorkTask extends PureComponent {
   }
 }
 
-AddWorkTask.propTypes = {};
+EditWorkTask.propTypes = {};
 
 function mapStateToProps(state) {
   return {
     deptDic: state.system.deptDic,
     deptArray: state.system.deptArray,
-    allowExts: state.system.allowExts,
-    amFrom: state.system.amFrom,
-    amTo: state.system.amTo,
-    pmFrom: state.system.pmFrom,
-    pmTo: state.system.pmTo
+    allowExts: state.system.allowExts
   };
 }
 
 export default compose(
   withStyles(style),
   connect(mapStateToProps)
-)(AddWorkTask);
+)(EditWorkTask);

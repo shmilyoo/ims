@@ -155,12 +155,12 @@ class DeptWorks extends PureComponent {
     this.setState({ alertOpen: false });
   };
   handleConfirmAlert = () => {
-    this.closeAlert();
     delWorks(this.state.selectedIds).then(res => {
       if (res.success) {
         this.setState({ workList: null });
         this.getWorkList(1);
       }
+      this.closeAlert();
     });
   };
   render() {

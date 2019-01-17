@@ -22,7 +22,12 @@ const SimpleAlertDialog = ({
       {title && <DialogTitle>{title}</DialogTitle>}
       {content && <DialogContent>{content}</DialogContent>}
       <DialogActions style={{ padding: '1.5rem' }}>
-        <Button variant="contained" color="secondary" onClick={onConfirm}>
+        <Button
+          style={{ marginRight: '1rem' }}
+          variant="contained"
+          color="secondary"
+          onClick={onConfirm}
+        >
           {confirmText}
         </Button>
         <Button variant="contained" onClick={onCancel}>

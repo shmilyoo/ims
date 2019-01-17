@@ -147,7 +147,6 @@ class RichEditor extends React.PureComponent {
     super(props);
     this.editor = null;
     this.state = {
-      htmlContent: props.value,
       showPicker: false,
       showImageDialog: false,
       pickerLeft: 0,
@@ -156,17 +155,18 @@ class RichEditor extends React.PureComponent {
     };
   }
   componentDidUpdate(prevProps) {
-    if (!prevProps.value && this.props.value && this.editor) {
-      console.log('nextProps.value ', this.props.value);
-      if (this.props.value.startsWith('<div>')) {
-        // 只在编辑界面有需要加载内容的时候运行一次，add等页面，手动输入的时候，不运行
-        this.editor.clipboard.dangerouslyPasteHTML(this.props.value);
-      }
+    if (this.props.value.startsWith('<div>')) {
+      // 此处包含编辑页面初始加载，以及初始content有值的时候的撤销操作
+      this.editor.clipboard.dangerouslyPasteHTML(this.props.value, 'silent');
+    }
+    if (prevProps.value && !this.props.value && this.editor) {
+      console.log('此处为初始content为空时候的撤销操作 ', this.props.value);
+      this.editor.clipboard.dangerouslyPasteHTML('', 'silent');
     }
   }
 
   componentDidMount() {
-    this.createEditor();
+    this.createEditor().focus();
   }
 
   componentWillUnmount() {
@@ -175,8 +175,8 @@ class RichEditor extends React.PureComponent {
   }
 
   createEditor = () => {
-    const { label } = this.props;
-    const { htmlContent } = this.state;
+    const { label, value } = this.props;
+    // const { htmlContent } = this.state;
     this.editor = new Quill('#editor', {
       debug: 'warn',
       theme: 'snow',
@@ -195,11 +195,12 @@ class RichEditor extends React.PureComponent {
     });
     this.setState({ editor: this.editor });
     // 判断value中是否有值，如果有那么就写入编辑器中
-    if (htmlContent) this.editor.clipboard.dangerouslyPasteHTML(htmlContent);
+    if (value) this.editor.clipboard.dangerouslyPasteHTML(value);
     // console.log('create htmlcontent ', htmlContent);
     // this.editor.clipboard.dangerouslyPasteHTML(htmlContent || '111111111');
     // 设置事件，change事件，
     this.editor.on('editor-change', this.handleEditorChange);
+    return this.editor;
   };
 
   imageHandler = (image, callback) => {
@@ -247,7 +248,7 @@ class RichEditor extends React.PureComponent {
     oldRangeOrOldDelta,
     source
   ) => {
-    console.log(eventType);
+    console.log('handleEditorChange eventType is ', eventType);
     if (eventType === Quill.events.SELECTION_CHANGE) {
       this.handleSelectionChange(rangeOrDelta, oldRangeOrOldDelta, source);
     }
@@ -257,14 +258,20 @@ class RichEditor extends React.PureComponent {
     }
   };
   handleTextChange = (delta, oldDelta, source) => {
-    console.log('selection', this.editor.getSelection());
+    console.log(
+      'handleTextChange delta and olddelta and source is ',
+      delta,
+      oldDelta,
+      source
+    );
+    if (source === 'silent') return;
     // let html = this.editor.root.innerHTML;
     // if (!html.startsWith('<div>')) html = `<div>${html}</div>`;
     this.props.onChange && this.props.onChange(this.editor.root.innerHTML);
   };
 
   handleSelectionChange = (range, oldRange, source) => {
-    console.log('range', range);
+    console.log('handleSelectionChange range', range);
   };
 
   render() {

@@ -13,7 +13,7 @@ module.exports = app => {
     createTime: { type: INTEGER }, // 添加时间
     updateTime: { type: INTEGER }, // 修改时间
     publisherId: { type: CHAR(32) }, // 发布文章的用户
-    lastEdit: { type: STRING(64), allowNull: true }, // 文章在。。时间由xxx修改
+    lastEdit: { type: STRING(255), allowNull: true }, // 文章在。。时间由xxx修改
   });
   WorkArticle.associate = function() {
     WorkArticle.belongsTo(app.model.WorkChannel, {

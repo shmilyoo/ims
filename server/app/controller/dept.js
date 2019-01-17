@@ -121,6 +121,46 @@ class DeptController extends Controller {
       totalNumber: count,
     });
   }
+
+  async getDeptChannels() {
+    const ctx = this.ctx;
+    const { deptId } = ctx.query;
+    if (!deptId) ctx.throw('错误的请求参数！');
+    const channels = await ctx.service.channel.getChannels('dept', deptId);
+    ctx.body = ctx.helper.getRespBody(true, channels);
+  }
+
+  async updateDeptChannel() {
+    const ctx = this.ctx;
+    const {
+      DeptId,
+      values: { name, content, order, id },
+    } = ctx.request.body;
+    if (!id || !name) ctx.throw('错误的请求参数！');
+    await ctx.model.DeptChannel.update(
+      { name, content, order },
+      { where: { id } }
+    );
+    const channels = await ctx.service.channel.getChannels('dept', DeptId);
+    ctx.body = ctx.helper.getRespBody(true, channels);
+  }
+
+  async addDeptChannel() {
+    const ctx = this.ctx;
+    const {
+      deptId,
+      values: { name, content, order },
+    } = ctx.request.body;
+    if (!deptId || !name) ctx.throw('错误的请求参数！');
+    await ctx.model.DeptChannel.create({
+      deptId,
+      name,
+      content,
+      order,
+    });
+    const channels = await ctx.service.channel.getChannels('dept', deptId);
+    ctx.body = ctx.helper.getRespBody(true, channels);
+  }
 }
 
 module.exports = DeptController;

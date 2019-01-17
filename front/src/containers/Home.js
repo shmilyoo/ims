@@ -76,7 +76,6 @@ class Home extends React.Component {
     return (
       <div className={classes.homeRoot}>
         <LeftNav menu={leftMenu} open={this.state.leftOpen} header={sysName} />
-
         <Grid
           container
           direction="column"
@@ -88,7 +87,7 @@ class Home extends React.Component {
           <Grid item>
             <AppHead type="user" onMenuClick={this.handleMenuClick} />
           </Grid>
-          <Grid item xs className={classes.main}>
+          <Grid item xs className={classes.main} style={{ height: '400' }}>
             {prerequisite ? (
               <Switch>
                 <Route path="/brief" component={Brief} />
@@ -105,7 +104,7 @@ class Home extends React.Component {
             )}
           </Grid>
           <Grid item className={classes.footer}>
-            @copyright 2018
+            @copyright 2018 - {new Date().getFullYear()}
           </Grid>
         </Grid>
       </div>

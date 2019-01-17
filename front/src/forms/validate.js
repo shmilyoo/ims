@@ -2,7 +2,6 @@ import axios from 'axios';
 import { types as accountTypes } from '../reducers/account';
 
 export const required = value => {
-  console.log('check required', JSON.stringify(value));
   if (value === undefined || value === null) return '不能为空';
   const type = typeof value;
   switch (type) {
@@ -24,13 +23,16 @@ export const required = value => {
   }
 };
 
+export const dateRangeRequired = dateRange => {
+  if (!dateRange || !dateRange.from || !dateRange.to) return '不能为空';
+};
+
 export const checkPositiveInteger = value => {
   if (!Number.isInteger(value)) return '必须是正整数';
   if (value < 1) return '必须是正整数';
 };
 
 export const checkMaxStringLength = max => value => {
-  console.log('checkMaxStringLength', JSON.stringify(value));
   if (!value) return;
   if (value.length > max) return `最大长度不能超过${max}个字符`;
 };
@@ -44,7 +46,6 @@ export const checkMaxStringLength64 = checkMaxStringLength(64);
 export const checkMaxStringLength255 = checkMaxStringLength(255);
 
 export const checkUsername = value => {
-  // console.log(`checkUsername =${value}=`);
   if (value && !/^[a-zA-Z][a-zA-Z0-9_]{3,15}$/.test(value)) {
     return '4-16字符,字母开头,允许字母/数字/_';
   }

@@ -57,11 +57,11 @@ class ArticleController extends Controller {
       await ctx.model.Attachment.destroy({
         where: { relativeId: { [ctx.model.Op.in]: ids } },
       });
-      await ArticleModel.destroy({
+      const number = await ArticleModel.destroy({
         where: { id: { [ctx.model.Op.in]: ids } },
       });
       await transaction.commit();
-      ctx.body = ctx.helper.getRespBody(true);
+      ctx.body = ctx.helper.getRespBody(true, number);
     } catch (error) {
       await transaction.rollback();
       ctx.body = ctx.helper.getRespBody(false);

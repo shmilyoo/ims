@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'redux-form';
-import { Grid, Button, IconButton, Typography } from '@material-ui/core';
+import { Grid, Button, IconButton, Typography, Fab } from '@material-ui/core';
 import Delete from '@material-ui/icons/Delete';
 import Add from '@material-ui/icons/Add';
 import setMinutes from 'date-fns/setMinutes';
@@ -25,16 +25,15 @@ const RenderWorkPhases = ({ fields, onDeletePhase }) => {
           <Typography variant="h6">大项工作的阶段</Typography>
         </Grid>
         <Grid item>
-          <Button
-            variant="fab"
-            mini
+          <Fab
+            size="small"
             color="secondary"
             onClick={() => {
               fields.push({ type: 'add' });
             }}
           >
             <Add />
-          </Button>
+          </Fab>
         </Grid>
       </Grid>
       {fields.map((phase, index) => (

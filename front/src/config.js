@@ -4,6 +4,7 @@ const config = {};
 
 export const sysName = '办公信息管理系统';
 export const system = 'ims';
+export const systemDomain = 'http://localhost:4000';
 export const server_base_url_product = '';
 export const server_baseURL_dev = 'http://localhost:8001';
 export const ssoBaseUrl = 'http://localhost:3000';
@@ -41,7 +42,7 @@ export const pathTitle = {
   '/work/schedule/manage': '日程管理',
   '/work/info': '查看工作',
   '/work/edit': '编辑大项工作',
-  '/work/article': '查看工作文章',
+  '/work/article/info': '查看工作文章',
   '/work/article/add': '添加工作文章',
   '/work/article/add/success': '添加工作文章成功',
   '/work/article/edit': '编辑工作文章',
@@ -52,15 +53,13 @@ export const pathTitle = {
   '/dept/mine': '我的部门',
   '/dept/work': '部门工作',
   '/dept/info': '查看部门情况',
-  '/dept-manage/announcement': '部门公告',
+  '/dept-manage/bulletin': '部门公告',
   '/dept-manage/work': '部门工作',
   '/dept-manage/work/add': '发布工作',
   '/dept-manage/work/add/success': '发布工作成功',
-  '/dept-manage/news': '部门文章',
-  '/dept-manage/news/add': '发布文章',
-  '/dept-manage/news/category': '文章分类',
-  '/dept-manage/news/edit': '编辑文章',
-  '/user/info': '我的资料',
+  '/dept-manage/channels': '文章分类',
+  '/user/mine': '我的资料',
+  '/user/info': '用户资料',
   '/user/changePasswd': '修改密码',
   '/user/message': '消息中心',
   '/user/message/send': '发送消息',
@@ -85,7 +84,7 @@ export const leftMenu = [
     children: [
       { title: pathTitle['/work/mine'], path: '/work/mine' },
       { title: pathTitle['/work/schedule'], path: '/work/schedule' },
-      { title: pathTitle['/work/info'], path: '/work/info' },
+      // { title: pathTitle['/work/info'], path: '/work/info' },
       {
         title: pathTitle['/work/schedule/manage'],
         path: '/work/schedule/manage'
@@ -109,22 +108,17 @@ export const leftMenu = [
     manageDept: true,
     children: [
       {
-        title: pathTitle['/dept-manage/announcement'],
-        path: '/dept-manage/announcement'
+        title: pathTitle['/dept-manage/bulletin'],
+        path: '/dept-manage/bulletin'
       },
       { title: pathTitle['/dept-manage/work'], path: '/dept-manage/work' },
       {
         title: pathTitle['/dept-manage/work/add'],
         path: '/dept-manage/work/add'
       },
-      { title: pathTitle['/dept-manage/news'], path: '/dept-manage/news' },
       {
-        title: pathTitle['/dept-manage/news/category'],
-        path: '/dept-manage/news/category'
-      },
-      {
-        title: pathTitle['/dept-manage/news/add'],
-        path: '/dept-manage/news/add'
+        title: pathTitle['/dept-manage/channels'],
+        path: '/dept-manage/channels'
       }
     ]
   },
@@ -133,7 +127,7 @@ export const leftMenu = [
     state: 'user',
     icon: AccountBox,
     children: [
-      { title: pathTitle['/user/info'], path: '/user/info' },
+      { title: pathTitle['/user/mine'], path: '/user/mine' },
       { title: pathTitle['/user/message'], path: '/user/message' },
       { title: pathTitle['/user/message/send'], path: '/user/message/send' },
       {

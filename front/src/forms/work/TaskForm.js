@@ -20,7 +20,7 @@ import setHours from 'date-fns/setHours';
 import setMinutes from 'date-fns/setMinutes';
 import { attachmentUploadUrl } from '../../config';
 
-class ArticleForm extends React.PureComponent {
+class TaskForm extends React.PureComponent {
   handleChangeAmPm = (index, ampm) => {
     const { change, amFrom, amTo, pmFrom, pmTo } = this.props;
     change(`schedules[${index}].from`, ampm === 'am' ? amFrom : pmFrom);
@@ -106,9 +106,6 @@ class ArticleForm extends React.PureComponent {
             />
           </Grid>
           <Grid item>
-            <Divider />
-          </Grid>
-          <Grid item>
             <Field
               name="attachments"
               component={RenderFileUpload}
@@ -116,32 +113,37 @@ class ArticleForm extends React.PureComponent {
               apiUrl={attachmentUploadUrl}
             />
           </Grid>
-          <Grid item>
-            <Divider />
-          </Grid>
-          <Grid item container direction="column" wrap="nowrap">
-            <Grid item>
-              <Field
-                name="addSchedules"
-                component={RenderCheck}
-                label={
-                  <Typography color="textSecondary">
-                    是否同时发布日程。用户会接收提醒，并选择是否接受安排的日程，默认一天后自动接受。
-                  </Typography>
-                }
-              />
-            </Grid>
-            {addSchedules && (
+          {!edit && (
+            <React.Fragment>
               <Grid item>
-                <FieldArray
-                  name="schedules"
-                  deptArray={deptArray}
-                  component={RenderAddMultiSchedules}
-                  onChangeAmPm={this.handleChangeAmPm}
-                />
+                <Divider />
               </Grid>
-            )}
-          </Grid>
+              <Grid item container direction="column" wrap="nowrap">
+                <Grid item>
+                  <Field
+                    name="addSchedules"
+                    component={RenderCheck}
+                    label={
+                      <Typography color="textSecondary">
+                        是否同时发布日程。用户会接收提醒，并选择是否接受安排的日程，默认一天后自动接受。
+                      </Typography>
+                    }
+                  />
+                </Grid>
+                {addSchedules && (
+                  <Grid item>
+                    <FieldArray
+                      name="schedules"
+                      deptArray={deptArray}
+                      component={RenderAddMultiSchedules}
+                      onChangeAmPm={this.handleChangeAmPm}
+                    />
+                  </Grid>
+                )}
+              </Grid>
+            </React.Fragment>
+          )}
+
           <Grid item container justify="center" spacing={32}>
             <Grid item>
               <Button
@@ -182,4 +184,4 @@ function mapStateToProps(state) {
 export default compose(
   reduxForm({ form: 'taskForm' }),
   connect(mapStateToProps)
-)(ArticleForm);
+)(TaskForm);

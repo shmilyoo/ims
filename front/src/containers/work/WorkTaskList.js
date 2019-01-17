@@ -9,7 +9,11 @@ import {
   setNumberPerPage,
   timeFunctions
 } from '../../services/utility';
-import { withStyles } from '@material-ui/core';
+import { withStyles, Grid, Select, MenuItem } from '@material-ui/core';
+import SearchTextField from '../../components/common/SearchTextField';
+import SearchTextFieldWithType from '../../components/common/SearchTextFieldWithType';
+import WorkTaskSearchForm from '../../forms/work/WorkTaskSearchForm';
+import { resolve } from 'url';
 
 const style = theme => ({
   left: {
@@ -43,36 +47,31 @@ class WorkTaskList extends PureComponent {
     totalNumber: 0,
     selectedIds: [],
     orderBy: 'updateTime',
-    orderDirection: 'desc'
+    orderDirection: 'desc',
+    searchType: '',
+    searchValue: ''
   };
+
   componentDidMount() {
-    const { workId } = this.props;
-    const { numberPerPage, currentPage } = this.state;
-    getWorkTasks({
-      workId,
-      numberPerPage,
-      currentPage,
-      withPublisher: true,
-      order: { updateTime: 'desc' }
-    }).then(res => {
-      const { totalNumber, taskList } = res.data;
-      if (res.success) {
-        this.setState({
-          rows: this.formatTasks(taskList),
-          totalNumber
-        });
-      }
-    });
+    this.showTasks();
   }
+
   showTasks = (page = 1) => {
     const { workId } = this.props;
-    const { numberPerPage, orderBy, orderDirection } = this.state;
-    getWorkTasks({
+    const {
+      numberPerPage,
+      orderBy,
+      orderDirection,
+      searchType,
+      searchValue
+    } = this.state;
+    return getWorkTasks({
       workId,
       numberPerPage,
       currentPage: page,
       withPublisher: true,
-      order: { [orderBy]: orderDirection }
+      order: { [orderBy]: orderDirection },
+      filter: { searchType, searchValue }
     }).then(res => {
       if (res.success) {
         const { totalNumber, taskList } = res.data;
@@ -82,6 +81,9 @@ class WorkTaskList extends PureComponent {
           currentPage: page
         });
       }
+      return new Promise(resolve => {
+        resolve(res.success);
+      });
     });
   };
   formatTasks = taskList => {
@@ -139,6 +141,26 @@ class WorkTaskList extends PureComponent {
       () => this.showTasks(1)
     );
   };
+  handleTaskSearchSubmit = values => {
+    const { value, name } = values;
+    let _value = value;
+    if (typeof value === 'string') {
+      _value = value.trim();
+    } else if (typeof value === 'object') {
+      _value = {
+        from: timeFunctions.getDateUnix(value.from),
+        to: timeFunctions.getDateUnix(value.to)
+      };
+    }
+    this.setState({ searchType: name, searchValue: _value }, () => {
+      this.showTasks(1);
+    });
+  };
+  handleTaskSearchReset = () => {
+    this.setState({ searchType: '', searchValue: '' }, () => {
+      this.showTasks(1);
+    });
+  };
   render() {
     const {
       numberPerPage,
@@ -150,25 +172,58 @@ class WorkTaskList extends PureComponent {
       columns
     } = this.state;
     return (
-      <TableList
-        rows={rows}
-        columns={columns}
-        showCheckbox={false}
-        totalNumber={totalNumber}
-        currentPage={currentPage}
-        numberPerPage={numberPerPage}
-        orderBy={orderBy}
-        orderDirection={orderDirection}
-        onPageChange={this.handlePageChagne}
-        onChangeRowsPerPage={this.handleChangeRowsPerPage}
-        onChangeOrder={this.handleChangeOrder}
-      />
+      <Grid container direction="column" wrap="nowrap">
+        {rows &&
+          rows.length > 0 && (
+            <Grid item>
+              <WorkTaskSearchForm
+                selectData={[
+                  { value: 'title', label: '标题', kind: 'text' },
+                  { value: 'from', label: '开始时间', kind: 'date' },
+                  { value: 'to', label: '结束时间', kind: 'date' },
+                  {
+                    value: 'createTime',
+                    label: '创建时间',
+                    kind: 'date'
+                  },
+                  {
+                    value: 'updateTime',
+                    label: '更新时间',
+                    kind: 'date'
+                  }
+                ]}
+                onSubmit={this.handleTaskSearchSubmit}
+                onReset={this.handleTaskSearchReset}
+                // initialValues={{ name: 'title' }}
+              />
+            </Grid>
+          )}
+        <Grid item>
+          <TableList
+            rows={rows}
+            columns={columns}
+            showCheckbox={false}
+            totalNumber={totalNumber}
+            currentPage={currentPage}
+            numberPerPage={numberPerPage}
+            orderBy={orderBy}
+            orderDirection={orderDirection}
+            onPageChange={this.handlePageChagne}
+            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+            onChangeOrder={this.handleChangeOrder}
+          />
+        </Grid>
+      </Grid>
     );
   }
 }
 
 WorkTaskList.propTypes = {
-  workId: PropTypes.string.isRequired
+  workId: PropTypes.string.isRequired,
+  showSearch: PropTypes.bool
+};
+WorkTaskList.defaultProps = {
+  showSearch: true
 };
 
 export default withStyles(style)(WorkTaskList);

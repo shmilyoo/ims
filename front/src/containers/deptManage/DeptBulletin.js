@@ -10,34 +10,25 @@ import { getDeptWorks, getNumberPerPage } from '../../services/utility';
 
 class DeptBulletin extends PureComponent {
   state = {
-    workList: [],
+    bulletinList: [],
     numberPerPage: getNumberPerPage(),
     currentPage: 1,
-    totalNumber: 0
+    totalNumber: 0,
+    edit: false // 编辑模式还是添加模式
   };
-  componentDidMount() {
-    this.getWorkList(1);
-  }
+  componentDidMount() {}
 
-  /**
-   * 获取指定页的workList，并设置相关state
-   */
-  getWorkList = getPage => {
-    const { manageDept } = this.props;
-    const { numberPerPage } = this.state;
-    getDeptWorks(manageDept, numberPerPage, getPage, true, true).then(res => {
-      if (res.success) {
-        const { workList, totalNumber } = res.data;
-        this.setState({ workList, totalNumber, currentPage: getPage });
-      }
-    });
-  };
   handleDeptChange = id => {
     this.props.dispatch(accountActions.setManageDept(id));
   };
   render() {
     const { manageDept, manageDepts, deptDic, deptArray } = this.props;
-    const { workList, numberPerPage, currentPage, totalNumber } = this.state;
+    const {
+      bulletinList,
+      numberPerPage,
+      currentPage,
+      totalNumber
+    } = this.state;
     return (
       <Grid container direction="column" wrap="nowrap" spacing={8}>
         <Grid item>
@@ -45,7 +36,7 @@ class DeptBulletin extends PureComponent {
             id={manageDept}
             deptArray={deptArray}
             deptDic={deptDic}
-            showSelect={manageDepts.length > 0}
+            showSelect={manageDepts.length > 1}
             canSelectIdList={manageDepts}
             onSelect={this.handleDeptChange}
           />

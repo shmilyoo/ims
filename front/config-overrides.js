@@ -5,7 +5,7 @@ refer to :
 2 https://github.com/kensnyder/quill-image-resize-module/issues/7
 3 https://github.com/kensnyder/quill-image-resize-module/issues/56
 *****/
-
+// todotodo 这个不需要了，还有 react-app-rewired
 var webpack = require('webpack');
 
 module.exports = function override(config, env) {

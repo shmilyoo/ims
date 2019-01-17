@@ -20,6 +20,9 @@ class WorkController extends Controller {
     const transaction = await ctx.model.transaction();
     try {
       const now = ctx.helper.timeFunctions.getNowUnix();
+      const _content = content.startsWith('<div>')
+        ? content
+        : `<div>${content}</div>`;
       const work = await ctx.model.Work.create({
         publisherId: ctx.user.id,
         title,
@@ -27,7 +30,7 @@ class WorkController extends Controller {
         to,
         tagId,
         deptId,
-        content,
+        content: _content,
         createTime: now,
         updateTime: now,
       });
@@ -58,19 +61,81 @@ class WorkController extends Controller {
       ctx.body = ctx.helper.getRespBody(false, '错误的请求参数');
       return;
     }
-    // todo 删除相关的phase task 文章 讨论 文件 等
     const transaction = await ctx.model.transaction();
     try {
-      await ctx.model.Work.destroy({
+      const works = await ctx.model.Work.findAll({
         where: {
-          id: {
-            [ctx.model.Op.in]: ids,
+          id: ids.length > 1 ? { [ctx.model.Op.in]: ids } : ids[0],
+        },
+        include: [
+          {
+            model: ctx.model.WorkChannel,
+            as: 'channels',
+            attributes: [ 'id' ],
+            include: [
+              {
+                model: ctx.model.WorkArticle,
+                as: 'articles',
+                attributes: [ 'id' ],
+              },
+            ],
           },
+          {
+            model: ctx.model.Task,
+            as: 'tasks',
+            attributes: [ 'id' ],
+          },
+          {
+            model: ctx.model.Phase,
+            as: 'phases',
+            attributes: [ 'id' ],
+          },
+          {
+            model: ctx.model.Attachment,
+            as: 'attachments',
+            attributes: [ 'id' ],
+          },
+        ],
+      });
+      const tasksInWorks = [];
+      const channelsInWorks = [];
+      const articlesInWorks = [];
+      const attachmentsInWorks = [];
+      works.forEach(({ channels, tasks, attachments }) => {
+        channels.forEach(({ id, articles }) => {
+          channelsInWorks.push(id);
+          articles.forEach(({ id }) => {
+            articlesInWorks.push(id);
+          });
+        });
+        tasks.forEach(({ id }) => {
+          tasksInWorks.push(id);
+        });
+        attachments.forEach(({ id }) => {
+          attachmentsInWorks.push(id);
+        });
+      });
+      if (tasksInWorks.length) {
+        await ctx.service.work.delTasks(tasksInWorks);
+      }
+      if (articlesInWorks.length) {
+        await ctx.service.work.delArticles(articlesInWorks);
+      }
+      if (channelsInWorks.length) {
+        await ctx.service.work.delChannels(channelsInWorks);
+      }
+      if (attachmentsInWorks.length) {
+        await ctx.service.work.delAttachments(attachmentsInWorks);
+      }
+      const number = await ctx.model.Work.destroy({
+        where: {
+          id: ids.length > 1 ? { [ctx.model.Op.in]: ids } : ids[0],
         },
       });
       await transaction.commit();
-      ctx.body = ctx.helper.getRespBody(true);
+      ctx.body = ctx.helper.getRespBody(true, number);
     } catch (error) {
+      console.log(error.message);
       await transaction.rollback();
       ctx.body = ctx.helper.getRespBody(false, '删除失败');
     }
@@ -218,6 +283,7 @@ class WorkController extends Controller {
       ctx.body = ctx.helper.getRespBody(false, error.message);
     }
   }
+
   async getWorkChannels() {
     const ctx = this.ctx;
     const { workId } = ctx.query;
@@ -269,6 +335,7 @@ class WorkController extends Controller {
       withWork,
       withDept,
       order,
+      filter,
     } = ctx.request.body;
     if (!workId) ctx.throw('错误的任务请求参数');
     const _order = ctx.service.work.getWorkTaskOrderSync(order);
@@ -278,8 +345,27 @@ class WorkController extends Controller {
       withWork,
       withDept,
     });
+    const where = { workId };
+    if (filter.searchValue && filter.searchType) {
+      if (filter.searchType === 'title') {
+        const searchTitleFragments = filter.searchValue
+          .split(/\s+/)
+          .map(key => `%${key}%`);
+        where[filter.searchType] = {
+          [ctx.model.Op.like]: { [ctx.model.Op.any]: searchTitleFragments },
+        };
+      }
+      if (
+        [ 'from', 'to', 'createTime', 'updateTime' ].includes(filter.searchType)
+      ) {
+        where[filter.searchType] = {
+          [ctx.model.Op.lt]: filter.searchValue.to,
+          [ctx.model.Op.gt]: filter.searchValue.from,
+        };
+      }
+    }
     const { count, rows } = await ctx.model.Task.findAndCountAll({
-      where: { workId },
+      where,
       include,
       attributes: { exclude: [ 'content' ] },
       limit: numberPerPage,
@@ -401,6 +487,46 @@ class WorkController extends Controller {
     }
   }
 
+  async editTask() {
+    const ctx = this.ctx;
+    const {
+      id,
+      title,
+      from,
+      to,
+      content,
+      attachments,
+      usersInCharge,
+      usersAttend,
+    } = ctx.request.body;
+    if (!id) ctx.throw('错误的请求参数！');
+    const transaction = await ctx.model.transaction();
+    try {
+      const _content = content.startsWith('<div>')
+        ? content
+        : `<div>${content}</div>`;
+      await ctx.model.Task.update(
+        { title, from, to, content: _content },
+        { where: { id } }
+      );
+      await ctx.model.UserTask.destroy({ where: { taskId: id } });
+      await ctx.service.work.addUserWorkTaskWithInChargeAndAttendArray(
+        usersInCharge,
+        usersAttend,
+        id,
+        false
+      );
+      if (attachments && attachments.length > 0) {
+        await ctx.service.work.dealAttachments(attachments, id);
+      }
+      await transaction.commit();
+      ctx.body = ctx.helper.getRespBody(true);
+    } catch (error) {
+      await transaction.rollback();
+      ctx.body = ctx.helper.getRespBody(false, error.message);
+    }
+  }
+
   async addWorkArticle() {
     const ctx = this.ctx;
     const {
@@ -436,7 +562,7 @@ class WorkController extends Controller {
 
   async updateWorkArticle() {
     const ctx = this.ctx;
-    const { channelId, title, content, id, attachments } = ctx.query.body;
+    const { channelId, title, content, id, attachments } = ctx.request.body;
     if (!id) ctx.throw('错误的请求参数');
     const transaction = await ctx.model.transaction();
     try {
@@ -448,13 +574,13 @@ class WorkController extends Controller {
       const { name } = await ctx.model.User.findOne({
         where: { id: ctx.user.id },
       });
-      const [ count, rows ] = await ctx.model.WorkArticle.update(
+      const [ count ] = await ctx.model.WorkArticle.update(
         {
           channelId,
           title,
           content,
           updateTime: now,
-          lastEdit: `文章在${nowFormat}由<a href='/user?id=${
+          lastEdit: `文章在${nowFormat}由<a href='/user/info?id=${
             ctx.user.id
           }'>${name}</a>进行编辑`,
         },
@@ -465,7 +591,7 @@ class WorkController extends Controller {
         await ctx.service.work.dealAttachments(attachments, id);
       }
       await transaction.commit();
-      ctx.body = ctx.helper.getRespBody(true, rows[0]);
+      ctx.body = ctx.helper.getRespBody(true);
     } catch (error) {
       await transaction.rollback();
       ctx.body = ctx.helper.getRespBody(false, error.message);

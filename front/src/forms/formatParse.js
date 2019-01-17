@@ -67,6 +67,27 @@ export const parseDateToUnixTime = date => {
   return Math.floor(date.getTime() / 1000);
 };
 
+/**
+ * 将dateRange转化为Date from
+ * @param {object} dateRange {from,to}
+ */
+export const formatDateRangeToDate = dateRange => {
+  if (!dateRange) return null;
+  return {
+    from: formatUnixTimeToDate(dateRange.from),
+    to: formatUnixTimeToDate(dateRange.to)
+  };
+};
+
+/**
+ * 将日期实例转化成unix 时间戳
+ * @param {Date} date 日期实例
+ */
+export const parseDateToDateRange = date => {
+  if (!(date instanceof Date)) return null;
+  return Math.floor(date.getTime() / 1000);
+};
+
 export const parseStringToNumber = s => {
   return Number(s);
 };

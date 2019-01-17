@@ -10,6 +10,7 @@ import RenderFileUpload from './renderFileUpload';
 import RenderAddMultiSchedules from './renderAddMultiSchedules';
 import RenderCheck from './renderCheck';
 import RenderRichEditor from './renderRichEditor';
+import RenderDateRangePicker from './renderDateRangePicker';
 // import RenderExps from './renderExps';
 // import RenderRandomCode from './renderRandomCode';
 
@@ -25,7 +26,8 @@ export {
   RenderFileUpload,
   RenderAddMultiSchedules,
   RenderCheck,
-  RenderRichEditor
+  RenderRichEditor,
+  RenderDateRangePicker
   // RenderExps,
   // RenderRandomCode
 };

@@ -22,6 +22,24 @@ export const checkCookieLocal = () => {
   return hasCookie;
 };
 
+/**
+ * 判断容器是否有滚动条
+ * @param {string} elmId 需要判断的容器id，默认为右边的主页面
+ * @param {'vertical'|'horizontal'} direction 判断滚动条的方向
+ * @returns {boolean}
+ */
+export const checkHasScrollBar = (
+  elmId = 'homeRight',
+  direction = 'vertical'
+) => {
+  const elm = document.getElementById(elmId);
+  if (direction === 'vertical') {
+    return elm.scrollHeight > (window.innerHeight || elm.clientHeight);
+  } else if (direction === 'horizontal') {
+    return elm.scrollWidth > elm.clientWidth;
+  }
+};
+
 export const checkInUsers = (users, id) => {
   let result = false;
   users.some(({ id: _id }) => {
@@ -62,20 +80,43 @@ export const checkCanManageWork = (
  * @param {string} userId 用户id
  * @param {string} workDeptId task的work所属的dept id
  * @param {array} usersInCharge task的负责人，[{id,name}...]
- * @param {object} taskPublisher task的发布人，{id,name}
+ * @param {object} taskPublisherId task的发布人，{id,name}
  */
 export const checkCanManageTask = (
   manageDepts,
   userId,
   workDeptId,
   usersInCharge,
-  taskPublisher
+  taskPublisherId
 ) => {
   // 是否可以编辑work的主要信息
   if (manageDepts.includes(workDeptId)) return true;
   if (checkInUsers(usersInCharge, userId)) return true;
-  if (userId === taskPublisher.id) return true;
+  if (userId === taskPublisherId) return true;
   return false;
+};
+
+export const checkCanManageArticle = (
+  userId,
+  manageDepts,
+  articlePublisherId,
+  articleWorkId,
+  articleDeptId
+) => {
+  console.log(
+    userId,
+    manageDepts,
+    articlePublisherId,
+    articleWorkId,
+    articleDeptId
+  );
+  if (manageDepts.includes(articleDeptId)) return Promise.resolve(true);
+  if (userId === articlePublisherId) return Promise.resolve(true);
+  return axios
+    .post('/check/userInWorkCharge', { userId, workId: articleWorkId })
+    .then(res => {
+      return Promise.resolve(res.success);
+    });
 };
 
 /**
@@ -329,7 +370,8 @@ export const getWorkTasks = ({
   withUsers,
   withWork,
   withDept,
-  order = { updateTime: 'desc' }
+  order = { updateTime: 'desc' },
+  filter
 }) => {
   return axios.post('/work/tasks', {
     workId,
@@ -339,7 +381,8 @@ export const getWorkTasks = ({
     withUsers,
     withWork,
     withDept,
-    order
+    order,
+    filter
   });
 };
 
@@ -460,6 +503,7 @@ export const timeFunctions = {
   //   if (d instanceof Date) return Math.floor(d.getTime() / 1000);
   //   throw Error('错误的参数，必须为Date类型');
   // },
+  getDateUnix: date => Math.floor(date.getTime() / 1000),
   getNowUnix: () => Math.floor(new Date().getTime() / 1000),
   /**
    * 从unix时间戳返回日期字符串
@@ -547,4 +591,37 @@ export const range = (start, end, step) => {
   }
 
   return range;
+};
+
+/**
+ * 把指定颜色变深或变暗
+ * @param {string} color 指定颜色
+ * @param {number} amount 变化值
+ */
+export const LightenDarkenColor = (color, amount) => {
+  var usePound = false;
+
+  if (color[0] === '#') {
+    color = color.slice(1);
+    usePound = true;
+  }
+
+  var num = parseInt(color, 16);
+
+  var r = (num >> 16) + amount;
+
+  if (r > 255) r = 255;
+  else if (r < 0) r = 0;
+
+  var b = ((num >> 8) & 0x00ff) + amount;
+
+  if (b > 255) b = 255;
+  else if (b < 0) b = 0;
+
+  var g = (num & 0x0000ff) + amount;
+
+  if (g > 255) g = 255;
+  else if (g < 0) g = 0;
+
+  return (usePound ? '#' : '') + (g | (b << 8) | (r << 16)).toString(16);
 };

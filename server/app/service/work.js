@@ -248,13 +248,12 @@ class WorkService extends Service {
       include.push({
         model: ctx.model.WorkChannel,
         as: 'channel',
-        attributes: [ 'id' ],
         include: withWork
           ? [
             {
               model: ctx.model.Work,
               as: 'work',
-              attributes: [ 'id', 'title' ],
+              attributes: [ 'id', 'title', 'deptId' ],
               include: withDept
                 ? [
                   {
@@ -497,6 +496,55 @@ class WorkService extends Service {
       // 删除本地的文件 toDeal.delete.paths 此处存储的是相对url信息
       shell.rm(toDeal.delete.paths.map(_path => path.join(uploadRoot, _path)));
     }
+  }
+
+  async delTasks(ids) {
+    const ctx = this.ctx;
+    await ctx.model.UserTask.destroy({
+      where: { taskId: { [ctx.model.Op.in]: ids } },
+    });
+    await this.delAttachments(ids);
+    const number = await ctx.model.Task.destroy({
+      where: { id: { [ctx.model.Op.in]: ids } },
+    });
+    return number;
+  }
+
+  async delArticles(ids, type = 'work') {
+    const ctx = this.ctx;
+    await this.delAttachments(ids);
+    const Model =
+      type === 'work'
+        ? ctx.model.WorkArticle
+        : type === 'dept'
+          ? ctx.model.DeptArticle
+          : ctx.throw('删除Article时类型只能是work或者dept');
+    const number = await Model.destroy({
+      where: { id: { [ctx.model.Op.in]: ids } },
+    });
+    return number;
+  }
+
+  async delChannels(ids, type = 'work') {
+    const ctx = this.ctx;
+    const Model =
+      type === 'work'
+        ? ctx.model.WorkChannel
+        : type === 'dept'
+          ? ctx.model.DeptChannel
+          : ctx.throw('删除channel时类型只能是work或者dept');
+    const number = await Model.destroy({
+      where: { id: { [ctx.model.Op.in]: ids } },
+    });
+    return number;
+  }
+
+  async delAttachments(relativeIds) {
+    const ctx = this.ctx;
+    const number = await ctx.model.Attachment.destroy({
+      where: { relativeId: { [ctx.model.Op.in]: relativeIds } },
+    });
+    return number;
   }
 }
 

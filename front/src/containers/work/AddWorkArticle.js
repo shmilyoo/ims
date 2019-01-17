@@ -13,11 +13,8 @@ import ArticleForm from '../../forms/work/ArticleForm';
 import { actions as workActions } from '../../reducers/work';
 
 const style = theme => ({
-  link: theme.sharedClass.link,
-  main: { width: '80%', maxWidth: '100rem' },
-  icon: {
-    content: '\\e90d'
-  }
+  link: theme.sharedClass.link
+  // main: { width: '80%', maxWidth: '100rem' },
 });
 
 class AddWorkArticle extends PureComponent {

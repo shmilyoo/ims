@@ -1,5 +1,6 @@
 import React from 'react';
-import { Tabs, Tab, Grid } from '@material-ui/core';
+import { Tabs, Tab, Grid, Button } from '@material-ui/core';
+import UndoIcon from '@material-ui/icons/Undo';
 import qs from 'qs';
 import history from '../../../history';
 import { toRedirectPage } from '../../../services/utility';
@@ -36,20 +37,35 @@ class WorkEdit extends React.PureComponent {
         wrap="nowrap"
         style={{ height: '100%' }}
       >
-        <Grid>
-          <Tabs
-            value={type}
-            onChange={this.tabChange}
-            indicatorColor="primary"
-            textColor="primary"
-            fullWidth
-          >
-            <Tab key="basic" label="基本信息" value="basic" />
-            <Tab key="task" label="任务管理" value="task" />
-            <Tab key="channel" label="频道管理" value="channel" />
-            <Tab key="article" label="文章管理" value="article" />
-            <Tab key="discuss" label="讨论管理" value="discuss" />
-          </Tabs>
+        <Grid item container alignItems="flex-end">
+          <Grid item>
+            <Button
+              title="返回工作信息页面"
+              size="small"
+              variant="text"
+              style={{ padding: 0 }}
+              onClick={() => {
+                history.push(`/work/info?id=${id}`);
+              }}
+            >
+              <UndoIcon />
+            </Button>
+          </Grid>
+          <Grid item xs>
+            <Tabs
+              value={type}
+              onChange={this.tabChange}
+              indicatorColor="primary"
+              textColor="primary"
+              variant="fullWidth"
+            >
+              <Tab key="basic" label="基本信息" value="basic" />
+              <Tab key="task" label="任务管理" value="task" />
+              <Tab key="channel" label="频道管理" value="channel" />
+              <Tab key="article" label="文章管理" value="article" />
+              <Tab key="discuss" label="讨论管理" value="discuss" />
+            </Tabs>
+          </Grid>
         </Grid>
         <Grid item xs style={{ marginTop: '2rem' }}>
           {type === 'basic' && <EditWorkBasic id={id} />}

@@ -14,10 +14,10 @@ import compose from 'recompose/compose';
 import ArticleForm from '../../forms/work/ArticleForm';
 import Loading from '../../components/common/Loading';
 import Axios from 'axios';
+import history from '../../history';
 
 const style = theme => ({
-  link: theme.sharedClass.link,
-  main: { width: '80%', maxWidth: '100rem' }
+  link: theme.sharedClass.link
 });
 
 class EditWorkArticle extends PureComponent {
@@ -56,12 +56,10 @@ class EditWorkArticle extends PureComponent {
 
   handleSubmit = values => {
     return new Promise((resolve, reject) => {
-      Axios.post('/work/article/update', {
-        values
-      }).then(res => {
+      Axios.post('/work/article/update', values).then(res => {
         if (res.success) {
           resolve();
-          this.setState({ article: { ...this.state.article, ...res.data } });
+          history.push(`/work/article/info?id=${values.id}`);
         } else {
           reject(
             new SubmissionError({

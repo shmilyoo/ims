@@ -43,3 +43,7 @@ Object 格式为：
 
 > ims_id : 用户 id，和 sso 系统用户 id 保持一致; httpOnly
 > auth_type: sso || local 用户认证方式，统一授权或者本地登录; not httpOnly,前端需要判断是否有 cookie
+
+# 注意事项
+
+- 所有使用 quill 富文本的 content 字段值，在后台插入和修改的时候都要在外面套一个<div></div>（如果没有的话），为了响应 form 中的撤销按钮，见 richeditor 的 didupdate 函数
