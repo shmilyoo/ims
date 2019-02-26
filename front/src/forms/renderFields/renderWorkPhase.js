@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'redux-form';
-import { Grid, Button, IconButton, Typography, Fab } from '@material-ui/core';
+import { Grid, IconButton, Typography, Fab } from '@material-ui/core';
 import Delete from '@material-ui/icons/Delete';
 import Add from '@material-ui/icons/Add';
 import setMinutes from 'date-fns/setMinutes';

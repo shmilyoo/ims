@@ -9,11 +9,7 @@ import {
   RenderFileUpload,
   RenderRichEditor
 } from '../renderFields';
-import {
-  required,
-  checkMaxStringLength32,
-  checkMaxStringLength255
-} from '../validate';
+import { required, checkMaxStringLength32 } from '../validate';
 import { trim } from '../normalize';
 
 const ArticleForm = ({

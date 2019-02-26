@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { TextField, InputAdornment } from '@material-ui/core';
 import Cancel from '@material-ui/icons/Cancel';
-import { debounce } from 'throttle-debounce';
 
 const SearchTextField = ({ label, value, onChange }) => {
   return (

@@ -3,6 +3,7 @@ const path = require('path');
 const os = require('os');
 
 const CASURL = 'http://localhost:3000';
+const CASURL_BACKEND = 'http://localhost:8001';
 const IMSURL = 'http://localhost:4000';
 
 exports.keys = 'ims-backend_1540020800270_169';
@@ -74,8 +75,8 @@ exports.ssoKey = '111111'; // sso服务器生成的和本服务端之间的通�
 exports.uploadRoot = '/var/www/ims/upload';
 exports.urlRoot = 'http://localhost:4000/static/upload';
 exports.ssoAuthLoginPage = `${CASURL}/auth/login`;
-exports.ssoCheckPage = `${CASURL}/auth/check`;
-exports.ssoCheckBind = `${CASURL}/auth/check/bind`;
-exports.ssoUserBind = `${CASURL}/auth/user/bind`;
+exports.ssoCheckPage = `${CASURL_BACKEND}/auth/check`;
+exports.ssoCheckBind = `${CASURL_BACKEND}/auth/check/bind`;
+exports.ssoUserBind = `${CASURL_BACKEND}/auth/user/bind`;
+exports.ssoDepts = `${CASURL_BACKEND}/sso-api/depts`; // sso获取deptArray地址
 exports.ssoAuthOk = `${IMSURL}/auth/ok`; // 用户单点登录认证时发送给CAS的本机auth-ok地址，以便成功后回调
-exports.ssoDepts = `${CASURL}/sso-api/depts`; // sso获取deptArray地址

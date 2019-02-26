@@ -135,6 +135,7 @@ function* checkAuthFlow() {
     // auth为初始化状态，undefined，在此进行用户权限校验
     const hasCookie = checkCookieLocal();
     if (hasCookie) {
+      console.log("'http get '/auth/check-auth'");
       const res = yield axios.get('/auth/check-auth');
       if (res.success) {
         // user.keys='id', username', 'active', 'name', 'sex', 'deptId','authType',

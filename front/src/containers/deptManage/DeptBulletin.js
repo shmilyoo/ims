@@ -1,12 +1,11 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import DeptHeadChange from '../../components/common/DeptHeadChange';
 import compose from 'recompose/compose';
 import { Grid, Divider } from '@material-ui/core';
 import { actions as accountActions } from '../../reducers/account';
 // import WorkList from '../../components/work/WorkList';
-import { getDeptWorks, getNumberPerPage } from '../../services/utility';
+import { getNumberPerPage } from '../../services/utility';
 
 class DeptBulletin extends PureComponent {
   state = {
@@ -23,12 +22,6 @@ class DeptBulletin extends PureComponent {
   };
   render() {
     const { manageDept, manageDepts, deptDic, deptArray } = this.props;
-    const {
-      bulletinList,
-      numberPerPage,
-      currentPage,
-      totalNumber
-    } = this.state;
     return (
       <Grid container direction="column" wrap="nowrap" spacing={8}>
         <Grid item>

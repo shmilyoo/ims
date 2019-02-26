@@ -7,16 +7,46 @@ import { withStyles, Grid } from '@material-ui/core';
 import LeftNav from '../components/LeftNav';
 import AppHead from './AppHead';
 import { sysName, leftMenu } from '../config';
-import SuperAdmin from './sa';
-import Brief from './brief';
-import Dept from './dept';
-import User from './user';
+// import SuperAdmin from './sa';
+// import Brief from './brief';
+// import Dept from './dept';
+// import User from './user';
 import { actions as accountActions } from '../reducers/account';
 import { actions as systemActions } from '../reducers/system';
-import Work from './work';
-import DeptManage from './deptManage';
-import About from './About';
+// import Work from './work';
+// import DeptManage from './deptManage';
+// import About from './About';
 import Loading from '../components/common/Loading';
+import Loadable from 'react-loadable';
+
+const LoadableBrief = Loadable({
+  loader: () => import('./brief'),
+  loading: Loading
+});
+const LoadableWork = Loadable({
+  loader: () => import('./work'),
+  loading: Loading
+});
+const LoadableDept = Loadable({
+  loader: () => import('./dept'),
+  loading: Loading
+});
+const LoadableDeptManage = Loadable({
+  loader: () => import('./deptManage'),
+  loading: Loading
+});
+const LoadableSuperAdmin = Loadable({
+  loader: () => import('./sa'),
+  loading: Loading
+});
+const LoadableUser = Loadable({
+  loader: () => import('./user'),
+  loading: Loading
+});
+const LoadableAbout = Loadable({
+  loader: () => import('./About'),
+  loading: Loading
+});
 
 const drawerWidth = 250;
 
@@ -90,13 +120,13 @@ class Home extends React.Component {
           <Grid item xs className={classes.main} style={{ height: '400' }}>
             {prerequisite ? (
               <Switch>
-                <Route path="/brief" component={Brief} />
-                <Route path="/work" component={Work} />
-                <Route path="/dept" component={Dept} />
-                <Route path="/dept-manage" component={DeptManage} />
-                <Route path="/sa" component={SuperAdmin} />
-                <Route path="/user" component={User} />
-                <Route path="/about" component={About} />
+                <Route path="/brief" component={LoadableBrief} />
+                <Route path="/work" component={LoadableWork} />
+                <Route path="/dept" component={LoadableDept} />
+                <Route path="/dept-manage" component={LoadableDeptManage} />
+                <Route path="/sa" component={LoadableSuperAdmin} />
+                <Route path="/user" component={LoadableUser} />
+                <Route path="/about" component={LoadableAbout} />
                 <Route path="/" component={() => <Redirect to="/brief" />} />
               </Switch>
             ) : (

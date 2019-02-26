@@ -9,11 +9,8 @@ import {
   setNumberPerPage,
   timeFunctions
 } from '../../services/utility';
-import { withStyles, Grid, Select, MenuItem } from '@material-ui/core';
-import SearchTextField from '../../components/common/SearchTextField';
-import SearchTextFieldWithType from '../../components/common/SearchTextFieldWithType';
+import { withStyles, Grid } from '@material-ui/core';
 import WorkTaskSearchForm from '../../forms/work/WorkTaskSearchForm';
-import { resolve } from 'url';
 
 const style = theme => ({
   left: {
