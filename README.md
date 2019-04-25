@@ -11,3 +11,7 @@ information management system
 - timeline流查看个人工作信息，日/周/月/年
 - 个人profile界面
 - 架设demo
+
+# 作为第三方系统与统一授权的单点登录系统流程图
+
+![流程图](http://ww1.sinaimg.cn/large/566418e8gy1fwwd9ghlp9j20ue0p3gqr.jpg)
